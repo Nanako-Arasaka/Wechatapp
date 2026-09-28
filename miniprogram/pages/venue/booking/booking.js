@@ -44,6 +44,9 @@ Page({
             });
             this.loadVenueAndTodaySlots(options.id, options.slotId);
         }
+        else {
+            this.setData({ loading: false, loadError: true });
+        }
     },
     /**
      * 加载场馆详情 + 今日时段余量
@@ -115,6 +118,8 @@ Page({
      */
     onSelectSlot(e) {
         const slot = e.currentTarget.dataset.slot;
+        if (this.data.loading || this.data.loadError || !slot)
+            return;
         if (!slot.isSelectable) {
             // 灰色不可预约时段：轻提示拦截
             wx.showToast({ title: `该时段不可预约（${slot.statusText}）`, icon: 'none' });

@@ -1,14 +1,17 @@
 import { AdminService } from '../../../services/admin.service';
 import { guardAdminPage } from '../../../utils/admin-guard';
+import { AuthStore } from '../../../store/auth';
 
 Page({
-  data: {},
+  data: { submitting: false },
 
   onShow() {
     guardAdminPage();
   },
 
   async handleGeneratePeak() {
+    if (!AuthStore.isSuperAdmin() || this.data.submitting) return;
+    this.setData({ submitting: true });
     try {
       const res: any = await AdminService.devGeneratePeak();
       wx.showModal({
@@ -18,10 +21,14 @@ Page({
       });
     } catch (err) {
       // 异常已处理
+    } finally {
+      this.setData({ submitting: false });
     }
   },
 
   async handleExpireOrders() {
+    if (!AuthStore.isSuperAdmin() || this.data.submitting) return;
+    this.setData({ submitting: true });
     try {
       const res: any = await AdminService.devExpireOrders();
       wx.showModal({
@@ -31,6 +38,8 @@ Page({
       });
     } catch (err) {
       // 异常已处理
+    } finally {
+      this.setData({ submitting: false });
     }
   },
 

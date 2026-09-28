@@ -13,8 +13,10 @@ Page({
         venueRanking: [],
         hotTimeSlots: [],
         suggestions: [],
-        pollTimer: null,
+        loading: false,
+        loadError: false,
     },
+    _pollTimer: null,
     onShow() {
         if (!(0, admin_guard_1.guardAdminPage)())
             return;
@@ -32,9 +34,12 @@ Page({
         this.stopPolling();
     },
     onPullDownRefresh() {
-        this.loadDashboardData().then(() => {
+        this.loadDashboardData().finally(() => {
             wx.stopPullDownRefresh();
         });
+    },
+    onRefresh() {
+        this.loadDashboardData();
     },
     navTo(e) {
         const url = e.currentTarget.dataset.url;
@@ -50,15 +55,18 @@ Page({
         const pollTimer = setInterval(() => {
             this.loadDashboardData(true);
         }, 30000); // 30秒静默轮询
-        this.setData({ pollTimer });
+        this._pollTimer = pollTimer;
     },
     stopPolling() {
-        if (this.data.pollTimer) {
-            clearInterval(this.data.pollTimer);
-            this.setData({ pollTimer: null });
+        if (this._pollTimer) {
+            clearInterval(this._pollTimer);
+            this._pollTimer = null;
         }
     },
     async loadDashboardData(silent = false) {
+        if (this.data.loading)
+            return;
+        this.setData({ loading: true, loadError: false });
         try {
             const data = await admin_service_1.AdminService.getDashboardOverview();
             const now = new Date();
@@ -77,24 +85,28 @@ Page({
                 date: d.date,
                 value: d.income,
             }));
-            setTimeout(() => {
-                chart_1.CanvasChart.drawLineChart('incomeTrendCanvas', lineData, 320, 180, this, '#1677FF', true);
-            }, 100);
+            chart_1.CanvasChart.drawInPage('incomeTrendCanvas', this, (width, height) => {
+                chart_1.CanvasChart.drawLineChart('incomeTrendCanvas', lineData, width, height, this, '#1677FF', true);
+            });
             // 绘制场馆占比环形饼图
             const pieData = data.venuePieData.map((d) => ({
                 name: d.name,
                 value: d.value,
                 percentage: d.percentage,
             }));
-            setTimeout(() => {
-                chart_1.CanvasChart.drawDonutChart('venuePieCanvas', pieData, 320, 160, this);
-            }, 150);
+            chart_1.CanvasChart.drawInPage('venuePieCanvas', this, (width, height) => {
+                chart_1.CanvasChart.drawDonutChart('venuePieCanvas', pieData, width, height, this);
+            });
             if (!silent) {
                 wx.showToast({ title: '数据已实时同步', icon: 'none' });
             }
         }
         catch (err) {
             console.error('加载 Dashboard 失败:', err);
+            this.setData({ loadError: true });
+        }
+        finally {
+            this.setData({ loading: false });
         }
     },
 });

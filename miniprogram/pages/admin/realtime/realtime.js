@@ -5,8 +5,10 @@ const admin_guard_1 = require("../../../utils/admin-guard");
 Page({
     data: {
         venueStatusList: [],
-        timer: null,
+        loading: false,
+        loadError: false,
     },
+    _timer: null,
     onShow() {
         if (!(0, admin_guard_1.guardAdminPage)())
             return;
@@ -20,24 +22,30 @@ Page({
         this.stopPolling();
     },
     onPullDownRefresh() {
-        this.loadRealtimeData().then(() => {
+        this.loadRealtimeData().finally(() => {
             wx.stopPullDownRefresh();
         });
+    },
+    onRefresh() {
+        this.loadRealtimeData();
     },
     startPolling() {
         this.stopPolling();
         const timer = setInterval(() => {
             this.loadRealtimeData(true);
         }, 30000);
-        this.setData({ timer });
+        this._timer = timer;
     },
     stopPolling() {
-        if (this.data.timer) {
-            clearInterval(this.data.timer);
-            this.setData({ timer: null });
+        if (this._timer) {
+            clearInterval(this._timer);
+            this._timer = null;
         }
     },
     async loadRealtimeData(silent = false) {
+        if (this.data.loading)
+            return;
+        this.setData({ loading: true, loadError: false });
         try {
             const list = await admin_service_1.AdminService.getRealtimeStatus();
             this.setData({ venueStatusList: list });
@@ -47,6 +55,10 @@ Page({
         }
         catch (err) {
             console.error('加载实时监控数据失败:', err);
+            this.setData({ loadError: true });
+        }
+        finally {
+            this.setData({ loading: false });
         }
     },
 });

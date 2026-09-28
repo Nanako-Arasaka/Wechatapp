@@ -12,6 +12,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CanvasChart = void 0;
 class CanvasChart {
+    static drawInPage(canvasId, page, draw) {
+        wx.nextTick(() => {
+            wx.createSelectorQuery().in(page).select(`#${canvasId}`).boundingClientRect((rect) => {
+                if (rect?.width > 0 && rect?.height > 0)
+                    draw(rect.width, rect.height);
+            }).exec();
+        });
+    }
     /**
      * 绘制平滑折线图 (带渐变面积填充、标尺参考线与高亮数据点)
      *
@@ -24,17 +32,24 @@ class CanvasChart {
      * @param fillGradient 是否开启面积渐变浅色填充
      */
     static drawLineChart(canvasId, data, width, height, componentInstance, lineColor = '#1677FF', fillGradient = true) {
-        if (!data || data.length === 0)
-            return;
         const ctx = componentInstance
             ? wx.createCanvasContext(canvasId, componentInstance)
             : wx.createCanvasContext(canvasId);
+        ctx.clearRect(0, 0, width, height);
+        if (!data || data.length === 0) {
+            ctx.setFillStyle('#86909C');
+            ctx.setFontSize(12);
+            ctx.setTextAlign('center');
+            ctx.fillText('暂无数据', width / 2, height / 2);
+            ctx.draw();
+            return;
+        }
         // 预留内边距（容纳 X/Y 轴文字与刻度）
         const padding = { top: 25, right: 20, bottom: 35, left: 35 };
         const chartW = width - padding.left - padding.right;
         const chartH = height - padding.top - padding.bottom;
         const maxVal = Math.max(...data.map((d) => d.value), 10);
-        const minVal = 0;
+        const minVal = Math.min(...data.map((d) => d.value), 0);
         const valRange = maxVal - minVal;
         // 清空画布背景
         ctx.clearRect(0, 0, width, height);
@@ -115,12 +130,19 @@ class CanvasChart {
      * @param componentInstance 组件/页面 this 指针
      */
     static drawDonutChart(canvasId, data, width, height, componentInstance) {
-        if (!data || data.length === 0)
-            return;
         const ctx = componentInstance
             ? wx.createCanvasContext(canvasId, componentInstance)
             : wx.createCanvasContext(canvasId);
-        const centerX = width * 0.38;
+        ctx.clearRect(0, 0, width, height);
+        if (!data || data.length === 0 || !data.some((item) => item.value > 0)) {
+            ctx.setFillStyle('#86909C');
+            ctx.setFontSize(12);
+            ctx.setTextAlign('center');
+            ctx.fillText('暂无收入', width / 2, height / 2);
+            ctx.draw();
+            return;
+        }
+        const centerX = width * 0.28;
         const centerY = height * 0.5;
         const outerRadius = Math.min(centerX, centerY) * 0.78;
         const innerRadius = outerRadius * 0.58;
@@ -152,7 +174,7 @@ class CanvasChart {
         ctx.setTextAlign('center');
         ctx.fillText('营收占比', centerX, centerY + 4);
         // 3. 绘制右侧图例列表 (Legend)
-        const legendX = width * 0.68;
+        const legendX = width * 0.57;
         const legendStartY = height * 0.18;
         const legendItemH = 22;
         data.slice(0, 5).forEach((item, idx) => {
@@ -167,7 +189,13 @@ class CanvasChart {
             ctx.setTextAlign('left');
             ctx.setFontSize(10);
             ctx.setFillStyle('#595959');
-            ctx.fillText(`${item.name} ${item.percentage}%`, legendX + 10, y + 3);
+            const suffix = ` ${item.percentage}%`;
+            let label = item.name;
+            const available = width - legendX - 14;
+            while (label.length > 1 && ctx.measureText && ctx.measureText(label + suffix).width > available) {
+                label = label.slice(0, -1);
+            }
+            ctx.fillText(label + suffix, legendX + 10, y + 3);
         });
         ctx.draw();
     }

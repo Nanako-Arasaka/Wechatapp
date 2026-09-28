@@ -27,7 +27,7 @@ export class AdminService {
    * 创建账号（管理员后台开通）
    */
   static async createUser(data: { username: string; password: string; nickname?: string; phone?: string; role?: string }) {
-    return request('/admin/users', 'POST', data, { showLoading: true, loadingTitle: '正在创建账号...' });
+    return request('/admin/users', 'POST', data, { showLoading: true, loadingTitle: '正在创建账号...', showErrorToast: true });
   }
 
   /**
@@ -41,7 +41,7 @@ export class AdminService {
    * 删除用户账号
    */
   static async deleteUser(id: string) {
-    return request(`/admin/users/${id}`, 'DELETE', {}, { showLoading: true, loadingTitle: '正在删除...' });
+    return request(`/admin/users/${id}`, 'DELETE', {}, { showLoading: true, loadingTitle: '正在删除...', showErrorToast: true });
   }
 
   /**
@@ -115,7 +115,7 @@ export class AdminService {
       '/admin/checkin/verify',
       'POST',
       { code },
-      { showLoading: true, loadingTitle: '正在解析二维码...' },
+      { showLoading: true, loadingTitle: '正在核验...', showErrorToast: true },
     );
   }
 
@@ -127,7 +127,7 @@ export class AdminService {
       '/admin/checkin/confirm',
       'POST',
       { bookingId },
-      { showLoading: true, loadingTitle: '正在执行核销...' },
+      { showLoading: true, loadingTitle: '正在核销...', showErrorToast: true },
     );
   }
 
@@ -135,13 +135,13 @@ export class AdminService {
    * 压力测试与数据调度：注入高峰客流
    */
   static async devGeneratePeak() {
-    return request('/dev/generate-peak', 'POST', {}, { showLoading: true, loadingTitle: '正在注入客流...' });
+    return request('/dev/generate-peak', 'POST', {}, { showLoading: true, loadingTitle: '正在注入客流...', showErrorToast: true });
   }
 
   /**
    * 订单超时扫描与库存自动释放调度
    */
   static async devExpireOrders() {
-    return request('/dev/expire-orders', 'POST', {}, { showLoading: true, loadingTitle: '正在扫描超时订单...' });
+    return request('/dev/expire-orders', 'POST', {}, { showLoading: true, loadingTitle: '正在扫描超时订单...', showErrorToast: true });
   }
 }

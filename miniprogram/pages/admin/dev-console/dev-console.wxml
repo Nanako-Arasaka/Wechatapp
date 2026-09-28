@@ -17,7 +17,7 @@
         <text class="tag tag-red">客流冲击</text>
       </view>
       <view class="tool-desc">将今日 18:00-21:00 所有场馆时段库存瞬间占满，随后可在实时监控大屏和 Dashboard 看到 100% 爆满预警与 AI 错峰建议生效！</view>
-      <button class="btn-tool-action bg-red" bindtap="handleGeneratePeak">立刻执行客流注入</button>
+      <button class="btn-tool-action bg-red" bindtap="handleGeneratePeak" disabled="{{submitting}}">{{submitting ? '执行中...' : '执行客流注入'}}</button>
     </view>
 
     <!-- 模拟订单超时与库存释放 -->
@@ -27,7 +27,7 @@
         <text class="tag tag-orange">防锁库</text>
       </view>
       <view class="tool-desc">模拟系统定时任务，扫描所有超过 15 分钟未完成支付的锁定订单，自动将其置为 EXPIRED 并将场地名额归还库存。</view>
-      <button class="btn-tool-action bg-orange" bindtap="handleExpireOrders">执行超时扫描释放</button>
+      <button class="btn-tool-action bg-orange" bindtap="handleExpireOrders" disabled="{{submitting}}">{{submitting ? '执行中...' : '执行超时扫描'}}</button>
     </view>
 
     <!-- 快速跳转大屏验证 -->

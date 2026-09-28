@@ -17,7 +17,8 @@
   </view>
 
   <!-- 骨架屏 -->
-  <view wx:if="{{loading}}" class="skeleton-wrap">
+  <empty wx:if="{{!isLoggedIn}}" title="登录后查看订单" btnText="去登录" bindbtnTap="goToLogin" />
+  <view wx:elif="{{loading}}" class="skeleton-wrap">
     <view class="card skeleton-box" style="height: 220rpx;"></view>
     <view class="card skeleton-box" style="height: 220rpx;"></view>
   </view>

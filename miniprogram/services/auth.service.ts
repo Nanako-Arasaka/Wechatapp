@@ -41,10 +41,16 @@ export class AuthService {
    */
   static async wechatLogin(nickname?: string, avatar?: string): Promise<AuthSession> {
     try {
+      const code = await new Promise<string>((resolve, reject) => {
+        wx.login({
+          success: (result) => result.code ? resolve(result.code) : reject(new Error('未获取到微信登录凭证')),
+          fail: () => reject(new Error('微信登录失败，请重试')),
+        });
+      });
       const res = await request<AuthSession>(
         '/auth/wechat-login',
         'POST',
-        { code: `mock_wx_code_${Date.now()}`, nickname, avatar },
+        { code, nickname, avatar },
         { showLoading: false, skipAuthRefresh: true },
       );
       this.saveSession(res);
@@ -106,12 +112,6 @@ export class AuthService {
    * 获取个人资料
    */
   static async getProfile(): Promise<User> {
-    try {
-      return await request<User>('/auth/profile', 'GET', undefined, { showErrorToast: false });
-    } catch (err) {
-      const user = AuthStore.getUser();
-      if (user) return user;
-      throw err;
-    }
+    return request<User>('/auth/profile', 'GET');
   }
 }

@@ -1,6 +1,6 @@
 import { VenueService } from '../../../services/venue.service';
 import { Venue } from '../../../types';
-import { getVenueTypeName } from '../../../utils/format';
+import { getVenueTypeName, safeDecode } from '../../../utils/format';
 
 Page({
   data: {
@@ -33,7 +33,7 @@ Page({
       this.setData({ currentType: options.type });
     }
     if (options.keyword) {
-      this.setData({ keyword: decodeURIComponent(options.keyword) });
+      this.setData({ keyword: safeDecode(options.keyword) });
     }
   },
 
@@ -41,12 +41,12 @@ Page({
     const app = getApp<any>();
     let changed = false;
     if (app && app.globalData) {
-      if (app.globalData.targetVenueKeyword) {
+      if (app.globalData.targetVenueKeyword !== null && app.globalData.targetVenueKeyword !== undefined) {
         this.setData({ keyword: app.globalData.targetVenueKeyword });
         app.globalData.targetVenueKeyword = null;
         changed = true;
       }
-      if (app.globalData.targetVenueType) {
+      if (app.globalData.targetVenueType !== null && app.globalData.targetVenueType !== undefined) {
         this.setData({ currentType: app.globalData.targetVenueType });
         app.globalData.targetVenueType = null;
         changed = true;
@@ -91,11 +91,7 @@ Page({
   async loadVenues() {
     this.setData({ loading: true, loadError: false });
     try {
-      const res = await VenueService.getVenues({
-        keyword: this.data.keyword || undefined,
-        type: this.data.currentType || undefined,
-        sortBy: this.data.sortBy === 'RECOMMEND' ? undefined : this.data.sortBy.toLowerCase(),
-      });
+      const res = await VenueService.getVenues();
       const venues = Array.isArray(res) ? res : (((res as any).list) || []);
       this.setData({ rawVenues: venues });
       this.filterAndSort(venues);

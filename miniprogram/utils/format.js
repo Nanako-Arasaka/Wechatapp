@@ -1,9 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStatusMeta = exports.getVenueTypeName = exports.getWeekdayName = exports.formatDate = exports.formatMoney = void 0;
+exports.getStatusMeta = exports.getVenueTypeName = exports.getWeekdayName = exports.formatDate = exports.formatMoney = exports.safeDecode = void 0;
 /**
  * 格式化金额 (分转元，保留2位或整数)
  */
+function safeDecode(value = '') {
+    try {
+        return decodeURIComponent(value);
+    }
+    catch (err) {
+        return value;
+    }
+}
+exports.safeDecode = safeDecode;
 function formatMoney(cents, showSymbol = true) {
     if (cents === undefined || cents === null || isNaN(cents)) {
         return showSymbol ? '¥0.00' : '0.00';

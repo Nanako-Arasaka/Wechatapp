@@ -6,12 +6,16 @@
         <view class="sys-title">智慧场馆数字化运营中心</view>
         <view class="admin-greet">欢迎您，{{adminName}}</view>
       </view>
-      <view class="refresh-tag" bindtap="loadDashboardData">
+      <view class="refresh-tag" bindtap="onRefresh">
         <text class="refresh-icon">🔄</text>
         <text>刷新大屏</text>
         <text class="refresh-time" wx:if="{{lastUpdated}}">{{lastUpdated}}</text>
       </view>
     </view>
+  </view>
+  <view class="page-state" wx:if="{{loadError}}">
+    <text>{{kpiLoaded ? '更新失败，当前显示上次数据' : '运营数据加载失败'}}</text>
+    <button bindtap="onRefresh">重试</button>
   </view>
 
   <!-- 4 个核心 KPI 数据卡片 -->
@@ -86,7 +90,7 @@
       <text class="tag tag-blue">实时统计</text>
     </view>
     <view class="canvas-box">
-      <canvas canvas-id="incomeTrendCanvas" class="trend-canvas"></canvas>
+      <canvas id="incomeTrendCanvas" canvas-id="incomeTrendCanvas" class="trend-canvas"></canvas>
     </view>
   </view>
 
@@ -100,7 +104,7 @@
       <text class="tag tag-green">近7天</text>
     </view>
     <view class="canvas-box">
-      <canvas canvas-id="venuePieCanvas" class="pie-canvas"></canvas>
+      <canvas id="venuePieCanvas" canvas-id="venuePieCanvas" class="pie-canvas"></canvas>
     </view>
   </view>
 
@@ -155,7 +159,7 @@
     <view class="chart-header flex-between">
       <view class="chart-title-box flex-row">
         <text class="chart-bar-icon"></text>
-        <text class="chart-title">智能运营诊断与调优策略</text>
+        <text class="chart-title">运营参考</text>
       </view>
     </view>
     <view class="suggestion-list">

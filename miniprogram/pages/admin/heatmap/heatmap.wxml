@@ -1,7 +1,6 @@
 <view class="heatmap-page container">
   <view class="hm-header card">
-    <view class="hm-title">全馆 7×24 小时预约热力图</view>
-    <view class="hm-desc">基于历史 300+ 笔预约数据计算出每个时段的场地利用饱和度</view>
+    <view class="hm-title">场馆时段热力图</view>
 
     <!-- 色阶图例 -->
     <view class="hm-scale-bar flex-row">
@@ -16,7 +15,14 @@
   </view>
 
   <!-- 热力网格卡片 -->
-  <view class="hm-matrix-card card">
+  <view class="page-state" wx:if="{{loading}}">正在加载热力图...</view>
+  <view class="page-state" wx:elif="{{loadError}}">
+    <text>热力图加载失败</text>
+    <button bindtap="loadHeatmap">重试</button>
+  </view>
+  <view class="page-state" wx:elif="{{rows.length === 0}}">暂无时段数据</view>
+  <scroll-view scroll-x wx:else>
+  <view class="hm-matrix-card card" style="min-width:640px;">
     <!-- 横向时段表头 -->
     <view class="matrix-row header-row flex-row">
       <view class="day-cell header">星期</view>
@@ -24,21 +30,22 @@
     </view>
 
     <!-- 每天的数据行 -->
-    <view class="matrix-row flex-row" wx:for="{{days}}" wx:for-index="dayIdx" wx:key="*this">
-      <view class="day-cell">{{item}}</view>
+    <view class="matrix-row flex-row" wx:for="{{rows}}" wx:for-item="row" wx:key="day">
+      <view class="day-cell">{{row.day}}</view>
       <view
         class="hour-cell flex-1 cell-val flex-center"
-        wx:for="{{hours}}"
-        wx:for-index="hourIdx"
-        wx:key="*this"
-        style="background: {{getCellBg(matrix[dayIdx][hourIdx])}}; color: {{matrix[dayIdx][hourIdx] >= 65 ? '#FFFFFF' : '#1F2329'}};"
+        wx:for="{{row.cells}}"
+        wx:for-item="cell"
+        wx:key="hour"
+        style="background: {{cell.background}}; color: {{cell.color}};"
         bindtap="onCellTap"
-        data-day="{{days[dayIdx]}}"
-        data-hour="{{hours[hourIdx]}}"
-        data-val="{{matrix[dayIdx][hourIdx]}}"
+        data-day="{{row.day}}"
+        data-hour="{{cell.hour}}"
+        data-val="{{cell.value}}"
       >
-        <text class="cell-num">{{matrix[dayIdx][hourIdx]}}%</text>
+        <text class="cell-num">{{cell.value}}%</text>
       </view>
     </view>
   </view>
+  </scroll-view>
 </view>

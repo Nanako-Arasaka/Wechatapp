@@ -119,9 +119,10 @@
   color: #86909C;
 }
 
-.chart-canvas {
+.trend-canvas,
+.pie-canvas {
   width: 100%;
-  height: 380rpx;
+  height: 180px;
   border-radius: 16rpx;
 }
 

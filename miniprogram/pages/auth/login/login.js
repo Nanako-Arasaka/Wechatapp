@@ -5,6 +5,7 @@ Page({
     data: {
         username: '',
         password: '',
+        submitting: false,
     },
     onUsernameInput(e) {
         this.setData({ username: e.detail.value });
@@ -13,6 +14,8 @@ Page({
         this.setData({ password: e.detail.value });
     },
     async handleLogin() {
+        if (this.data.submitting)
+            return;
         const { username, password } = this.data;
         if (!username.trim()) {
             wx.showToast({ title: '请输入学工号', icon: 'none' });
@@ -22,6 +25,7 @@ Page({
             wx.showToast({ title: '请输入密码', icon: 'none' });
             return;
         }
+        this.setData({ submitting: true });
         try {
             const res = await auth_service_1.AuthService.login(username.trim(), password);
             wx.showToast({
@@ -29,27 +33,32 @@ Page({
                 icon: 'success',
                 duration: 1500,
             });
-            setTimeout(() => {
-                wx.switchTab({ url: '/pages/index/index' });
-            }, 1500);
+            wx.switchTab({ url: '/pages/index/index' });
         }
         catch (err) {
             console.warn('登录异常:', err);
         }
+        finally {
+            this.setData({ submitting: false });
+        }
     },
     async handleWechatLogin() {
+        if (this.data.submitting)
+            return;
+        this.setData({ submitting: true });
         try {
-            const res = await auth_service_1.AuthService.wechatLogin('微信运动用户', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150');
+            await auth_service_1.AuthService.wechatLogin();
             wx.showToast({
                 title: '微信登录成功',
                 icon: 'success',
             });
-            setTimeout(() => {
-                wx.switchTab({ url: '/pages/index/index' });
-            }, 1000);
+            wx.switchTab({ url: '/pages/index/index' });
         }
         catch (err) {
-            wx.switchTab({ url: '/pages/index/index' });
+            console.warn('微信登录失败:', err);
+        }
+        finally {
+            this.setData({ submitting: false });
         }
     },
 });

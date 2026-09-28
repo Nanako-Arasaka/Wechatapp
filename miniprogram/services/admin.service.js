@@ -25,7 +25,7 @@ class AdminService {
      * 创建账号（管理员后台开通）
      */
     static async createUser(data) {
-        return (0, request_1.request)('/admin/users', 'POST', data, { showLoading: true, loadingTitle: '正在创建账号...' });
+        return (0, request_1.request)('/admin/users', 'POST', data, { showLoading: true, loadingTitle: '正在创建账号...', showErrorToast: true });
     }
     /**
      * 查询用户列表（支持按角色筛选）
@@ -37,7 +37,7 @@ class AdminService {
      * 删除用户账号
      */
     static async deleteUser(id) {
-        return (0, request_1.request)(`/admin/users/${id}`, 'DELETE', {}, { showLoading: true, loadingTitle: '正在删除...' });
+        return (0, request_1.request)(`/admin/users/${id}`, 'DELETE', {}, { showLoading: true, loadingTitle: '正在删除...', showErrorToast: true });
     }
     /**
      * 场馆管理列表
@@ -97,25 +97,25 @@ class AdminService {
      * 扫码预检
      */
     static async verifyCheckin(code) {
-        return (0, request_1.request)('/admin/checkin/verify', 'POST', { code }, { showLoading: true, loadingTitle: '正在解析二维码...' });
+        return (0, request_1.request)('/admin/checkin/verify', 'POST', { code }, { showLoading: true, loadingTitle: '正在核验...', showErrorToast: true });
     }
     /**
      * 确认核销
      */
     static async confirmCheckin(bookingId) {
-        return (0, request_1.request)('/admin/checkin/confirm', 'POST', { bookingId }, { showLoading: true, loadingTitle: '正在执行核销...' });
+        return (0, request_1.request)('/admin/checkin/confirm', 'POST', { bookingId }, { showLoading: true, loadingTitle: '正在核销...', showErrorToast: true });
     }
     /**
      * 压力测试与数据调度：注入高峰客流
      */
     static async devGeneratePeak() {
-        return (0, request_1.request)('/dev/generate-peak', 'POST', {}, { showLoading: true, loadingTitle: '正在注入客流...' });
+        return (0, request_1.request)('/dev/generate-peak', 'POST', {}, { showLoading: true, loadingTitle: '正在注入客流...', showErrorToast: true });
     }
     /**
      * 订单超时扫描与库存自动释放调度
      */
     static async devExpireOrders() {
-        return (0, request_1.request)('/dev/expire-orders', 'POST', {}, { showLoading: true, loadingTitle: '正在扫描超时订单...' });
+        return (0, request_1.request)('/dev/expire-orders', 'POST', {}, { showLoading: true, loadingTitle: '正在扫描超时订单...', showErrorToast: true });
     }
 }
 exports.AdminService = AdminService;

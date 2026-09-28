@@ -6,6 +6,7 @@
   background: #1F2329;
   padding: 20rpx 28rpx 28rpx;
   gap: 16rpx;
+  flex-wrap: wrap;
 }
 
 .header-search-input {
@@ -14,6 +15,7 @@
   padding: 14rpx 24rpx;
   font-size: 24rpx;
   color: #FFFFFF;
+  min-width: 200rpx;
 }
 
 .header-actions {
@@ -100,6 +102,8 @@
 .av-actions-row {
   border-top: 1rpx solid #F4F6F9;
   padding-top: 16rpx;
+  flex-wrap: wrap;
+  gap: 16rpx;
 }
 
 .btn-action-sm {
@@ -151,7 +155,9 @@
 }
 
 .modal-dialog {
-  width: 640rpx;
+  width: calc(100% - 48rpx);
+  max-width: 640rpx;
+  box-sizing: border-box;
   max-height: 80vh;
   margin: 0;
   padding: 36rpx;
@@ -167,7 +173,7 @@
 }
 
 .modal-form-scroll {
-  max-height: 55vh;
+  height: 55vh;
 }
 
 .form-item {

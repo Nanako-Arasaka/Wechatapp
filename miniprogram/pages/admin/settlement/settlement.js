@@ -6,6 +6,8 @@ const admin_guard_1 = require("../../../utils/admin-guard");
 Page({
     data: {
         kpi: {},
+        loading: true,
+        loadError: false,
     },
     onShow() {
         if (!(0, admin_guard_1.guardAdminPage)())
@@ -13,11 +15,12 @@ Page({
         this.loadData();
     },
     onPullDownRefresh() {
-        this.loadData().then(() => {
+        this.loadData().finally(() => {
             wx.stopPullDownRefresh();
         });
     },
     async loadData() {
+        this.setData({ loading: true, loadError: false });
         try {
             const data = await admin_service_1.AdminService.getDashboardOverview();
             this.setData({ kpi: data.kpi });
@@ -26,21 +29,25 @@ Page({
                 date: d.date,
                 value: d.income,
             }));
-            setTimeout(() => {
-                chart_1.CanvasChart.drawLineChart('settleTrendCanvas', lineData, 320, 180, this, '#00B96B', true);
-            }, 100);
+            chart_1.CanvasChart.drawInPage('settleTrendCanvas', this, (width, height) => {
+                chart_1.CanvasChart.drawLineChart('settleTrendCanvas', lineData, width, height, this, '#00B96B', true);
+            });
             // 绘制环形饼图
             const pieData = data.venuePieData.map((d) => ({
                 name: d.name,
                 value: d.value,
                 percentage: d.percentage,
             }));
-            setTimeout(() => {
-                chart_1.CanvasChart.drawDonutChart('settlePieCanvas', pieData, 320, 160, this);
-            }, 150);
+            chart_1.CanvasChart.drawInPage('settlePieCanvas', this, (width, height) => {
+                chart_1.CanvasChart.drawDonutChart('settlePieCanvas', pieData, width, height, this);
+            });
         }
         catch (err) {
             console.error('加载资金看板失败:', err);
+            this.setData({ loadError: true, kpi: {} });
+        }
+        finally {
+            this.setData({ loading: false });
         }
     },
 });

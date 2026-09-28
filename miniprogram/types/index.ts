@@ -93,6 +93,33 @@ export interface OrderItem {
   expiredAt?: string;
 }
 
+export interface OrderDetail {
+  id: string;
+  orderNo: string;
+  amount: number;
+  paidAmount: number;
+  paymentStatus: string;
+  orderStatus: string;
+  booking: {
+    id: string;
+    bookingNo: string;
+    bookingCode: string;
+    bookingDate: string;
+    startTime: string;
+    endTime: string;
+    quantity: number;
+    studentNo?: string;
+    contactName: string;
+    contactPhone: string;
+    status: string;
+    expiredAt?: string;
+    venue: Venue;
+    checkinRecords: any[];
+  };
+  payments: any[];
+  refunds: any[];
+}
+
 export interface DashboardKPI {
   todayOrders: number;
   todayOrderGrowth: number;

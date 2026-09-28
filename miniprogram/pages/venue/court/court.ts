@@ -1,5 +1,5 @@
 import { VenueService } from '../../../services/venue.service';
-import { formatMoney } from '../../../utils/format';
+import { formatMoney, safeDecode } from '../../../utils/format';
 
 /**
  * ============================================================================
@@ -40,11 +40,11 @@ Page({
     // 解析 P2 透传参数
     this.setData({
       venueId: options.venueId || '',
-      venueName: decodeURIComponent(options.venueName || ''),
-      venueAddress: decodeURIComponent(options.venueAddress || ''),
+      venueName: safeDecode(options.venueName || ''),
+      venueAddress: safeDecode(options.venueAddress || ''),
       slotId: options.slotId || '',
       date: options.date || '',
-      timeRange: decodeURIComponent(options.timeRange || ''),
+      timeRange: safeDecode(options.timeRange || ''),
       price: Number(options.price || 0),
       priceText: formatMoney(Number(options.price || 0)),
     });
@@ -60,6 +60,7 @@ Page({
   async loadCourts() {
     try {
       this.setData({ loading: true, loadError: false, unavailableReason: '', sheetVisible: false, courts: [], selectedCourtNo: 0 });
+      if (!this.data.venueId || !this.data.slotId) throw new Error('缺少预约时段');
 
       const [courtData, availability] = await Promise.all([
         VenueService.getSlotCourts(this.data.venueId, this.data.slotId),
@@ -131,7 +132,7 @@ Page({
    * venueId / venueName / venueAddress / slotId / date / timeRange / unitPrice / quantity
    */
   goToFillInfo() {
-    if (this.data.navigating) return;
+    if (this.data.navigating || this.data.loading || this.data.loadError || this.data.unavailableReason) return;
     if (!this.data.selectedCourtNo) {
       wx.showToast({ title: '请先选择场地', icon: 'none' });
       return;

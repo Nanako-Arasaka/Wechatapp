@@ -8,6 +8,7 @@ App({
         isLoggedIn: false,
         targetOrderStatus: null,
         targetVenueKeyword: null,
+        targetVenueType: null,
     },
     onLaunch() {
         console.log('🚀 Slotify (智场通) 启动中...');
@@ -25,10 +26,10 @@ App({
                 auth_1.AuthStore.setUser(profile);
             })
                 .catch(() => {
-                // Token 失效时清除过期的登录态
-                auth_1.AuthStore.clear();
-                this.globalData.userInfo = null;
-                this.globalData.isLoggedIn = false;
+                if (!auth_1.AuthStore.getToken()) {
+                    this.globalData.userInfo = null;
+                    this.globalData.isLoggedIn = false;
+                }
             });
         }
         else {

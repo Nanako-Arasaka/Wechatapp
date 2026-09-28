@@ -480,3 +480,16 @@ page {
   background: #FF4D4F;
   margin-left: 10rpx;
 }
+
+.page-state {
+  padding: 64rpx 32rpx;
+  color: #687076;
+  font-size: 28rpx;
+  text-align: center;
+}
+
+.page-state button {
+  margin-top: 24rpx;
+  max-width: 400rpx;
+  font-size: 28rpx;
+}

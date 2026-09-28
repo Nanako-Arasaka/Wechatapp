@@ -2,13 +2,18 @@
   <!-- 头部控制栏 -->
   <view class="realtime-header flex-between">
     <view class="header-left">
-      <view class="rt-title">全馆实时并发监控</view>
-      <view class="rt-sub">数据每 30 秒自动静默轮询更新</view>
+      <view class="rt-title">场馆实时监控</view>
     </view>
-    <view class="rt-tag" bindtap="loadRealtimeData">
+    <view class="rt-tag" bindtap="onRefresh">
       <text>🔄 立即刷新</text>
     </view>
   </view>
+  <view class="page-state" wx:if="{{loadError}}">
+    <text>{{venueStatusList.length ? '更新失败，当前显示上次数据' : '场馆状态加载失败'}}</text>
+    <button bindtap="onRefresh">重试</button>
+  </view>
+  <view class="page-state" wx:elif="{{loading && venueStatusList.length === 0}}">正在加载场馆状态...</view>
+  <view class="page-state" wx:elif="{{!loading && venueStatusList.length === 0}}">暂无场馆数据</view>
 
   <!-- 场馆实时监控卡片列表 -->
   <view class="venue-realtime-list">

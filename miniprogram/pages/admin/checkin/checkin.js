@@ -1,39 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin_service_1 = require("../../../services/admin.service");
-const format_1 = require("../../../utils/format");
 const admin_guard_1 = require("../../../utils/admin-guard");
 Page({
     data: {
         inputCode: '',
-        demoCode: '',
         verifyResult: null,
         confirming: false,
         parsing: false,
-        isDev: false,
-    },
-    onLoad() {
-        const todayStr = (0, format_1.formatDate)(new Date(), 'YYYYMMDD');
-        let isDev = false;
-        try {
-            isDev = wx.getAccountInfoSync().miniProgram.envVersion === 'develop';
-        }
-        catch (e) { }
-        this.setData({
-            demoCode: `SV${todayStr}0888`,
-            isDev,
-        });
     },
     onShow() {
         (0, admin_guard_1.guardAdminPage)();
     },
     onCodeInput(e) {
-        this.setData({ inputCode: e.detail.value });
-    },
-    fillDemoCode(e) {
-        const code = e.currentTarget.dataset.code;
-        this.setData({ inputCode: code });
-        this.verify(code);
+        if (this.data.parsing || this.data.confirming)
+            return;
+        this.setData({ inputCode: e.detail.value, verifyResult: null });
     },
     handleManualVerify() {
         if (!this.data.inputCode.trim()) {
@@ -43,6 +25,8 @@ Page({
         this.verify(this.data.inputCode.trim());
     },
     handleScanCode() {
+        if (this.data.parsing || this.data.confirming)
+            return;
         wx.scanCode({
             onlyFromCamera: false,
             scanType: ['qrCode'],
@@ -59,9 +43,9 @@ Page({
         });
     },
     async verify(code) {
-        if (this.data.parsing)
+        if (this.data.parsing || this.data.confirming)
             return;
-        this.setData({ parsing: true });
+        this.setData({ parsing: true, verifyResult: null });
         try {
             const res = await admin_service_1.AdminService.verifyCheckin(code);
             this.setData({ verifyResult: res });
@@ -76,14 +60,16 @@ Page({
         }
     },
     async onConfirmCheckin() {
-        if (!this.data.verifyResult)
+        if (!this.data.verifyResult?.canConfirm || this.data.confirming || this.data.parsing)
             return;
+        const booking = this.data.verifyResult;
         this.setData({ confirming: true });
         try {
-            const res = await admin_service_1.AdminService.confirmCheckin(this.data.verifyResult.bookingId);
+            await admin_service_1.AdminService.confirmCheckin(booking.bookingId);
+            this.setData({ verifyResult: null, inputCode: '' });
             wx.showModal({
                 title: '核销成功！',
-                content: `已成功为【${this.data.verifyResult.userName}】办理【${this.data.verifyResult.venueName}】入场核销。`,
+                content: `已为【${booking.userName}】办理【${booking.venueName}】入场核销。`,
                 showCancel: false,
                 success: () => {
                     this.setData({ verifyResult: null, inputCode: '' });
@@ -91,7 +77,7 @@ Page({
             });
         }
         catch (err) {
-            // 异常已处理
+            this.setData({ verifyResult: null });
         }
         finally {
             this.setData({ confirming: false });

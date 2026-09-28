@@ -7,7 +7,7 @@
       placeholder="搜索场馆..."
       value="{{keyword}}"
       bindinput="onInputKeyword"
-      bindconfirm="loadVenues"
+      bindconfirm="onSearchConfirm"
     />
     <view class="header-actions flex-row">
       <button class="btn-batch-time" bindtap="openBulkTimeModal">批量调时</button>
@@ -22,6 +22,10 @@
   </view>
 
   <!-- 空状态 -->
+  <view wx:elif="{{loadError && venues.length === 0}}" class="page-state">
+    <text>场馆列表加载失败</text>
+    <button bindtap="onSearchConfirm">重试</button>
+  </view>
   <view wx:elif="{{!loading && venues.length === 0}}" class="empty-state">
     <text class="empty-icon">🏟️</text>
     <text class="empty-title">暂无场馆</text>
@@ -88,8 +92,8 @@
         </view>
         <view class="form-item">
           <text class="f-label">项目分类</text>
-          <picker mode="selector" range="{{['BADMINTON','BASKETBALL','TENNIS','TABLE_TENNIS','FOOTBALL','SWIMMING','FITNESS','MULTI']}}" value="{{form.type}}" bindchange="onFormInput" data-field="type">
-            <view class="f-input">{{form.type}}</view>
+          <picker mode="selector" range="{{typeOptions}}" value="{{typeIndex}}" bindchange="onTypeChange">
+            <view class="f-input">{{typeOptions[typeIndex]}}</view>
           </picker>
         </view>
         <view class="form-item">
@@ -120,7 +124,8 @@
         </view>
         <view class="form-item">
           <text class="f-label">场馆介绍</text>
-          <textarea class="f-input" value="{{form.description}}" bindinput="onFormInput" data-field="description" placeholder="请输入场馆介绍..." style="height: 160rpx;" />
+          <textarea class="f-input {{formErrors.description ? 'f-input-error' : ''}}" maxlength="2000" value="{{form.description}}" bindinput="onFormInput" data-field="description" placeholder="请输入场馆介绍..." style="height: 160rpx;" />
+          <text class="f-error" wx:if="{{formErrors.description}}">{{formErrors.description}}</text>
         </view>
         <view class="form-item">
           <text class="f-label">场馆详细地址</text>
@@ -153,7 +158,7 @@
       </view>
       <view class="modal-btn-row flex-row">
         <button class="btn-modal-cancel flex-1" bindtap="closeTimePreviewModal">再想想</button>
-        <button class="btn-modal-submit flex-1" bindtap="submitVenueForm">确认变更</button>
+        <button class="btn-modal-submit flex-1" bindtap="submitVenueForm" disabled="{{submitting}}">确认变更</button>
       </view>
     </view>
   </view>

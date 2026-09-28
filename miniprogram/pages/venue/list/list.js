@@ -32,19 +32,19 @@ Page({
             this.setData({ currentType: options.type });
         }
         if (options.keyword) {
-            this.setData({ keyword: decodeURIComponent(options.keyword) });
+            this.setData({ keyword: (0, format_1.safeDecode)(options.keyword) });
         }
     },
     onShow() {
         const app = getApp();
         let changed = false;
         if (app && app.globalData) {
-            if (app.globalData.targetVenueKeyword) {
+            if (app.globalData.targetVenueKeyword !== null && app.globalData.targetVenueKeyword !== undefined) {
                 this.setData({ keyword: app.globalData.targetVenueKeyword });
                 app.globalData.targetVenueKeyword = null;
                 changed = true;
             }
-            if (app.globalData.targetVenueType) {
+            if (app.globalData.targetVenueType !== null && app.globalData.targetVenueType !== undefined) {
                 this.setData({ currentType: app.globalData.targetVenueType });
                 app.globalData.targetVenueType = null;
                 changed = true;
@@ -85,11 +85,7 @@ Page({
     async loadVenues() {
         this.setData({ loading: true, loadError: false });
         try {
-            const res = await venue_service_1.VenueService.getVenues({
-                keyword: this.data.keyword || undefined,
-                type: this.data.currentType || undefined,
-                sortBy: this.data.sortBy === 'RECOMMEND' ? undefined : this.data.sortBy.toLowerCase(),
-            });
+            const res = await venue_service_1.VenueService.getVenues();
             const venues = Array.isArray(res) ? res : ((res.list) || []);
             this.setData({ rawVenues: venues });
             this.filterAndSort(venues);

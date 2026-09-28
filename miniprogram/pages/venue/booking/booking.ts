@@ -44,6 +44,8 @@ Page({
         todayText: `${today} ${getWeekdayName(today)}`,
       });
       this.loadVenueAndTodaySlots(options.id, options.slotId);
+    } else {
+      this.setData({ loading: false, loadError: true });
     }
   },
 
@@ -121,6 +123,7 @@ Page({
    */
   onSelectSlot(e: any) {
     const slot = e.currentTarget.dataset.slot as VenueSlot;
+    if (this.data.loading || this.data.loadError || !slot) return;
     if (!slot.isSelectable) {
       // 灰色不可预约时段：轻提示拦截
       wx.showToast({ title: `该时段不可预约（${slot.statusText}）`, icon: 'none' });

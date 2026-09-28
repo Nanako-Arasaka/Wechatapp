@@ -1,35 +1,29 @@
 import { request } from './request';
-import { OrderItem } from '../types';
+import { OrderItem, OrderDetail } from '../types';
 import { BookingService } from './booking.service';
-import { MOCK_ORDERS } from './mock.data';
 
 export class OrderService {
   /**
-   * 获取订单列表 (双重保障：HTTP API -> 本地自愈数据集)
+   * 获取订单列表
    */
   static async getOrders(status?: string): Promise<OrderItem[]> {
-    try {
-      return await request<OrderItem[]>('/orders', 'GET', { status }, { showErrorToast: false });
-    } catch (httpErr) {
-      // 二级自愈保障：返回用户默认订单
-      let orders = [...MOCK_ORDERS];
-      if (status && status !== 'ALL') {
-        orders = orders.filter((o) => o.bookingStatus === status);
-      }
-      return orders;
-    }
+    // 接口的 REFUNDED 筛选只含退款；前端此分组还包括取消和超时订单。
+    const list = await request<OrderItem[]>('/orders', 'GET', {
+      status: status === 'REFUNDED' ? undefined : status,
+    });
+    if (!Array.isArray(list)) throw new Error('订单数据异常');
+    return status === 'REFUNDED'
+      ? list.filter((order) => ['REFUNDED', 'CANCELLED', 'EXPIRED'].includes(order.bookingStatus))
+      : list;
   }
 
   /**
    * 获取订单详情
    */
-  static async getOrderDetail(id: string): Promise<OrderItem> {
-    try {
-      return await request<OrderItem>(`/orders/${id}`, 'GET', undefined, { showErrorToast: false });
-    } catch (httpErr) {
-      const found = MOCK_ORDERS.find((o) => o.id === id || o.bookingId === id) || MOCK_ORDERS[0];
-      return found;
-    }
+  static async getOrderDetail(id: string): Promise<OrderDetail> {
+    const order = await request<OrderDetail>(`/orders/${encodeURIComponent(id)}`, 'GET');
+    if (!order?.id || !order.booking?.venue) throw new Error('订单数据异常');
+    return order;
   }
 
   /**
@@ -47,7 +41,7 @@ export class OrderService {
       `/orders/${id}/pay`,
       'POST',
       { paymentMethod },
-      { showLoading: true, loadingTitle: '正在调用微信安全支付...', showErrorToast: true },
+      { showLoading: true, loadingTitle: '正在支付...' },
     );
   }
 }

@@ -6,7 +6,7 @@
       placeholder="搜索预约号 / 姓名 / 手机号..."
       value="{{keyword}}"
       bindinput="onInputKeyword"
-      bindconfirm="loadBookings"
+      bindconfirm="onSearchConfirm"
     />
 
     <!-- 状态 Tab -->
@@ -26,11 +26,15 @@
   <!-- 预约列表 -->
   <view class="bookings-list-wrap">
     <empty
-      wx:if="{{bookings.length === 0}}"
+      wx:if="{{!loading && !loadError && bookings.length === 0}}"
       icon="📑"
       title="暂无匹配预约"
       description="当前分类下暂无预约记录"
     />
+    <view class="page-state" wx:if="{{loadError}}">
+      <text>预约列表加载失败</text>
+      <button bindtap="onSearchConfirm">重试</button>
+    </view>
 
     <view class="admin-booking-card card" wx:for="{{bookings}}" wx:key="id">
       <view class="ab-header flex-between">
@@ -63,8 +67,9 @@
 
       <view class="ab-footer flex-between" wx:if="{{item.status === 'CONFIRMED'}}">
         <text class="code-badge">核销码：{{item.bookingCode}}</text>
-        <button class="btn-fast-checkin" bindtap="quickCheckin" data-id="{{item.id}}" data-code="{{item.bookingCode}}">一键核销</button>
+        <button class="btn-fast-checkin" bindtap="quickCheckin" disabled="{{checkingIn}}" data-id="{{item.id}}" data-code="{{item.bookingCode}}">一键核销</button>
       </view>
     </view>
+    <view class="page-state" wx:if="{{loading}}">正在加载预约...</view>
   </view>
 </view>

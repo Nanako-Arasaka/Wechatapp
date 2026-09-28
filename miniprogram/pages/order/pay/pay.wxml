@@ -1,8 +1,14 @@
 <wxs src="../../../utils/filters.wxs" module="filters" />
-<view class="pay-page container">
+<view class="page-state" wx:if="{{loading}}">正在加载订单...</view>
+<view class="page-state" wx:elif="{{loadError}}">
+  <text>订单加载失败</text>
+  <button bindtap="onRetry">重新加载</button>
+</view>
+<view class="pay-page container" wx:elif="{{order}}">
   <!-- 顶部倒计时与金额 -->
   <view class="pay-header-card card">
-    <view class="countdown-tip">支付剩余时间：<text class="time-highlight">{{countdownText}}</text></view>
+    <view class="countdown-tip" wx:if="{{canPay}}">支付剩余时间：<text class="time-highlight">{{countdownText}}</text></view>
+    <view class="countdown-tip" wx:else>{{paymentNotice}}</view>
     <view class="amount-box">
       <text class="currency">¥</text>
       <text class="amount-val">{{filters.formatMoney(order.amount)}}</text>
@@ -42,8 +48,8 @@
       <view class="method-left flex-row">
         <text class="wx-pay-icon">💬</text>
         <view class="method-info">
-          <view class="method-name">微信支付</view>
-          <view class="method-sub">微信安全快捷支付通道</view>
+          <view class="method-name">模拟支付</view>
+          <view class="method-sub">本次支付不会产生实际扣款</view>
         </view>
       </view>
       <view class="radio-checked">●</view>
@@ -53,11 +59,13 @@
   <!-- 底部支付操作栏 -->
   <view class="bottom-pay-bar">
     <button
+      wx:if="{{canPay}}"
       class="btn-confirm-pay {{paying ? 'disabled' : ''}}"
       bindtap="onConfirmPay"
-      disabled="{{paying}}"
+      disabled="{{paying || !canPay}}"
     >
-      {{paying ? '正在模拟微信支付...' : '确认支付 ¥' + filters.formatMoney(order.amount)}}
+      {{paying ? '正在支付...' : (canPay ? '确认支付 ¥' + filters.formatMoney(order.amount) : paymentNotice)}}
     </button>
+    <button wx:else class="btn-confirm-pay" bindtap="goToOrders">查看订单</button>
   </view>
 </view>

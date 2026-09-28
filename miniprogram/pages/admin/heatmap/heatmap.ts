@@ -3,17 +3,10 @@ import { guardAdminPage } from '../../../utils/admin-guard';
 
 Page({
   data: {
-    days: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-    hours: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '21:00'],
-    matrix: [
-      [30, 45, 50, 60, 65, 88, 92, 70],
-      [35, 40, 48, 55, 60, 90, 95, 75],
-      [28, 38, 45, 50, 65, 86, 90, 68],
-      [32, 42, 52, 58, 70, 92, 96, 78],
-      [40, 50, 60, 70, 80, 98, 100, 85],
-      [65, 80, 85, 90, 95, 96, 98, 88],
-      [60, 75, 80, 88, 92, 94, 90, 80],
-    ],
+    hours: [] as string[],
+    rows: [] as any[],
+    loading: true,
+    loadError: false,
   },
 
   onShow() {
@@ -22,18 +15,31 @@ Page({
   },
 
   async loadHeatmap() {
+    this.setData({ loading: true, loadError: false });
     try {
       const res: any = await AdminService.getHeatmap();
-      if (res && res.matrix) {
-        this.setData({
-          days: res.days,
-          hours: res.hours,
-          matrix: res.matrix,
-        });
-      }
+      if (!Array.isArray(res?.days) || !Array.isArray(res.hours) || !Array.isArray(res.matrix) || res.matrix.length !== res.days.length) throw new Error('热力图数据异常');
+      const rows = res.days.map((day: string, dayIdx: number) => {
+        const values = res.matrix[dayIdx];
+        if (!Array.isArray(values) || values.length !== res.hours.length || values.some((value: any) => !Number.isFinite(value))) throw new Error('热力图数据异常');
+        return {
+          day,
+          cells: res.hours.map((hour: string, hourIdx: number) => {
+            const value = Math.min(100, Math.max(0, values[hourIdx]));
+            return { hour, value, background: this.getCellBg(value), color: value >= 75 ? '#FFFFFF' : '#1F2329' };
+          }),
+        };
+      });
+      this.setData({ hours: res.hours, rows });
     } catch (err) {
-      console.warn('热力矩阵降级使用预置高保真数据:', err);
+      this.setData({ loadError: true, rows: [], hours: [] });
+    } finally {
+      this.setData({ loading: false });
     }
+  },
+
+  onPullDownRefresh() {
+    this.loadHeatmap().finally(() => wx.stopPullDownRefresh());
   },
 
   getCellBg(val: number) {

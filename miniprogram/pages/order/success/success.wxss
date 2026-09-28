@@ -93,7 +93,7 @@
   font-size: 32rpx;
   font-weight: 700;
   color: #1677FF;
-  letter-spacing: 2rpx;
+  letter-spacing: 0;
 }
 
 .ticket-divider {
@@ -134,11 +134,15 @@
 
 .d-label {
   color: #86909C;
+  flex-shrink: 0;
 }
 
 .d-val {
   color: #1F2329;
   font-weight: 500;
+  max-width: 70%;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .text-price {
@@ -207,6 +211,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 1rpx;
+  letter-spacing: 0;
 }
-

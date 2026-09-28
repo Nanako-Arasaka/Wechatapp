@@ -51,7 +51,7 @@ Page({
     refreshUserInfo() {
         const user = auth_1.AuthStore.getUser();
         if (user && auth_1.AuthStore.getToken()) {
-            const phone = user.phone || '13800138000';
+            const phone = user.phone || '未绑定手机号';
             const maskedPhone = phone.length === 11
                 ? `${phone.substring(0, 3)} **** ${phone.substring(7)}`
                 : phone;
@@ -79,7 +79,7 @@ Page({
             const confirmed = orders.filter((o) => o.bookingStatus === 'CONFIRMED').length;
             const pendingPay = orders.filter((o) => o.bookingStatus === 'PENDING_PAYMENT').length;
             const completed = orders.filter((o) => o.bookingStatus === 'COMPLETED' || o.bookingStatus === 'CHECKED_IN').length;
-            const totalBookedHours = orders.reduce((sum, o) => {
+            const totalBookedHours = orders.filter((o) => ['CONFIRMED', 'CHECKED_IN', 'COMPLETED'].includes(o.bookingStatus)).reduce((sum, o) => {
                 const [sh, sm] = o.startTime.split(':').map(Number);
                 const [eh, em] = o.endTime.split(':').map(Number);
                 return sum + (eh * 60 + em - sh * 60 - sm) / 60;
@@ -95,7 +95,7 @@ Page({
         }
         catch (err) {
             console.warn('统计数据加载异常:', err);
-            this.setData({ statsLoaded: true });
+            this.setData({ statsLoaded: false });
         }
     },
     /**
@@ -140,6 +140,8 @@ Page({
         wx.navigateTo({ url: '/pages/auth/login/login' });
     },
     goToNotifications() {
+        if (!this.data.isLoggedIn)
+            return this.goToLogin();
         wx.navigateTo({ url: '/pages/user/notifications/notifications' });
     },
     navTo(e) {
@@ -148,7 +150,11 @@ Page({
             return;
         }
         const url = e.currentTarget.dataset.url;
-        wx.navigateTo({ url });
+        const tabs = ['/pages/index/index', '/pages/venue/list/list', '/pages/order/list/list', '/pages/user/profile/profile'];
+        if (tabs.includes(url))
+            wx.switchTab({ url });
+        else
+            wx.navigateTo({ url });
     },
     showAbout() {
         wx.showModal({
@@ -160,10 +166,7 @@ Page({
         });
     },
     showFeedback() {
-        wx.showToast({
-            title: '感谢反馈，我们将持续优化',
-            icon: 'success',
-        });
+        wx.showModal({ title: '意见反馈', content: '请联系场馆管理中心或前台工作人员反馈预约问题。', showCancel: false });
     },
     handleLogout() {
         wx.showModal({
@@ -179,6 +182,7 @@ Page({
                         app.globalData.isLoggedIn = false;
                     }
                     this.refreshUserInfo();
+                    this.setData({ confirmedCount: 0, pendingPayCount: 0, completedCount: 0, totalBookingsCount: 0, exerciseHours: 0, unreadCount: 0, statsLoaded: true });
                     wx.showToast({ title: '已退出登录', icon: 'none' });
                     setTimeout(() => {
                         wx.navigateTo({ url: '/pages/auth/login/login' });

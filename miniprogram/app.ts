@@ -8,6 +8,7 @@ App({
     isLoggedIn: false,
     targetOrderStatus: null as string | null,
     targetVenueKeyword: null as string | null,
+    targetVenueType: null as string | null,
   },
 
   onLaunch() {
@@ -29,10 +30,10 @@ App({
           AuthStore.setUser(profile);
         })
         .catch(() => {
-          // Token 失效时清除过期的登录态
-          AuthStore.clear();
-          this.globalData.userInfo = null;
-          this.globalData.isLoggedIn = false;
+          if (!AuthStore.getToken()) {
+            this.globalData.userInfo = null;
+            this.globalData.isLoggedIn = false;
+          }
         });
     } else {
       // 默认保持未登录状态

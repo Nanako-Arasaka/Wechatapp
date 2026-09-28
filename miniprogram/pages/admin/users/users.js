@@ -24,13 +24,15 @@ Page({
         // 管理员列表
         adminList: [],
         listLoading: false,
+        listError: false,
+        deletingId: '',
     },
     onShow() {
         if (!(0, admin_guard_1.guardAdminPage)())
             return;
         const isSuperAdmin = auth_1.AuthStore.isSuperAdmin();
         const roleOptions = isSuperAdmin ? ['普通用户', '场馆管理员'] : ['普通用户'];
-        this.setData({ isSuperAdmin, roleOptions });
+        this.setData({ isSuperAdmin, roleOptions, roleIndex: 0, role: 'USER' });
         if (isSuperAdmin) {
             this.loadAdmins();
         }
@@ -111,13 +113,16 @@ Page({
         }
     },
     async loadAdmins() {
-        this.setData({ listLoading: true });
+        if (!this.data.isSuperAdmin || this.data.listLoading)
+            return;
+        this.setData({ listLoading: true, listError: false });
         try {
             const res = await admin_service_1.AdminService.getUsers('ADMIN', 1, 100);
-            this.setData({ adminList: res.data.list || [] });
+            this.setData({ adminList: res.list || [] });
         }
         catch (err) {
             console.error('加载管理员列表失败:', err);
+            this.setData({ listError: true, adminList: [] });
         }
         finally {
             this.setData({ listLoading: false });
@@ -125,15 +130,16 @@ Page({
     },
     async onDeleteAdmin(e) {
         const { id, username } = e.currentTarget.dataset;
-        if (!id)
+        if (!id || this.data.deletingId)
             return;
         const res = await wx.showModal({
             title: '确认删除',
             content: `确定删除管理员账号「${username}」吗？删除后该账号将无法登录。`,
             confirmColor: '#FF4D4F',
         });
-        if (!res.confirm)
+        if (!res.confirm || this.data.deletingId)
             return;
+        this.setData({ deletingId: id });
         try {
             await admin_service_1.AdminService.deleteUser(id);
             wx.showToast({ title: '删除成功', icon: 'success' });
@@ -141,6 +147,9 @@ Page({
         }
         catch (err) {
             // request 拦截器已弹 Toast
+        }
+        finally {
+            this.setData({ deletingId: '' });
         }
     },
 });

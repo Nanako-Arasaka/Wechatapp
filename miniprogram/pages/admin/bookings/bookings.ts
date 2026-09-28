@@ -6,6 +6,11 @@ Page({
     bookings: [] as any[],
     keyword: '',
     currentStatus: 'ALL',
+    loading: true,
+    loadError: false,
+    checkingIn: false,
+    page: 1,
+    hasMore: true,
     statusTabs: [
       { key: 'ALL', label: '全部' },
       { key: 'CONFIRMED', label: '待核销' },
@@ -14,6 +19,7 @@ Page({
       { key: 'REFUNDED', label: '已退款' },
     ],
   },
+  _loadId: 0,
 
   onShow() {
     if (!guardAdminPage()) return;
@@ -21,9 +27,17 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.loadBookings().then(() => {
+    this.loadBookings().finally(() => {
       wx.stopPullDownRefresh();
     });
+  },
+
+  onReachBottom() {
+    if (this.data.hasMore && !this.data.loading) this.loadBookings(true);
+  },
+
+  onSearchConfirm() {
+    this.loadBookings();
   },
 
   onInputKeyword(e: any) {
@@ -36,33 +50,49 @@ Page({
     this.loadBookings();
   },
 
-  async loadBookings() {
+  async loadBookings(append: boolean = false) {
+    if (append && this.data.loading) return;
+    const loadId = ++this._loadId;
+    const status = this.data.currentStatus;
+    const keyword = this.data.keyword.trim();
+    const page = append ? this.data.page + 1 : 1;
+    this.setData({ loading: true, loadError: false });
     try {
       const res: any = await AdminService.getBookings({
-        page: 1,
+        page,
         pageSize: 50,
-        status: this.data.currentStatus !== 'ALL' ? this.data.currentStatus : undefined,
-        keyword: this.data.keyword || undefined,
+        status: status !== 'ALL' ? status : undefined,
+        keyword: keyword || undefined,
       });
-      this.setData({ bookings: res.list || [] });
+      if (loadId !== this._loadId) return;
+      const list = res.list || [];
+      this.setData({ bookings: append ? [...this.data.bookings, ...list] : list, page, hasMore: page * 50 < res.total });
     } catch (err) {
+      if (loadId !== this._loadId) return;
       console.error('加载预约列表失败:', err);
+      this.setData({ loadError: true });
+    } finally {
+      if (loadId === this._loadId) this.setData({ loading: false });
     }
   },
 
   async quickCheckin(e: any) {
+    if (this.data.checkingIn) return;
     const bookingId = e.currentTarget.dataset.id;
     wx.showModal({
       title: '确认一键核销？',
       content: '确认核销该客户的场地预约并允许其入场？',
       success: async (res) => {
-        if (res.confirm) {
+        if (res.confirm && !this.data.checkingIn) {
+          this.setData({ checkingIn: true });
           try {
             await AdminService.confirmCheckin(bookingId);
             wx.showToast({ title: '核销成功，已入场', icon: 'success' });
             this.loadBookings();
           } catch (err) {
             // 异常已处理
+          } finally {
+            this.setData({ checkingIn: false });
           }
         }
       },

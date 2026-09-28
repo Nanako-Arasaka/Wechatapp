@@ -1,6 +1,14 @@
 /**
  * 格式化金额 (分转元，保留2位或整数)
  */
+export function safeDecode(value: string = ''): string {
+  try {
+    return decodeURIComponent(value);
+  } catch (err) {
+    return value;
+  }
+}
+
 export function formatMoney(cents: number | undefined | null, showSymbol: boolean = true): string {
   if (cents === undefined || cents === null || isNaN(cents)) {
     return showSymbol ? '¥0.00' : '0.00';

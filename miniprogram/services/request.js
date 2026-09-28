@@ -61,7 +61,7 @@ function request(url, method = 'GET', data, options = {}) {
         cleanData = {};
         for (const key of Object.keys(data)) {
             const val = data[key];
-            if (val !== undefined && val !== null && val !== '') {
+            if (val !== undefined) {
                 cleanData[key] = val;
             }
         }
@@ -96,22 +96,26 @@ function request(url, method = 'GET', data, options = {}) {
                     // access token 过期：尝试用 refreshToken 续期后重放一次
                     const canRefresh = !skipAuthRefresh && retryOn401 && !!auth_1.AuthStore.getRefreshToken();
                     if (canRefresh) {
+                        let refreshed = false;
                         try {
                             await refreshAccessToken();
-                            const retryRes = await request(url, method, data, {
-                                ...options,
-                                retryOn401: false,
-                            });
-                            resolve(retryRes);
-                            return;
+                            refreshed = true;
                         }
                         catch (refreshErr) {
                             // 刷新失败视为会话失效
                         }
+                        if (refreshed) {
+                            // 重试接口自身的业务或网络错误不能当作登录失效。
+                            request(url, method, data, { ...options, retryOn401: false }).then(resolve, reject);
+                            return;
+                        }
                     }
-                    auth_1.AuthStore.clear();
-                    wx.showToast({ title: '登录已过期，请重新登录', icon: 'none', duration: 2500 });
-                    reject(new Error('未授权'));
+                    if (!skipAuthRefresh)
+                        auth_1.AuthStore.clear();
+                    const errorMsg = skipAuthRefresh ? (body?.message || '登录失败') : '登录已过期，请重新登录';
+                    if (!skipAuthRefresh || showErrorToast)
+                        wx.showToast({ title: errorMsg, icon: 'none', duration: 2500 });
+                    reject(new Error(errorMsg));
                 }
                 else if (statusCode === 403) {
                     const errorMsg = body?.message || '暂无管理权限';
@@ -132,7 +136,10 @@ function request(url, method = 'GET', data, options = {}) {
                 if (showLoading) {
                     wx.hideLoading();
                 }
-                reject(new Error(err.errMsg || 'NETWORK_FAIL'));
+                const errorMsg = '网络连接失败，请稍后重试';
+                if (showErrorToast)
+                    wx.showToast({ title: errorMsg, icon: 'none', duration: 2500 });
+                reject(new Error(errorMsg));
             },
         });
     });

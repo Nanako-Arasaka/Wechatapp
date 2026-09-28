@@ -4,6 +4,7 @@ Page({
   data: {
     username: '',
     password: '',
+    submitting: false,
   },
 
   onUsernameInput(e: any) {
@@ -15,6 +16,7 @@ Page({
   },
 
   async handleLogin() {
+    if (this.data.submitting) return;
     const { username, password } = this.data;
     if (!username.trim()) {
       wx.showToast({ title: '请输入学工号', icon: 'none' });
@@ -25,6 +27,7 @@ Page({
       return;
     }
 
+    this.setData({ submitting: true });
     try {
       const res = await AuthService.login(username.trim(), password);
       wx.showToast({
@@ -32,26 +35,28 @@ Page({
         icon: 'success',
         duration: 1500,
       });
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/index/index' });
-      }, 1500);
+      wx.switchTab({ url: '/pages/index/index' });
     } catch (err: any) {
       console.warn('登录异常:', err);
+    } finally {
+      this.setData({ submitting: false });
     }
   },
 
   async handleWechatLogin() {
+    if (this.data.submitting) return;
+    this.setData({ submitting: true });
     try {
-      const res = await AuthService.wechatLogin('微信运动用户', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150');
+      await AuthService.wechatLogin();
       wx.showToast({
         title: '微信登录成功',
         icon: 'success',
       });
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/index/index' });
-      }, 1000);
-    } catch (err) {
       wx.switchTab({ url: '/pages/index/index' });
+    } catch (err) {
+      console.warn('微信登录失败:', err);
+    } finally {
+      this.setData({ submitting: false });
     }
   },
 });

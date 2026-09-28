@@ -4,8 +4,10 @@ import { guardAdminPage } from '../../../utils/admin-guard';
 Page({
   data: {
     venueStatusList: [] as any[],
-    timer: null as any,
+    loading: false,
+    loadError: false,
   },
+  _timer: null as any,
 
   onShow() {
     if (!guardAdminPage()) return;
@@ -22,9 +24,13 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.loadRealtimeData().then(() => {
+    this.loadRealtimeData().finally(() => {
       wx.stopPullDownRefresh();
     });
+  },
+
+  onRefresh() {
+    this.loadRealtimeData();
   },
 
   startPolling() {
@@ -32,17 +38,19 @@ Page({
     const timer = setInterval(() => {
       this.loadRealtimeData(true);
     }, 30000);
-    this.setData({ timer });
+    this._timer = timer;
   },
 
   stopPolling() {
-    if (this.data.timer) {
-      clearInterval(this.data.timer);
-      this.setData({ timer: null });
+    if (this._timer) {
+      clearInterval(this._timer);
+      this._timer = null;
     }
   },
 
   async loadRealtimeData(silent: boolean = false) {
+    if (this.data.loading) return;
+    this.setData({ loading: true, loadError: false });
     try {
       const list: any = await AdminService.getRealtimeStatus();
       this.setData({ venueStatusList: list });
@@ -51,6 +59,9 @@ Page({
       }
     } catch (err) {
       console.error('加载实时监控数据失败:', err);
+      this.setData({ loadError: true });
+    } finally {
+      this.setData({ loading: false });
     }
   },
 });

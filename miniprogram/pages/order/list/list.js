@@ -1,9 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const order_service_1 = require("../../../services/order.service");
+const auth_1 = require("../../../store/auth");
 Page({
     data: {
         loading: false,
+        loadError: false,
+        cancelling: false,
+        isLoggedIn: false,
         currentStatus: 'ALL',
         orderList: [],
         statusTabs: [
@@ -14,7 +18,15 @@ Page({
             { key: 'REFUNDED', name: '退款/取消' },
         ],
     },
+    _loadId: 0,
     onShow() {
+        const isLoggedIn = !!auth_1.AuthStore.getToken();
+        this.setData({ isLoggedIn });
+        if (!isLoggedIn) {
+            this._loadId++;
+            this.setData({ orderList: [], loading: false, loadError: false });
+            return;
+        }
         const app = getApp();
         if (app && app.globalData && app.globalData.targetOrderStatus) {
             const target = app.globalData.targetOrderStatus;
@@ -25,17 +37,25 @@ Page({
         this.loadOrders();
     },
     onPullDownRefresh() {
-        this.loadOrders().then(() => {
+        this.loadOrders().finally(() => {
             wx.stopPullDownRefresh();
         });
     },
     async loadOrders() {
+        if (!auth_1.AuthStore.getToken())
+            return;
+        const loadId = ++this._loadId;
+        const status = this.data.currentStatus;
         this.setData({ loading: true, loadError: false });
         try {
-            const list = await order_service_1.OrderService.getOrders(this.data.currentStatus !== 'ALL' ? this.data.currentStatus : undefined);
+            const list = await order_service_1.OrderService.getOrders(status !== 'ALL' ? status : undefined);
+            if (loadId !== this._loadId)
+                return;
             this.setData({ orderList: list || [], loading: false });
         }
         catch (err) {
+            if (loadId !== this._loadId)
+                return;
             console.warn('订单列表加载失败:', err);
             this.setData({ loading: false, loadError: true, orderList: [] });
         }
@@ -58,9 +78,8 @@ Page({
     },
     goToQRCode(e) {
         const id = e.currentTarget.dataset.id;
-        const order = this.data.orderList.find((o) => o.id === id);
         wx.navigateTo({
-            url: `/pages/order/success/success?orderId=${id}&bookingCode=${order?.bookingCode || 'SV202608290888'}`,
+            url: `/pages/order/success/success?orderId=${encodeURIComponent(id)}`,
         });
     },
     /**
@@ -79,7 +98,7 @@ Page({
             confirmText: '确认退订',
             cancelText: '再想想',
             success: async (res) => {
-                if (!res.confirm)
+                if (!res.confirm || this.data.cancelling)
                     return;
                 this.setData({ cancelling: true });
                 wx.showLoading({ title: '正在退订...', mask: true });
@@ -107,17 +126,20 @@ Page({
         if (this.data.cancelling)
             return;
         const id = e.currentTarget.dataset.id;
+        const order = this.data.orderList.find((o) => o.id === id);
+        if (!order)
+            return;
         wx.showModal({
             title: '确认取消订单',
             content: '是否确认取消该待支付订单？',
             confirmColor: '#FF4D4F',
             success: async (res) => {
-                if (!res.confirm)
+                if (!res.confirm || this.data.cancelling)
                     return;
                 this.setData({ cancelling: true });
                 wx.showLoading({ title: '正在取消...', mask: true });
                 try {
-                    await order_service_1.OrderService.cancelOrder(id);
+                    await order_service_1.OrderService.cancelOrder(order.bookingId);
                     wx.hideLoading();
                     wx.showToast({ title: '订单已取消', icon: 'success' });
                     await this.loadOrders();
@@ -136,11 +158,16 @@ Page({
      * 再次预约
      */
     onRebook(e) {
-        const venueId = e.currentTarget.dataset.venueId || '1';
+        const venueId = e.currentTarget.dataset.venueId;
+        if (!venueId)
+            return;
         wx.navigateTo({ url: `/pages/venue/booking/booking?id=${venueId}` });
     },
     goToVenues() {
         wx.switchTab({ url: '/pages/venue/list/list' });
+    },
+    goToLogin() {
+        wx.navigateTo({ url: '/pages/auth/login/login' });
     },
     noBubble() { },
 });

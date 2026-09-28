@@ -100,8 +100,7 @@ Page({
    * 将场馆数据渲染到页面（含平面示意图场地格生成）
    */
   applyVenue(venue: Venue, activeTab: string) {
-    // 根据场馆容量生成平面示意场地格（兜底至少展示 4 块场地）
-    const capacity = venue.capacity || 4;
+    const capacity = Math.max(0, Math.floor(venue.capacity || 0));
     const courtBlocks = [];
     for (let i = 1; i <= capacity; i++) {
       courtBlocks.push({ no: i });

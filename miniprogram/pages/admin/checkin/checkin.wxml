@@ -2,10 +2,9 @@
   <!-- 头部控制卡片 -->
   <view class="checkin-header-card card">
     <view class="ch-title">前台入场快速核销</view>
-    <view class="ch-desc">扫描客户出示的预约二维码，或输入 12 位核销码完成入场核验</view>
 
     <!-- 扫码主按钮 -->
-    <button class="btn-scan-camera" bindtap="handleScanCode" disabled="{{parsing}}">
+    <button class="btn-scan-camera" bindtap="handleScanCode" disabled="{{parsing || confirming}}">
       <text class="camera-icon">📷</text>
       <text>{{parsing ? '解析中...' : '调用摄像头扫码核销'}}</text>
     </button>
@@ -16,17 +15,11 @@
         placeholder="输入核销码 (例如 SV...)"
         value="{{inputCode}}"
         bindinput="onCodeInput"
+        disabled="{{parsing || confirming}}"
       />
-      <button class="btn-verify-action" bindtap="handleManualVerify" disabled="{{parsing}}">{{parsing ? '解析中' : '解析核销码'}}</button>
+      <button class="btn-verify-action" bindtap="handleManualVerify" disabled="{{parsing || confirming}}">{{parsing ? '解析中' : '解析核销码'}}</button>
     </view>
 
-    <!-- 快捷测试码 (仅开发版显示) -->
-    <view class="demo-code-helper" wx:if="{{isDev}}">
-      <view class="helper-label">💡 快捷测试核销码：</view>
-      <view class="helper-tags flex-row">
-        <text class="h-tag" bindtap="fillDemoCode" data-code="{{demoCode}}">【待核销预约】{{demoCode}}</text>
-      </view>
-    </view>
   </view>
 
   <!-- 预检结果展示卡片 -->

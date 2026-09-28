@@ -1,8 +1,13 @@
-<view class="order-detail-page container" wx:if="{{order}}">
+<view class="page-state" wx:if="{{loading}}">正在加载订单...</view>
+<view class="page-state" wx:elif="{{loadError}}">
+  <text>订单加载失败</text>
+  <button bindtap="onRetry">重新加载</button>
+</view>
+<view class="order-detail-page container" wx:elif="{{order}}">
   <!-- 头部状态 -->
   <view class="detail-header-card card flex-between">
     <view class="header-left">
-      <view class="status-title-text">{{order.booking.status === 'CONFIRMED' ? '预约成功 (待使用)' : (order.booking.status === 'CHECKED_IN' ? '已核销入场' : (order.booking.status === 'REFUNDED' ? '已取消并全额退款' : order.booking.status))}}</view>
+      <view class="status-title-text">{{statusText}}</view>
       <view class="status-desc-text">订单编号：{{order.orderNo}}</view>
     </view>
     <status-tag status="{{order.booking.status}}" />
@@ -30,7 +35,7 @@
       <text class="item-label">预约数量</text>
       <text class="item-val">{{order.booking.quantity}} 个场地名额</text>
     </view>
-    <view class="item-row flex-between">
+    <view class="item-row flex-between" wx:if="{{order.booking.status === 'CONFIRMED'}}">
       <text class="item-label">核销验证码</text>
       <text class="item-val code-text">{{order.booking.bookingCode}}</text>
     </view>
@@ -42,10 +47,10 @@
 
   <!-- 支付流水卡片 -->
   <view class="info-card card" wx:if="{{order.payments.length > 0}}">
-    <view class="card-title">支付明细 (企业级模拟支付)</view>
+    <view class="card-title">支付明细</view>
     <view class="item-row flex-between">
       <text class="item-label">支付方式</text>
-      <text class="item-val">微信支付 (Mock)</text>
+      <text class="item-val">模拟支付</text>
     </view>
     <view class="item-row flex-between">
       <text class="item-label">支付流水号</text>
@@ -78,7 +83,7 @@
     </view>
     <view class="item-row flex-between">
       <text class="item-label">退款状态</text>
-      <text class="tag tag-green">退款已到账</text>
+      <text class="tag tag-green">{{order.refunds[0].status === 'SUCCESS' ? '退款成功' : '退款处理中'}}</text>
     </view>
   </view>
 
@@ -96,8 +101,9 @@
   </view>
 
   <!-- 底部操作按钮 -->
-  <view class="bottom-action-bar flex-row" wx:if="{{order.booking.status === 'CONFIRMED'}}">
-    <button class="btn-cancel flex-1" bindtap="onCancelBooking">取消预约</button>
-    <button class="btn-qr flex-1" bindtap="goToQR">查看核销码</button>
+  <view class="bottom-action-bar flex-row" wx:if="{{order.booking.status === 'CONFIRMED' || order.booking.status === 'PENDING_PAYMENT'}}">
+    <button class="btn-cancel flex-1" bindtap="onCancelBooking" disabled="{{cancelling}}">{{cancelling ? '取消中...' : '取消预约'}}</button>
+    <button class="btn-qr flex-1" bindtap="goToQR" wx:if="{{order.booking.status === 'CONFIRMED'}}">查看核销码</button>
+    <button class="btn-qr flex-1" bindtap="goToPay" wx:else>去支付</button>
   </view>
 </view>

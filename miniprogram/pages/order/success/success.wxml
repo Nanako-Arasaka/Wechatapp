@@ -1,26 +1,33 @@
-<view class="success-page container">
+<view class="page-state" wx:if="{{loading}}">正在加载入场凭证...</view>
+<view class="page-state" wx:elif="{{loadError}}">
+  <text>凭证加载失败</text>
+  <button bindtap="onRetry">重新加载</button>
+  <button bindtap="goToOrders">查看订单</button>
+</view>
+<view class="success-page container" wx:elif="{{order}}">
   
   <view class="status-top">
-    <view class="success-icon-box">
+    <view class="success-icon-box" wx:if="{{canCheckin}}">
       <text class="success-check">✓</text>
     </view>
-    <view class="success-title">预约成功！</view>
-    <view class="success-sub">您的场地已锁定，请在运动时间前凭码入场</view>
+    <view class="success-title">{{canCheckin ? '预约成功' : statusText}}</view>
+    <view class="success-sub">{{canCheckin ? '请在预约时段凭码入场' : '当前预约状态不可使用入场凭证'}}</view>
   </view>
 
   
   <view class="ticket-card card">
     <view class="ticket-header flex-between">
       <text class="ticket-type">入场核销凭证</text>
-      <text class="tag tag-blue">待使用</text>
+      <text class="tag tag-blue">{{statusText}}</text>
     </view>
 
     
-    <view class="qrcode-wrapper flex-center">
-      <canvas canvas-id="qrcodeCanvas" class="qrcode-canvas"></canvas>
+    <view class="qrcode-wrapper flex-center" wx:if="{{canCheckin}}">
+      <canvas wx:if="{{!qrError}}" canvas-id="qrcodeCanvas" class="qrcode-canvas" style="width:160px;height:160px;"></canvas>
+      <text wx:else>二维码暂不可用，请出示下方核销码</text>
     </view>
 
-    <view class="code-number-box">
+    <view class="code-number-box" wx:if="{{canCheckin}}">
       <text class="code-label">核销码：</text>
       <text class="code-val">{{bookingCode}}</text>
     </view>
@@ -57,23 +64,22 @@
     <view class="contact-title">联系信息（入场核验）</view>
     <view class="info-row flex-between">
       <text class="info-label">学号</text>
-      <text class="info-value">{{studentNo}}</text>
+      <text class="info-value">{{order.booking.studentNo || '未填写'}}</text>
     </view>
     <view class="info-row flex-between">
       <text class="info-label">姓名</text>
-      <text class="info-value">{{contactName}}</text>
+      <text class="info-value">{{order.booking.contactName}}</text>
     </view>
     <view class="info-row flex-between info-row-last">
       <text class="info-label">手机号</text>
-      <text class="info-value">{{contactPhone}}</text>
+      <text class="info-value">{{order.booking.contactPhone}}</text>
     </view>
   </view>
 
   
   <view class="actions-box">
-    <button class="btn-primary btn-location" bindtap="onOpenLocation">📍 查看场地位置</button>
+    <button class="btn-primary btn-location" bindtap="onOpenLocation">查看场馆地址</button>
     <button class="btn-primary" bindtap="goToOrders">查看我的全部订单</button>
     <button class="btn-outline-home" bindtap="goToHome">返回首页</button>
   </view>
 </view>
-

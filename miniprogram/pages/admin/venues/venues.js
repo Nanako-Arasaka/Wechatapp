@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin_service_1 = require("../../../services/admin.service");
 const admin_guard_1 = require("../../../utils/admin-guard");
+const format_1 = require("../../../utils/format");
 const PAGE_SIZE = 20;
 Page({
     data: {
@@ -10,6 +11,10 @@ Page({
         page: 1,
         hasMore: true,
         loading: false,
+        loadError: false,
+        typeOptions: ['羽毛球', '篮球', '网球', '乒乓球', '足球', '游泳', '健身', '综合馆'],
+        typeKeys: ['BADMINTON', 'BASKETBALL', 'TENNIS', 'TABLE_TENNIS', 'FOOTBALL', 'SWIMMING', 'FITNESS', 'MULTI'],
+        typeIndex: 0,
         showEditModal: false,
         showTimePreviewModal: false,
         showBulkTimeModal: false,
@@ -42,6 +47,7 @@ Page({
         formErrors: {}, // 表单字段级 inline 错误提示
         submitting: false,
     },
+    _loadId: 0,
     onShow() {
         if (!(0, admin_guard_1.guardAdminPage)())
             return;
@@ -50,7 +56,7 @@ Page({
     },
     onPullDownRefresh() {
         this.setData({ page: 1, venues: [], hasMore: true });
-        this.loadVenues().then(() => {
+        this.loadVenues().finally(() => {
             wx.stopPullDownRefresh();
         });
     },
@@ -67,12 +73,15 @@ Page({
         this.loadVenues();
     },
     async loadVenues(append = false) {
-        if (this.data.loading)
+        if (append && this.data.loading)
             return;
-        this.setData({ loading: true });
+        const loadId = ++this._loadId;
+        this.setData({ loading: true, loadError: false });
         try {
             const page = append ? this.data.page + 1 : 1;
             const res = await admin_service_1.AdminService.getVenues(page, PAGE_SIZE, this.data.keyword || undefined);
+            if (loadId !== this._loadId)
+                return;
             const list = res.list || [];
             this.setData({
                 venues: append ? [...this.data.venues, ...list] : list,
@@ -81,10 +90,14 @@ Page({
             });
         }
         catch (err) {
+            if (loadId !== this._loadId)
+                return;
+            this.setData({ loadError: true });
             wx.showToast({ title: err.message || '加载失败', icon: 'none' });
         }
         finally {
-            this.setData({ loading: false });
+            if (loadId === this._loadId)
+                this.setData({ loading: false });
         }
     },
     openAddModal() {
@@ -92,6 +105,7 @@ Page({
             showEditModal: true,
             isEditing: false,
             editingId: '',
+            typeIndex: 0,
             formErrors: {},
             form: {
                 name: '',
@@ -112,6 +126,8 @@ Page({
             showEditModal: true,
             isEditing: true,
             editingId: item.id,
+            typeIndex: Math.max(0, this.data.typeKeys.indexOf(item.type)),
+            formErrors: {},
             form: {
                 name: item.name,
                 type: item.type,
@@ -126,7 +142,13 @@ Page({
         });
     },
     closeEditModal() {
-        this.setData({ showEditModal: false, timePreview: null });
+        this.setData({ showEditModal: false, showTimePreviewModal: false, timePreview: null });
+    },
+    onTypeChange(e) {
+        const typeIndex = Number(e.detail.value);
+        const type = this.data.typeKeys[typeIndex];
+        if (type)
+            this.setData({ typeIndex, 'form.type': type });
     },
     onFormInput(e) {
         const field = e.currentTarget.dataset.field;
@@ -194,7 +216,7 @@ Page({
     },
     // ===== 临时闭馆区间 =====
     openCloseRangeModal(e) {
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = (0, format_1.formatDate)(new Date());
         this.setData({
             showCloseRangeModal: true,
             closeRangeVenueId: e.currentTarget.dataset.id,
@@ -278,12 +300,18 @@ Page({
             errors.name = '请输入场馆名称';
         if (!f.type.trim())
             errors.type = '请选择项目分类';
-        const price = parseFloat(f.basePriceYuan);
-        if (isNaN(price) || price <= 0)
-            errors.basePriceYuan = '单价必须为大于 0 的数字';
-        const capacity = parseInt(f.capacity, 10);
-        if (isNaN(capacity) || capacity < 1)
-            errors.capacity = '容量至少为 1';
+        if (f.name.trim().length > 100)
+            errors.name = '场馆名称不能超过 100 字';
+        if (!this.data.isEditing && !f.description.trim())
+            errors.description = '请输入场馆介绍';
+        if (f.description.length > 2000)
+            errors.description = '场馆介绍不能超过 2000 字';
+        const price = Number(f.basePriceYuan);
+        if (!Number.isFinite(price) || price < 0 || !/^\d+(\.\d{1,2})?$/.test(f.basePriceYuan.trim()))
+            errors.basePriceYuan = '单价不能为负数，最多两位小数';
+        const capacity = Number(f.capacity);
+        if (!Number.isInteger(capacity) || capacity < 1)
+            errors.capacity = '容量须为大于 0 的整数';
         const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
         if (!timeRegex.test(f.openTime) || !timeRegex.test(f.closeTime)) {
             errors.timeRange = '时间格式应为 HH:mm';
@@ -297,6 +325,8 @@ Page({
         }
         if (!f.address.trim())
             errors.address = '请输入场馆详细地址';
+        if (f.address.trim().length > 200)
+            errors.address = '地址不能超过 200 字';
         if (!f.coverImage.trim())
             errors.coverImage = '请输入封面图 URL';
         if (Object.keys(errors).length > 0) {
@@ -306,11 +336,11 @@ Page({
         }
         this.setData({ formErrors: {} });
         const payload = {
-            name: f.name,
+            name: f.name.trim(),
             type: f.type,
-            description: f.description || `${f.name}，配备高规格运动地胶与专业照明设备。`,
-            address: f.address,
-            coverImage: f.coverImage,
+            description: f.description || '',
+            address: f.address.trim(),
+            coverImage: f.coverImage.trim(),
             basePrice: Math.round(price * 100),
             capacity,
             openTime: f.openTime,
@@ -376,13 +406,16 @@ Page({
         }
     },
     deleteVenue(e) {
+        if (this.data.submitting)
+            return;
         const id = e.currentTarget.dataset.id;
         wx.showModal({
             title: '确认下架并删除？',
             content: '删除后前端用户将无法检索到该场馆，历史订单仍会保留记录。',
             confirmColor: '#FF4D4F',
             success: async (res) => {
-                if (res.confirm) {
+                if (res.confirm && !this.data.submitting) {
+                    this.setData({ submitting: true });
                     try {
                         await admin_service_1.AdminService.deleteVenue(id);
                         wx.showToast({ title: '已成功下架删除', icon: 'success' });
@@ -390,6 +423,9 @@ Page({
                     }
                     catch (err) {
                         wx.showToast({ title: err.message || '删除失败', icon: 'none' });
+                    }
+                    finally {
+                        this.setData({ submitting: false });
                     }
                 }
             },

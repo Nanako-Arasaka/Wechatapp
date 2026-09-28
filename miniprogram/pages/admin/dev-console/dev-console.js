@@ -2,12 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin_service_1 = require("../../../services/admin.service");
 const admin_guard_1 = require("../../../utils/admin-guard");
+const auth_1 = require("../../../store/auth");
 Page({
-    data: {},
+    data: { submitting: false },
     onShow() {
         (0, admin_guard_1.guardAdminPage)();
     },
     async handleGeneratePeak() {
+        if (!auth_1.AuthStore.isSuperAdmin() || this.data.submitting)
+            return;
+        this.setData({ submitting: true });
         try {
             const res = await admin_service_1.AdminService.devGeneratePeak();
             wx.showModal({
@@ -19,8 +23,14 @@ Page({
         catch (err) {
             // 异常已处理
         }
+        finally {
+            this.setData({ submitting: false });
+        }
     },
     async handleExpireOrders() {
+        if (!auth_1.AuthStore.isSuperAdmin() || this.data.submitting)
+            return;
+        this.setData({ submitting: true });
         try {
             const res = await admin_service_1.AdminService.devExpireOrders();
             wx.showModal({
@@ -31,6 +41,9 @@ Page({
         }
         catch (err) {
             // 异常已处理
+        }
+        finally {
+            this.setData({ submitting: false });
         }
     },
     goToDashboard() {

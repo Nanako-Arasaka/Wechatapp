@@ -1,6 +1,6 @@
 .order-detail-page {
   background: #F4F6F9;
-  padding-bottom: 140rpx;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
 .detail-header-card {
@@ -75,11 +75,16 @@
 
 .item-label {
   color: #86909C;
+  flex-shrink: 0;
 }
 
 .item-val {
   color: #1F2329;
   font-weight: 500;
+  min-width: 0;
+  max-width: 70%;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .highlight {
@@ -117,10 +122,10 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
+  min-height: 120rpx;
   background: #FFFFFF;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
-  padding: 16rpx 32rpx;
+  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
   box-sizing: border-box;
   gap: 20rpx;
   z-index: 100;

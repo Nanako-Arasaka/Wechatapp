@@ -26,6 +26,8 @@ export class AuthStore {
     this.setToken(token);
     if (refreshToken) {
       this.setRefreshToken(refreshToken);
+    } else {
+      wx.removeStorageSync(REFRESH_TOKEN_KEY);
     }
   }
 
@@ -43,12 +45,13 @@ export class AuthStore {
   }
 
   static isAdmin(): boolean {
+    if (!this.getToken()) return false;
     const role = this.getRole();
     return role === 'ADMIN' || role === 'SUPER_ADMIN';
   }
 
   static isSuperAdmin(): boolean {
-    return this.getRole() === 'SUPER_ADMIN';
+    return !!this.getToken() && this.getRole() === 'SUPER_ADMIN';
   }
 
   static clear() {

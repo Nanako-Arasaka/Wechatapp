@@ -47,7 +47,7 @@
         bindtap="onConfirmSheet"
         disabled="{{submitting}}"
       >
-        {{submitting ? '锁定中...' : '确认预约'}}
+        {{submitting ? '处理中...' : (createdOrderId ? '前往支付' : '确认预约')}}
       </button>
     </view>
   </view>

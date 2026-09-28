@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const notification_service_1 = require("../../../services/notification.service");
+const auth_1 = require("../../../store/auth");
 /** 将 ISO 时间格式化为相对时间 */
 function formatRelativeTime(iso) {
     if (!iso)
         return '';
     const time = new Date(iso).getTime();
+    if (!Number.isFinite(time))
+        return '';
     const diff = Date.now() - time;
     const minute = 60 * 1000;
     const hour = 60 * minute;
@@ -27,6 +30,7 @@ Page({
     data: {
         loading: true,
         loadError: false,
+        isLoggedIn: false,
         notifications: [],
     },
     onShow() {
@@ -36,6 +40,12 @@ Page({
         this.loadNotifications().finally(() => wx.stopPullDownRefresh());
     },
     async loadNotifications() {
+        const isLoggedIn = !!auth_1.AuthStore.getToken();
+        this.setData({ isLoggedIn });
+        if (!isLoggedIn) {
+            this.setData({ loading: false, loadError: false, notifications: [] });
+            return;
+        }
         this.setData({ loading: true, loadError: false });
         try {
             const list = await notification_service_1.NotificationService.getNotifications();
@@ -48,7 +58,9 @@ Page({
             });
             // 打开通知中心后自动全部标记为已读（角标清零）
             if ((list || []).some((n) => !n.isRead)) {
-                notification_service_1.NotificationService.markAllRead().catch(() => { });
+                notification_service_1.NotificationService.markAllRead().then(() => {
+                    this.setData({ notifications: this.data.notifications.map((notification) => ({ ...notification, isRead: true })) });
+                }).catch(() => { });
             }
         }
         catch (err) {
@@ -58,5 +70,8 @@ Page({
     },
     onRetry() {
         this.loadNotifications();
+    },
+    goToLogin() {
+        wx.navigateTo({ url: '/pages/auth/login/login' });
     },
 });

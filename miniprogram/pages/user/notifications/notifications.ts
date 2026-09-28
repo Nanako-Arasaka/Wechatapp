@@ -1,4 +1,5 @@
 import { NotificationService, NotificationItem } from '../../../services/notification.service';
+import { AuthStore } from '../../../store/auth';
 
 interface NotificationView extends NotificationItem {
   time: string;
@@ -8,6 +9,7 @@ interface NotificationView extends NotificationItem {
 function formatRelativeTime(iso: string): string {
   if (!iso) return '';
   const time = new Date(iso).getTime();
+  if (!Number.isFinite(time)) return '';
   const diff = Date.now() - time;
   const minute = 60 * 1000;
   const hour = 60 * minute;
@@ -26,6 +28,7 @@ Page({
   data: {
     loading: true,
     loadError: false,
+    isLoggedIn: false,
     notifications: [] as NotificationView[],
   },
 
@@ -38,6 +41,12 @@ Page({
   },
 
   async loadNotifications() {
+    const isLoggedIn = !!AuthStore.getToken();
+    this.setData({ isLoggedIn });
+    if (!isLoggedIn) {
+      this.setData({ loading: false, loadError: false, notifications: [] });
+      return;
+    }
     this.setData({ loading: true, loadError: false });
     try {
       const list = await NotificationService.getNotifications();
@@ -50,7 +59,9 @@ Page({
       });
       // 打开通知中心后自动全部标记为已读（角标清零）
       if ((list || []).some((n) => !n.isRead)) {
-        NotificationService.markAllRead().catch(() => {});
+        NotificationService.markAllRead().then(() => {
+          this.setData({ notifications: this.data.notifications.map((notification: NotificationView) => ({ ...notification, isRead: true })) });
+        }).catch(() => {});
       }
     } catch (err) {
       console.warn('加载通知失败:', err);
@@ -60,5 +71,9 @@ Page({
 
   onRetry() {
     this.loadNotifications();
+  },
+
+  goToLogin() {
+    wx.navigateTo({ url: '/pages/auth/login/login' });
   },
 });
