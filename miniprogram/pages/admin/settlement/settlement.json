@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "资金结算看板",
+  "navigationBarBackgroundColor": "#1F2329",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

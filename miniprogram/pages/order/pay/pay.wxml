@@ -1,0 +1,63 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
+<view class="pay-page container">
+  <!-- 顶部倒计时与金额 -->
+  <view class="pay-header-card card">
+    <view class="countdown-tip">支付剩余时间：<text class="time-highlight">{{countdownText}}</text></view>
+    <view class="amount-box">
+      <text class="currency">¥</text>
+      <text class="amount-val">{{filters.formatMoney(order.amount)}}</text>
+    </view>
+    <view class="order-no-text">订单编号：{{order.orderNo}}</view>
+  </view>
+
+  <!-- 订单明细卡片 -->
+  <view class="order-info-card card">
+    <view class="card-title">预约详情明细</view>
+    <view class="info-row flex-between">
+      <text class="row-label">预约场馆</text>
+      <text class="row-val">{{order.booking.venue.name}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="row-label">预约日期</text>
+      <text class="row-val">{{order.booking.bookingDate}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="row-label">预约时段</text>
+      <text class="row-val">{{order.booking.startTime}} - {{order.booking.endTime}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="row-label">预约数量</text>
+      <text class="row-val">{{order.booking.quantity}} 个名额</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="row-label">预订人</text>
+      <text class="row-val">{{order.booking.contactName}} ({{order.booking.contactPhone}})</text>
+    </view>
+  </view>
+
+  <!-- 支付方式选择 -->
+  <view class="pay-method-card card">
+    <view class="card-title">支付方式</view>
+    <view class="method-item flex-between">
+      <view class="method-left flex-row">
+        <text class="wx-pay-icon">💬</text>
+        <view class="method-info">
+          <view class="method-name">微信支付</view>
+          <view class="method-sub">微信安全快捷支付通道</view>
+        </view>
+      </view>
+      <view class="radio-checked">●</view>
+    </view>
+  </view>
+
+  <!-- 底部支付操作栏 -->
+  <view class="bottom-pay-bar">
+    <button
+      class="btn-confirm-pay {{paying ? 'disabled' : ''}}"
+      bindtap="onConfirmPay"
+      disabled="{{paying}}"
+    >
+      {{paying ? '正在模拟微信支付...' : '确认支付 ¥' + filters.formatMoney(order.amount)}}
+    </button>
+  </view>
+</view>

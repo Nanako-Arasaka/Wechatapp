@@ -1,0 +1,70 @@
+<view class="admin-bookings-page container">
+  <!-- 头部筛选栏 -->
+  <view class="filter-header-bar">
+    <input
+      class="filter-search-input"
+      placeholder="搜索预约号 / 姓名 / 手机号..."
+      value="{{keyword}}"
+      bindinput="onInputKeyword"
+      bindconfirm="loadBookings"
+    />
+
+    <!-- 状态 Tab -->
+    <scroll-view class="status-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+      <view
+        class="status-tab-item {{currentStatus === item.key ? 'active' : ''}}"
+        wx:for="{{statusTabs}}"
+        wx:key="key"
+        bindtap="onSelectStatus"
+        data-key="{{item.key}}"
+      >
+        <text>{{item.label}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 预约列表 -->
+  <view class="bookings-list-wrap">
+    <empty
+      wx:if="{{bookings.length === 0}}"
+      icon="📑"
+      title="暂无匹配预约"
+      description="当前分类下暂无预约记录"
+    />
+
+    <view class="admin-booking-card card" wx:for="{{bookings}}" wx:key="id">
+      <view class="ab-header flex-between">
+        <text class="ab-no">预约号：{{item.bookingNo}}</text>
+        <status-tag status="{{item.status}}" />
+      </view>
+
+      <view class="ab-details">
+        <view class="ab-row flex-between">
+          <text class="ab-label">预约场馆</text>
+          <text class="ab-val font-bold">{{item.venueName}}</text>
+        </view>
+        <view class="ab-row flex-between">
+          <text class="ab-label">预约时段</text>
+          <text class="ab-val text-primary font-bold">📅 {{item.bookingDate}} {{item.timeRange}}</text>
+        </view>
+        <view class="ab-row flex-between">
+          <text class="ab-label">预订客户</text>
+          <text class="ab-val">{{item.userName}} ({{item.userPhone}})</text>
+        </view>
+        <view class="ab-row flex-between">
+          <text class="ab-label">数量 / 金额</text>
+          <text class="ab-val">{{item.quantity}}个名额 · <text class="text-danger font-bold">¥{{item.totalAmount / 100}}</text></text>
+        </view>
+        <view class="ab-row flex-between" wx:if="{{item.checkedInAt}}">
+          <text class="ab-label">核销入场时间</text>
+          <text class="ab-val text-success">{{item.checkedInAt}}</text>
+        </view>
+      </view>
+
+      <view class="ab-footer flex-between" wx:if="{{item.status === 'CONFIRMED'}}">
+        <text class="code-badge">核销码：{{item.bookingCode}}</text>
+        <button class="btn-fast-checkin" bindtap="quickCheckin" data-id="{{item.id}}" data-code="{{item.bookingCode}}">一键核销</button>
+      </view>
+    </view>
+  </view>
+</view>

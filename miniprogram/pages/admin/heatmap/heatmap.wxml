@@ -1,0 +1,44 @@
+<view class="heatmap-page container">
+  <view class="hm-header card">
+    <view class="hm-title">全馆 7×24 小时预约热力图</view>
+    <view class="hm-desc">基于历史 300+ 笔预约数据计算出每个时段的场地利用饱和度</view>
+
+    <!-- 色阶图例 -->
+    <view class="hm-scale-bar flex-row">
+      <text class="scale-label">空闲</text>
+      <view class="scale-box s-1"></view>
+      <view class="scale-box s-2"></view>
+      <view class="scale-box s-3"></view>
+      <view class="scale-box s-4"></view>
+      <view class="scale-box s-5"></view>
+      <text class="scale-label">爆满</text>
+    </view>
+  </view>
+
+  <!-- 热力网格卡片 -->
+  <view class="hm-matrix-card card">
+    <!-- 横向时段表头 -->
+    <view class="matrix-row header-row flex-row">
+      <view class="day-cell header">星期</view>
+      <view class="hour-cell header flex-1" wx:for="{{hours}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <!-- 每天的数据行 -->
+    <view class="matrix-row flex-row" wx:for="{{days}}" wx:for-index="dayIdx" wx:key="*this">
+      <view class="day-cell">{{item}}</view>
+      <view
+        class="hour-cell flex-1 cell-val flex-center"
+        wx:for="{{hours}}"
+        wx:for-index="hourIdx"
+        wx:key="*this"
+        style="background: {{getCellBg(matrix[dayIdx][hourIdx])}}; color: {{matrix[dayIdx][hourIdx] >= 65 ? '#FFFFFF' : '#1F2329'}};"
+        bindtap="onCellTap"
+        data-day="{{days[dayIdx]}}"
+        data-hour="{{hours[hourIdx]}}"
+        data-val="{{matrix[dayIdx][hourIdx]}}"
+      >
+        <text class="cell-num">{{matrix[dayIdx][hourIdx]}}%</text>
+      </view>
+    </view>
+  </view>
+</view>

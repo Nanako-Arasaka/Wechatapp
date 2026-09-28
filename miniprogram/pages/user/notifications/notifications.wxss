@@ -1,0 +1,32 @@
+.notifications-page {
+  background: #F4F6F9;
+  padding-top: 10rpx;
+}
+
+.notify-card {
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.notify-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.notify-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.notify-time {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.notify-content {
+  font-size: 24rpx;
+  color: #4E5969;
+  line-height: 1.6;
+  margin-top: 14rpx;
+}

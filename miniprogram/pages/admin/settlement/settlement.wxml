@@ -1,0 +1,72 @@
+<view class="settlement-page container">
+  <!-- 资金核心总览大卡 -->
+  <view class="settlement-header card">
+    <view class="sh-title flex-between">
+      <text class="sh-label">今日净收入 (元)</text>
+      <text class="tag tag-green">↑ 13.3% 环比增长</text>
+    </view>
+    <view class="sh-amount-box flex-row">
+      <text class="sh-currency">¥</text>
+      <text class="sh-amount">{{kpi.todayNetIncome || '3,862'}}</text>
+    </view>
+    <view class="sh-sub-row flex-between">
+      <text class="yesterday-text">昨日净收入：¥{{kpi.yesterdayNetIncome || '3,410'}}</text>
+      <text class="settle-rule-tag">T+1 自动结算</text>
+    </view>
+  </view>
+
+  <!-- 4 个资金指标卡 -->
+  <view class="money-grid">
+    <view class="m-card card">
+      <view class="m-label">本月累计收入</view>
+      <view class="m-val">¥{{kpi.monthRevenue || '76,820'}}</view>
+    </view>
+    <view class="m-card card">
+      <view class="m-label">历史总营收</view>
+      <view class="m-val font-blue">¥{{kpi.totalRevenue || '326,580'}}</view>
+    </view>
+    <view class="m-card card">
+      <view class="m-label">待结算资金</view>
+      <view class="m-val font-orange">¥{{kpi.pendingSettlement || '12,360'}}</view>
+    </view>
+    <view class="m-card card">
+      <view class="m-label">累计退款金额</view>
+      <view class="m-val font-danger">¥{{kpi.totalRefunds || '680'}}</view>
+    </view>
+  </view>
+
+  <!-- 7天营收趋势图 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="c-title-box flex-row">
+        <text class="c-bar"></text>
+        <text class="c-title">近 7 天实际营收走势</text>
+      </view>
+      <text class="tag tag-blue">日结走势</text>
+    </view>
+    <view class="canvas-wrap">
+      <canvas canvas-id="settleTrendCanvas" class="trend-chart-canvas"></canvas>
+    </view>
+  </view>
+
+  <!-- 场馆营收结构占比 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="c-title-box flex-row">
+        <text class="c-bar"></text>
+        <text class="c-title">各场馆营收来源占比</text>
+      </view>
+      <text class="tag tag-green">收入结构</text>
+    </view>
+    <view class="canvas-wrap">
+      <canvas canvas-id="settlePieCanvas" class="pie-chart-canvas"></canvas>
+    </view>
+  </view>
+
+  <!-- 结算规则说明 -->
+  <view class="info-note-card card">
+    <view class="note-title">资金结算与退款清算机制说明</view>
+    <view class="note-item">• 平台统一维护 order_amount, paid_amount, refund_amount 与 settlement_amount 真实数据模型。</view>
+    <view class="note-item">• 用户在有效退订期内取消，退款将通过 MockRefundProvider 自动原路退回，并实时从今日结算额中扣减。</view>
+  </view>
+</view>

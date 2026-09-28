@@ -1,0 +1,254 @@
+.venue-list-page {
+  background: #F6F8FB;
+  padding-bottom: 30rpx;
+}
+
+.search-header {
+  background: #FFFFFF;
+  padding: 16rpx 28rpx 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.search-input-box {
+  background: #F4F6F9;
+  border-radius: 40rpx;
+  padding: 14rpx 24rpx;
+  align-items: center;
+}
+
+.search-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.search-input {
+  font-size: 26rpx;
+  color: #1F2329;
+}
+
+.clear-btn {
+  font-size: 24rpx;
+  color: #86909C;
+  padding: 4rpx 10rpx;
+}
+
+/* 分类 Tab */
+.type-scroll {
+  display: flex;
+  white-space: nowrap;
+  padding: 18rpx 0 10rpx;
+}
+
+.type-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 24rpx;
+  background: #F4F6F9;
+  border-radius: 30rpx;
+  margin-right: 16rpx;
+  font-size: 24rpx;
+  color: #4E5969;
+  transition: all 0.2s;
+}
+
+.type-item.active {
+  background: #1677FF;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.type-emoji {
+  margin-right: 8rpx;
+  font-size: 24rpx;
+}
+
+/* 排序栏 */
+.sort-bar {
+  display: flex;
+  padding: 16rpx 0 12rpx;
+  border-top: 1rpx solid #F4F6F9;
+}
+
+.sort-item {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: #86909C;
+}
+
+.sort-item.active {
+  color: #1677FF;
+  font-weight: 700;
+}
+
+/* 场馆列表 */
+.venue-cards-list {
+  padding-top: 10rpx;
+}
+
+.venue-item-card {
+  padding: 26rpx;
+  margin-bottom: 20rpx;
+  border-radius: 24rpx;
+}
+
+.cover-box {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 18rpx;
+  overflow: hidden;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.venue-cover {
+  width: 100%;
+  height: 100%;
+  border-radius: 18rpx;
+  background: #E5E6EB;
+}
+
+.cover-badge {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  backdrop-filter: blur(6px);
+}
+
+.badge-avail {
+  background: rgba(0, 185, 107, 0.92);
+  color: #FFFFFF;
+}
+
+.badge-tight {
+  background: rgba(250, 140, 22, 0.92);
+  color: #FFFFFF;
+}
+
+.badge-full {
+  background: rgba(255, 77, 79, 0.92);
+  color: #FFFFFF;
+}
+
+.v-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #1D2129;
+}
+
+.v-addr {
+  font-size: 22rpx;
+  color: #86909C;
+  margin: 6rpx 0 10rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v-open-time {
+  font-size: 22rpx;
+  color: #4E5969;
+  margin-bottom: 10rpx;
+}
+
+.clock-icon {
+  font-size: 20rpx;
+  margin-right: 6rpx;
+}
+
+.v-facilities-row {
+  gap: 8rpx;
+}
+
+.v-fac-tag {
+  background: #F4F6F9;
+  color: #4E5969;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.card-footer-row {
+  margin-top: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #F4F6F9;
+  align-items: center;
+}
+
+.price-wrap {
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.price-symbol {
+  font-size: 24rpx;
+  color: #FF4D4F;
+  font-weight: 700;
+}
+
+.price-num {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #FF4D4F;
+  margin: 0 4rpx;
+}
+
+.price-unit {
+  font-size: 20rpx;
+  color: #86909C;
+}
+
+.footer-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.btn-detail-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 26rpx;
+  background: #F4F6F9;
+  color: #4E5969;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.btn-detail-action:active {
+  opacity: 0.8;
+}
+
+.btn-book-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 34rpx;
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.25);
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.btn-book-action:active {
+  opacity: 0.85;
+}

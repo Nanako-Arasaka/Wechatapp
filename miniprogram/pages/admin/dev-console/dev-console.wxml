@@ -1,0 +1,43 @@
+<view class="dev-console-page container">
+  <!-- 头部提示卡 -->
+  <view class="dev-header card">
+    <view class="dev-title flex-row">
+      <text class="dev-icon">⚡</text>
+      <text>智能数据调度与控制中心</text>
+    </view>
+    <view class="dev-desc">此面板仅超级管理员可见，支持快速触发运营压力测试与数据注入。</view>
+  </view>
+
+  <!-- 模拟操作卡片列表 -->
+  <view class="tools-grid">
+    <!-- 模拟晚高峰火爆 -->
+    <view class="tool-card card">
+      <view class="tool-top flex-between">
+        <text class="tool-name">🔥 一键制造晚高峰爆满客流</text>
+        <text class="tag tag-red">客流冲击</text>
+      </view>
+      <view class="tool-desc">将今日 18:00-21:00 所有场馆时段库存瞬间占满，随后可在实时监控大屏和 Dashboard 看到 100% 爆满预警与 AI 错峰建议生效！</view>
+      <button class="btn-tool-action bg-red" bindtap="handleGeneratePeak">立刻执行客流注入</button>
+    </view>
+
+    <!-- 模拟订单超时与库存释放 -->
+    <view class="tool-card card">
+      <view class="tool-top flex-between">
+        <text class="tool-name">⏱️ 超时订单扫描与库存释放</text>
+        <text class="tag tag-orange">防锁库</text>
+      </view>
+      <view class="tool-desc">模拟系统定时任务，扫描所有超过 15 分钟未完成支付的锁定订单，自动将其置为 EXPIRED 并将场地名额归还库存。</view>
+      <button class="btn-tool-action bg-orange" bindtap="handleExpireOrders">执行超时扫描释放</button>
+    </view>
+
+    <!-- 快速跳转大屏验证 -->
+    <view class="tool-card card">
+      <view class="tool-top flex-between">
+        <text class="tool-name">📊 查看大屏实时变化</text>
+        <text class="tag tag-blue">即时验证</text>
+      </view>
+      <view class="tool-desc">完成上述操作后，跳转至运营指挥大屏查看数据变动。</view>
+      <button class="btn-tool-action bg-blue" bindtap="goToDashboard">前往运营大屏 ›</button>
+    </view>
+  </view>
+</view>

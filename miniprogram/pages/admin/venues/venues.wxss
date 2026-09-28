@@ -1,0 +1,225 @@
+.admin-venues-page {
+  background: #F4F6F9;
+}
+
+.admin-header-bar {
+  background: #1F2329;
+  padding: 20rpx 28rpx 28rpx;
+  gap: 16rpx;
+}
+
+.header-search-input {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 30rpx;
+  padding: 14rpx 24rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+
+.header-actions {
+  gap: 12rpx;
+}
+
+.btn-add-venue {
+  background: #1677FF;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 30rpx;
+  padding: 14rpx 28rpx;
+  border: none;
+}
+
+.btn-batch-time {
+  background: #F4F6F9;
+  color: #1677FF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 30rpx;
+  padding: 14rpx 24rpx;
+  border: none;
+}
+
+.venue-admin-list {
+  padding-top: 10rpx;
+}
+
+.admin-venue-card {
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.av-img {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 14rpx;
+  margin-right: 18rpx;
+  background: #E5E6EB;
+}
+
+.av-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.av-addr {
+  font-size: 22rpx;
+  color: #86909C;
+  margin: 6rpx 0 8rpx;
+}
+
+.av-meta-row {
+  font-size: 22rpx;
+  color: #4E5969;
+}
+
+.av-price {
+  color: #FF4D4F;
+  font-weight: 700;
+}
+
+.av-sep {
+  margin: 0 10rpx;
+  color: #E5E6EB;
+}
+
+.av-stats-box {
+  background: #F8F9FB;
+  border-radius: 12rpx;
+  padding: 14rpx 20rpx;
+  margin: 16rpx 0;
+  font-size: 24rpx;
+}
+
+.av-stat-num {
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.av-actions-row {
+  border-top: 1rpx solid #F4F6F9;
+  padding-top: 16rpx;
+}
+
+.btn-action-sm {
+  background: #F4F6F9;
+  color: #4E5969;
+  font-size: 22rpx;
+  border-radius: 20rpx;
+  padding: 8rpx 18rpx;
+  margin-right: 10rpx;
+  border: none;
+}
+
+.btn-action-sm.btn-reopen {
+  background: #E6FFFB;
+  color: #13C2C2;
+}
+
+.btn-edit-sm {
+  background: #E6F4FF;
+  color: #1677FF;
+  font-size: 22rpx;
+  border-radius: 20rpx;
+  padding: 8rpx 22rpx;
+  margin-right: 10rpx;
+  border: none;
+}
+
+.btn-del-sm {
+  background: #FFF1F0;
+  color: #FF4D4F;
+  font-size: 22rpx;
+  border-radius: 20rpx;
+  padding: 8rpx 22rpx;
+  border: none;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dialog {
+  width: 640rpx;
+  max-height: 80vh;
+  margin: 0;
+  padding: 36rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 24rpx;
+}
+
+.modal-form-scroll {
+  max-height: 55vh;
+}
+
+.form-item {
+  margin-bottom: 20rpx;
+}
+
+.f-label {
+  font-size: 24rpx;
+  color: #4E5969;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.f-input {
+  background: #F4F6F9;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  color: #1F2329;
+  border: 2rpx solid transparent;
+}
+
+.f-input-error {
+  border-color: #FF4D4F;
+  background: #FFF1F0;
+}
+
+.f-error {
+  display: block;
+  color: #FF4D4F;
+  font-size: 22rpx;
+  margin-top: 8rpx;
+}
+
+.modal-btn-row {
+  margin-top: 30rpx;
+  gap: 20rpx;
+}
+
+.btn-modal-cancel {
+  background: #F4F6F9;
+  color: #4E5969;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  border: none;
+}
+
+.btn-modal-submit {
+  background: #1677FF;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  border: none;
+}

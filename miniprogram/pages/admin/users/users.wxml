@@ -1,0 +1,81 @@
+<view class="users-page">
+  <view class="header-card">
+    <view class="h-title">账号管理</view>
+    <view class="h-desc">{{isSuperAdmin ? '超级管理员可开通/删除管理员账号' : '普通管理员仅可开通普通用户账号'}}</view>
+  </view>
+
+  <!-- 超级管理员 tab 切换 -->
+  <view class="tab-bar" wx:if="{{isSuperAdmin}}">
+    <view class="tab-item {{activeTab === 'create' ? 'active' : ''}}" bindtap="switchTab" data-tab="create">开通账号</view>
+    <view class="tab-item {{activeTab === 'manage' ? 'active' : ''}}" bindtap="switchTab" data-tab="manage">管理员管理</view>
+  </view>
+
+  <!-- 开通账号 -->
+  <view class="form-card card" wx:if="{{!isSuperAdmin || activeTab === 'create'}}">
+    <view class="form-item">
+      <text class="f-label">账号 <text class="required">*</text></text>
+      <input class="f-input" placeholder="请设置登录账号（学工号/工号）" value="{{username}}" bindinput="onUsernameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="f-label">初始密码 <text class="required">*</text></text>
+      <input class="f-input" password placeholder="请设置 6-32 位初始密码" value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="f-label">姓名/昵称</text>
+      <input class="f-input" placeholder="留空则使用账号作为昵称" value="{{nickname}}" bindinput="onNicknameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="f-label">手机号</text>
+      <input class="f-input" type="number" placeholder="用于接收预约提醒" value="{{phone}}" bindinput="onPhoneInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="f-label">角色</text>
+      <view class="role-selector">
+        <picker bindchange="onRoleChange" value="{{roleIndex}}" range="{{roleOptions}}">
+          <view class="picker-value">{{roleOptions[roleIndex]}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <button class="btn-submit {{submitting ? 'btn-disabled' : ''}}" bindtap="onSubmit" disabled="{{submitting}}">
+      {{submitting ? '开通中...' : '确认开通账号'}}
+    </button>
+  </view>
+
+  <!-- 管理员管理 -->
+  <view class="list-card card" wx:if="{{isSuperAdmin && activeTab === 'manage'}}">
+    <view class="list-title">已有场馆管理员</view>
+    <view class="empty-state" wx:if="{{!listLoading && adminList.length === 0}}">
+      <text>暂无管理员账号</text>
+    </view>
+
+    <view class="admin-item" wx:for="{{adminList}}" wx:key="id">
+      <view class="admin-info">
+        <view class="admin-name">{{item.nickname || item.username}}</view>
+        <view class="admin-meta">
+          <text class="meta-tag">账号：{{item.username}}</text>
+          <text class="meta-tag" wx:if="{{item.phone}}">手机：{{item.phone}}</text>
+        </view>
+      </view>
+      <button
+        class="btn-delete"
+        size="mini"
+        bindtap="onDeleteAdmin"
+        data-id="{{item.id}}"
+        data-username="{{item.nickname || item.username}}"
+      >删除</button>
+    </view>
+  </view>
+
+  <view class="hint-card" wx:if="{{!isSuperAdmin || activeTab === 'create'}}">
+    <view class="hint-title">注意事项</view>
+    <view class="hint-item">• 普通用户可预约场地、查看订单、出示核销码。</view>
+    <view class="hint-item">• 场馆管理员可管理场馆、扫码核销、查看运营数据。</view>
+    <view class="hint-item" wx:if="{{isSuperAdmin}}">• 超级管理员可开通或删除场馆管理员账号。</view>
+    <view class="hint-item" wx:else>• 如需开通管理员账号，请联系超级管理员。</view>
+  </view>
+</view>

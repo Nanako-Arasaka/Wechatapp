@@ -1,0 +1,216 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(uuid())
+  openid          String?          @unique
+  username        String?          @unique
+  password        String?          // 账号密码登录使用，bcrypt 哈希存储
+  nickname        String
+  avatar          String
+  phone           String?
+  role            String           @default("USER") // USER, ADMIN, SUPER_ADMIN
+  status          String           @default("ACTIVE") // ACTIVE, DISABLED
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  bookings        Booking[]
+  orders          Order[]
+  checkinRecords  CheckinRecord[]
+  operatorCheckins CheckinRecord[] @relation("OperatorCheckins")
+  logs            OperationLog[]
+}
+
+model Venue {
+  id              String           @id @default(uuid())
+  name            String
+  type            String           // BADMINTON, BASKETBALL, TENNIS, TABLE_TENNIS, FOOTBALL, SWIMMING, FITNESS, MULTI
+  description     String
+  address         String
+  coverImage      String
+  latitude        Float?
+  longitude       Float?
+  basePrice       Int              // 单位：分
+  capacity        Int              // 默认单时段容量
+  openTime        String           // "08:00"
+  closeTime       String           // "22:00"
+  bookingInterval Int              @default(60) // 分钟
+  advanceDays     Int              @default(7)  // 提前预约天数
+  status          String           @default("ACTIVE") // ACTIVE, INACTIVE, MAINTENANCE, DELETED
+  facilities      String?          // 设施标签逗号分隔
+  rules           String?          // 预约须知与规则
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  slots           VenueSlot[]
+  bookings        Booking[]
+  schedules       VenueSchedule[]
+  closedDates     VenueClosedDate[]
+}
+
+model VenueSchedule {
+  id          String   @id @default(uuid())
+  venueId     String
+  venue       Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int      // 0-6
+  openTime    String
+  closeTime   String
+  isClosed    Boolean  @default(false)
+  priceFactor Float    @default(1.0)
+}
+
+model VenueClosedDate {
+  id        String   @id @default(uuid())
+  venueId   String
+  venue     Venue    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  date      String   // YYYY-MM-DD
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model VenueSlot {
+  id             String     @id @default(uuid())
+  venueId        String
+  venue          Venue      @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  date           String     // YYYY-MM-DD
+  startTime      String     // HH:mm
+  endTime        String     // HH:mm
+  price          Int        // 单位：分
+  totalCapacity  Int
+  bookedCapacity Int        @default(0)
+  status         String     @default("AVAILABLE") // AVAILABLE, FULL, CLOSED, ADMIN_ONLY, RESERVED, OUT_OF_HOURS
+  isAdminOnly    Boolean    @default(false) // 管理员专属时段标记
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  bookings       Booking[]
+
+  @@unique([venueId, date, startTime])
+}
+
+model Booking {
+  id             String         @id @default(uuid())
+  bookingNo      String         @unique // BK20260829153000123
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  venueId        String
+  venue          Venue          @relation(fields: [venueId], references: [id])
+  slotId         String
+  slot           VenueSlot      @relation(fields: [slotId], references: [id])
+  bookingDate    String         // YYYY-MM-DD
+  startTime      String         // HH:mm
+  endTime        String         // HH:mm
+  quantity       Int            @default(1)
+  unitPrice      Int            // 单位：分
+  totalAmount    Int            // 单位：分
+  status         String         @default("PENDING_PAYMENT") // PENDING_PAYMENT, CONFIRMED, CHECKED_IN, COMPLETED, CANCELLED, REFUNDING, REFUNDED, EXPIRED
+  source         String         @default("USER") // USER, ADMIN
+  bookingCode    String         @unique // SV202609010001 用于核销二维码
+  contactName    String?
+  contactPhone   String?
+  studentNo      String?         // 学号，预约必填（DTO 层强制，DB 兼容历史数据可空）
+  courtNo        Int?            // 选定的场地编号（1~totalCapacity），选场地流程时写入
+  expiredAt      DateTime?
+  checkedInAt    DateTime?
+  cancelledAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  order          Order?
+  checkinRecords CheckinRecord[]
+  courtOccupancies CourtOccupancy[]
+}
+
+// 场地级占用表：一条记录 = 某时段的某号场地被一个预约占用。
+// @@unique([slotId, courtNo]) 在数据库层面保证同时段同场地互斥（含并发）。
+// 预约取消/过期/退款时删除对应记录释放场地。
+model CourtOccupancy {
+  id        String   @id @default(uuid())
+  slotId    String
+  courtNo   Int
+  bookingId String
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([slotId, courtNo])
+}
+
+model Order {
+  id             String         @id @default(uuid())
+  orderNo        String         @unique // SV20260829153000123
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  bookingId      String         @unique
+  booking        Booking        @relation(fields: [bookingId], references: [id])
+  amount         Int            // 应付总额(分)
+  discountAmount Int            @default(0) // 优惠金额(分)
+  paidAmount     Int            @default(0) // 实付金额(分)
+  refundAmount   Int            @default(0) // 退款金额(分)
+  paymentStatus  String         @default("UNPAID") // UNPAID, PAID, REFUNDED
+  orderStatus    String         @default("PENDING_PAYMENT") // PENDING_PAYMENT, PAID, COMPLETED, CANCELLED, REFUNDED, EXPIRED
+  createdAt      DateTime       @default(now())
+  paidAt         DateTime?
+  cancelledAt    DateTime?
+  payments       Payment[]
+  refunds        Refund[]
+}
+
+model Payment {
+  id            String              @id @default(uuid())
+  paymentNo     String              @unique // PAY20260829153000123
+  orderId       String
+  order         Order               @relation(fields: [orderId], references: [id])
+  paymentMethod String              @default("WECHAT_PAY")
+  transactionNo String              @unique
+  amount        Int                 // 支付金额(分)
+  status        String              @default("SUCCESS") // SUCCESS, FAILED
+  paidAt        DateTime            @default(now())
+}
+
+model Refund {
+  id          String       @id @default(uuid())
+  refundNo    String       @unique // RF20260829153000123
+  orderId     String
+  order       Order        @relation(fields: [orderId], references: [id])
+  amount      Int          // 退款金额(分)
+  reason      String?
+  status      String       @default("SUCCESS") // SUCCESS, FAILED, PROCESSING
+  createdAt   DateTime     @default(now())
+  completedAt DateTime?
+}
+
+model CheckinRecord {
+  id          String   @id @default(uuid())
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  operatorId  String
+  operator    User     @relation("OperatorCheckins", fields: [operatorId], references: [id])
+  checkinCode String
+  checkinAt   DateTime @default(now())
+  status      String   @default("SUCCESS")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  content   String
+  type      String   // BOOKING_SUCCESS, PAYMENT_SUCCESS, REMINDER, CANCELLED, REFUND
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model OperationLog {
+  id          String   @id @default(uuid())
+  operatorId  String
+  operator    User     @relation(fields: [operatorId], references: [id])
+  action      String   // CREATE_VENUE, UPDATE_VENUE, DELETE_VENUE, CHECKIN, CANCEL_ORDER, REFUND, UPDATE_PRICE
+  module      String   // VENUE, BOOKING, ORDER, CHECKIN, SYSTEM
+  targetId    String?
+  description String
+  createdAt   DateTime @default(now())
+}

@@ -1,0 +1,211 @@
+/**
+ * ============================================================================
+ * P2 选择时间页样式
+ * ----------------------------------------------------------------------------
+ * 布局：场馆概览 -> 今日标题 -> 小时格子时间选择 -> 选中时段摘要 -> 底部【下一步】
+ * 色彩规则：灰色 = 不可预约；绿色 = 可选；主色描边 = 已选中。
+ * ============================================================================
+ */
+
+/* 页面容器：为底部固定操作栏预留空间 */
+.booking-page {
+  padding-bottom: 180rpx;
+}
+
+/* ===== 场馆概览 ===== */
+.v-brief-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: var(--radius-md);
+  margin-right: 20rpx;
+  background: var(--border-light);
+}
+
+.v-brief-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.v-brief-addr {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-top: 10rpx;
+}
+
+/* ===== 今日日期标题 ===== */
+.dst-main {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.dst-sub {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-top: 8rpx;
+}
+
+/* ===== 小时格子时间选择组件 ===== */
+.slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* 单个小时格子：默认可选（绿色系） */
+.slot-cell {
+  width: calc((100% - 32rpx) / 3);
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+  padding: 20rpx 0;
+  text-align: center;
+  background: var(--success-light);
+  border: 2rpx solid rgba(0, 185, 107, 0.35);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+/* 每行第 3 个去掉右间距 */
+.slot-cell:nth-child(3n) {
+  margin-right: 0;
+}
+
+/* 灰色色块：不可预约时段 */
+.slot-cell.disabled {
+  background: #F0F1F3;
+  border-color: var(--border-color);
+}
+
+/* 选中态：主色描边 + 浅蓝底 + 轻微上浮 */
+.slot-cell.selected {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-float);
+  animation: selection-pop 260ms ease-out;
+}
+
+.slot-time {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.slot-cell.disabled .slot-time {
+  color: var(--text-placeholder);
+}
+
+.slot-cell.selected .slot-time {
+  color: var(--primary-color);
+}
+
+.slot-range {
+  font-size: 20rpx;
+  color: var(--text-secondary);
+  margin-top: 6rpx;
+}
+
+.slot-status {
+  font-size: 20rpx;
+  color: var(--success-color);
+  margin-top: 6rpx;
+}
+
+.slot-cell.disabled .slot-status {
+  color: var(--text-placeholder);
+}
+
+.slot-cell.selected .slot-status {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* ===== 选中时段摘要信息 ===== */
+.summary-card {
+  border: 2rpx solid var(--primary-color);
+}
+
+.summary-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 16rpx;
+}
+
+.summary-row {
+  margin-bottom: 12rpx;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.summary-value {
+  font-size: 26rpx;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.summary-price {
+  color: var(--warning-color);
+}
+
+/* ===== 闭馆 / 加载提示 ===== */
+.closed-box {
+  text-align: center;
+}
+
+.closed-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.loading-box {
+  padding: 100rpx 0;
+  text-align: center;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+/* ===== 底部固定【下一步】操作栏 ===== */
+.bottom-action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg-white);
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  z-index: 10;
+}
+
+.btn-next {
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  padding: 22rpx 0;
+  text-align: center;
+  border: none;
+  box-shadow: var(--shadow-float);
+}
+
+/* 未选时段时的置灰态 */
+.btn-next.disabled {
+  background: #C9CDD4;
+  box-shadow: none;
+}
+
+.btn-next:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}

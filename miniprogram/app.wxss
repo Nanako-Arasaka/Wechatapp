@@ -1,0 +1,329 @@
+/**
+ * ============================================================================
+ * 全局视觉与样式设计规范 (Design Tokens & Global Styles)
+ * ----------------------------------------------------------------------------
+ * 核心色板：
+ * - 品牌主色：科技蓝 #1677FF (渐变 #1677FF -> #3B82F6)
+ * - 成功/空闲：翡翠绿 #00B96B (浅底 #E6FFFB)
+ * - 预警/紧张：琥珀橙 #FA8C16 (浅底 #FFF7E6)
+ * - 爆满/危险：珊瑚红 #FF4D4F (浅底 #FFF1F0)
+ * ============================================================================
+ */
+page {
+  --primary-color: #1677FF;
+  --primary-gradient: linear-gradient(135deg, #1677FF 0%, #3B82F6 100%);
+  --primary-light: #E6F4FF;
+  --primary-glow: rgba(22, 119, 255, 0.28);
+
+  --success-color: #00B96B;
+  --success-light: #E6FFFB;
+  --warning-color: #FA8C16;
+  --warning-light: #FFF7E6;
+  --danger-color: #FF4D4F;
+  --danger-light: #FFF1F0;
+  
+  --text-main: #1D2129;
+  --text-regular: #4E5969;
+  --text-secondary: #86909C;
+  --text-placeholder: #C9CDD4;
+  
+  --bg-page: #F6F8FB;
+  --bg-white: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --border-color: #E5E6EB;
+  --border-light: #F2F3F5;
+  
+  --radius-xs: 8rpx;
+  --radius-sm: 12rpx;
+  --radius-md: 18rpx;
+  --radius-lg: 26rpx;
+  --radius-xl: 36rpx;
+  --radius-pill: 999rpx;
+  
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 6rpx 24rpx rgba(0, 0, 0, 0.04), 0 1rpx 4rpx rgba(0, 0, 0, 0.02);
+  --shadow-float: 0 12rpx 36rpx rgba(22, 119, 255, 0.2);
+  --shadow-danger: 0 10rpx 30rpx rgba(255, 77, 79, 0.22);
+  --shadow-success: 0 10rpx 30rpx rgba(0, 185, 107, 0.22);
+
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 布局通用工具类 */
+.container {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-bottom: 40rpx;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 卡片基类 */
+.card {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 30rpx;
+  margin: 20rpx 24rpx;
+  box-shadow: var(--shadow-card);
+  box-sizing: border-box;
+  border: 1rpx solid rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease;
+}
+
+/* 按钮通用体系 */
+.btn-primary {
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  padding: 22rpx 36rpx;
+  text-align: center;
+  box-shadow: var(--shadow-float);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.btn-primary.disabled {
+  background: #C9CDD4;
+  color: #FFFFFF;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  border: 2rpx solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  padding: 18rpx 32rpx;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.btn-outline:active {
+  background: var(--primary-light);
+}
+
+.btn-danger-outline {
+  border: 2rpx solid var(--danger-color);
+  color: var(--danger-color);
+  background: transparent;
+  font-size: 26rpx;
+  border-radius: var(--radius-pill);
+  padding: 12rpx 24rpx;
+  text-align: center;
+}
+
+/* 标签体系 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border-radius: var(--radius-xs);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tag-blue {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.tag-green {
+  background: var(--success-light);
+  color: var(--success-color);
+}
+
+.tag-orange {
+  background: var(--warning-light);
+  color: var(--warning-color);
+}
+
+.tag-red {
+  background: var(--danger-light);
+  color: var(--danger-color);
+}
+
+.tag-gray {
+  background: #F2F3F5;
+  color: var(--text-secondary);
+}
+
+/* 价格文字规范 */
+.price-symbol {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #FF4D4F;
+}
+
+.price-num {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #FF4D4F;
+  letter-spacing: -0.5rpx;
+}
+
+.price-unit {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  margin-left: 4rpx;
+}
+
+/* 骨架屏动画 */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton-box {
+  background: linear-gradient(90deg, #F0F2F5 25%, #E6E8EB 37%, #F0F2F5 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: 12rpx;
+}
+
+.skeleton-card {
+  min-height: 140rpx;
+}
+
+.skeleton-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+
+.skeleton-copy {
+  flex: 1;
+}
+
+.skeleton-line {
+  height: 26rpx;
+  margin-bottom: 18rpx;
+}
+
+.skeleton-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 22rpx;
+}
+
+.skeleton-tile {
+  width: calc((100% - 32rpx) / 3);
+  height: 110rpx;
+  margin-right: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.skeleton-tile:nth-child(3n) {
+  margin-right: 0;
+}
+
+@keyframes content-rise {
+  from { opacity: 0; transform: translateY(18rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes selection-pop {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.content-enter {
+  animation: content-rise 380ms ease-out both;
+}
+
+.delay-short { animation-delay: 70ms; }
+.delay-medium { animation-delay: 140ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .content-enter, .skeleton-box { animation: none; }
+}
+
+/* ============ 通用空状态 / 错误重试占位 ============ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 88rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #86909C;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.btn-retry {
+  margin-top: 36rpx;
+  padding: 18rpx 64rpx;
+  min-height: 44rpx;
+  line-height: 44rpx;
+  background: #1677FF;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 999rpx;
+}
+
+.btn-retry:active {
+  opacity: 0.85;
+}
+
+/* 未读小红点 */
+.unread-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #FF4D4F;
+  margin-left: 10rpx;
+}

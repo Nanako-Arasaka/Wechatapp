@@ -1,0 +1,24 @@
+var typeMap = {
+  BADMINTON: '羽毛球',
+  BASKETBALL: '篮球',
+  TENNIS: '网球',
+  TABLE_TENNIS: '乒乓球',
+  FOOTBALL: '足球',
+  SWIMMING: '游泳',
+  FITNESS: '健身',
+  MULTI: '综合馆',
+};
+
+function venueTypeName(type) {
+  return typeMap[type] || type;
+}
+
+function formatMoney(cents) {
+  if (cents === undefined || cents === null || isNaN(cents)) return '0.00';
+  return (cents / 100).toFixed(2);
+}
+
+module.exports = {
+  venueTypeName: venueTypeName,
+  formatMoney: formatMoney,
+};

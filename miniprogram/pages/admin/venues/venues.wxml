@@ -1,0 +1,211 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
+<view class="admin-venues-page container">
+  <!-- 头部搜索与新增操作 -->
+  <view class="admin-header-bar flex-between">
+    <input
+      class="header-search-input flex-1"
+      placeholder="搜索场馆..."
+      value="{{keyword}}"
+      bindinput="onInputKeyword"
+      bindconfirm="loadVenues"
+    />
+    <view class="header-actions flex-row">
+      <button class="btn-batch-time" bindtap="openBulkTimeModal">批量调时</button>
+      <button class="btn-add-venue" bindtap="openAddModal">+ 新增场馆</button>
+    </view>
+  </view>
+
+  <!-- 加载骨架 -->
+  <view wx:if="{{loading && venues.length === 0}}">
+    <view class="card skeleton-box" style="height: 260rpx; margin-bottom: 20rpx;"></view>
+    <view class="card skeleton-box" style="height: 260rpx; margin-bottom: 20rpx;"></view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{!loading && venues.length === 0}}" class="empty-state">
+    <text class="empty-icon">🏟️</text>
+    <text class="empty-title">暂无场馆</text>
+    <text class="empty-desc">点击右上角「+ 新增场馆」创建第一个运动场馆</text>
+  </view>
+
+  <!-- 场馆列表 -->
+  <view class="venue-admin-list" wx:else>
+    <view class="admin-venue-card card" wx:for="{{venues}}" wx:key="id">
+      <view class="v-card-top flex-row">
+        <image class="av-img" src="{{item.coverImage}}" mode="aspectFill" />
+        <view class="av-info flex-1">
+          <view class="av-name-row flex-between">
+            <text class="av-name">{{item.name}}</text>
+            <text class="tag {{item.status === 'ACTIVE' ? 'tag-green' : 'tag-gray'}}">{{item.status === 'ACTIVE' ? '上架运营' : '已下架'}}</text>
+          </view>
+          <view class="av-addr">{{item.address}}</view>
+          <view class="av-meta-row flex-row">
+            <text class="av-price">¥{{filters.formatMoney(item.basePrice)}}/小时</text>
+            <text class="av-sep">|</text>
+            <text class="av-time">{{item.openTime}}-{{item.closeTime}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 今日指标 -->
+      <view class="av-stats-box flex-between">
+        <view class="av-stat-item">
+          <text class="av-stat-label">今日预约：</text>
+          <text class="av-stat-num">{{item.todayBookingsCount}} 单</text>
+        </view>
+        <view class="av-stat-item">
+          <text class="av-stat-label">今日收益：</text>
+          <text class="av-stat-num text-danger">¥{{item.todayIncome}}</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮栏 -->
+      <view class="av-actions-row flex-between">
+        <view class="left-actions flex-row">
+          <button class="btn-action-sm" bindtap="openCloseRangeModal" data-id="{{item.id}}" data-name="{{item.name}}">临时闭馆</button>
+          <button class="btn-action-sm btn-reopen" bindtap="reopenVenue" data-id="{{item.id}}" data-name="{{item.name}}">直接开馆</button>
+          <button class="btn-action-sm" bindtap="toggleStatus" data-id="{{item.id}}" data-status="{{item.status}}">
+            {{item.status === 'ACTIVE' ? '下架' : '上架'}}
+          </button>
+        </view>
+        <view class="right-actions flex-row">
+          <button class="btn-edit-sm" bindtap="openEditModal" data-item="{{item}}">编辑</button>
+          <button class="btn-del-sm" bindtap="deleteVenue" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增/编辑场馆弹窗 -->
+  <view class="modal-mask" wx:if="{{showEditModal}}">
+    <view class="modal-dialog card">
+      <view class="modal-title">{{isEditing ? '编辑场馆信息' : '新增运动场馆'}}</view>
+      <scroll-view class="modal-form-scroll" scroll-y>
+        <view class="form-item">
+          <text class="f-label">场馆名称</text>
+          <input class="f-input {{formErrors.name ? 'f-input-error' : ''}}" value="{{form.name}}" bindinput="onFormInput" data-field="name" placeholder="请输入场馆名称" />
+          <text class="f-error" wx:if="{{formErrors.name}}">{{formErrors.name}}</text>
+        </view>
+        <view class="form-item">
+          <text class="f-label">项目分类</text>
+          <picker mode="selector" range="{{['BADMINTON','BASKETBALL','TENNIS','TABLE_TENNIS','FOOTBALL','SWIMMING','FITNESS','MULTI']}}" value="{{form.type}}" bindchange="onFormInput" data-field="type">
+            <view class="f-input">{{form.type}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="f-label">单价 (元/小时)</text>
+          <input class="f-input {{formErrors.basePriceYuan ? 'f-input-error' : ''}}" type="digit" value="{{form.basePriceYuan}}" bindinput="onFormInput" data-field="basePriceYuan" placeholder="例如 35" />
+          <text class="f-error" wx:if="{{formErrors.basePriceYuan}}">{{formErrors.basePriceYuan}}</text>
+        </view>
+        <view class="form-item">
+          <text class="f-label">单时段并发总容量</text>
+          <input class="f-input {{formErrors.capacity ? 'f-input-error' : ''}}" type="number" value="{{form.capacity}}" bindinput="onFormInput" data-field="capacity" placeholder="例如 10" />
+          <text class="f-error" wx:if="{{formErrors.capacity}}">{{formErrors.capacity}}</text>
+        </view>
+        <view class="form-item">
+          <text class="f-label">营业时间 (开始 - 结束)</text>
+          <view class="time-range-inputs flex-row">
+            <picker mode="time" value="{{form.openTime}}" bindchange="onTimeChange" data-field="openTime">
+              <view class="f-input flex-1 {{formErrors.timeRange ? 'f-input-error' : ''}}">{{form.openTime}}</view>
+            </picker>
+            <text style="margin: 0 10rpx;">至</text>
+            <picker mode="time" value="{{form.closeTime}}" bindchange="onTimeChange" data-field="closeTime">
+              <view class="f-input flex-1 {{formErrors.timeRange ? 'f-input-error' : ''}}">{{form.closeTime}}</view>
+            </picker>
+          </view>
+          <text class="f-error" wx:if="{{formErrors.timeRange}}">{{formErrors.timeRange}}</text>
+        </view>
+        <view wx:if="{{isEditing}}" class="form-item">
+          <button class="btn-action-sm" bindtap="previewTimeChange">预览变更影响</button>
+        </view>
+        <view class="form-item">
+          <text class="f-label">场馆介绍</text>
+          <textarea class="f-input" value="{{form.description}}" bindinput="onFormInput" data-field="description" placeholder="请输入场馆介绍..." style="height: 160rpx;" />
+        </view>
+        <view class="form-item">
+          <text class="f-label">场馆详细地址</text>
+          <input class="f-input {{formErrors.address ? 'f-input-error' : ''}}" value="{{form.address}}" bindinput="onFormInput" data-field="address" placeholder="文体中心综合馆..." />
+          <text class="f-error" wx:if="{{formErrors.address}}">{{formErrors.address}}</text>
+        </view>
+        <view class="form-item">
+          <text class="f-label">封面图片 URL</text>
+          <input class="f-input {{formErrors.coverImage ? 'f-input-error' : ''}}" value="{{form.coverImage}}" bindinput="onFormInput" data-field="coverImage" placeholder="https://..." />
+          <text class="f-error" wx:if="{{formErrors.coverImage}}">{{formErrors.coverImage}}</text>
+        </view>
+      </scroll-view>
+      <view class="modal-btn-row flex-row">
+        <button class="btn-modal-cancel flex-1" bindtap="closeEditModal">取消</button>
+        <button class="btn-modal-submit flex-1" bindtap="submitVenueForm" disabled="{{submitting}}">{{submitting ? '保存中...' : '保存'}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 时间变更预览弹窗 -->
+  <view class="modal-mask" wx:if="{{showTimePreviewModal}}">
+    <view class="modal-dialog card">
+      <view class="modal-title">变更影响预览</view>
+      <view class="preview-body" wx:if="{{timePreview}}">
+        <view>原时间：{{timePreview.originalOpenTime}} - {{timePreview.originalCloseTime}}</view>
+        <view>新时间：{{timePreview.newOpenTime}} - {{timePreview.newCloseTime}}</view>
+        <view>将新增时段：{{timePreview.toAdd}} 个</view>
+        <view>将删除空时段：{{timePreview.toRemove}} 个</view>
+        <view>已有人预约保留：{{timePreview.keepWithBooking}} 个</view>
+      </view>
+      <view class="modal-btn-row flex-row">
+        <button class="btn-modal-cancel flex-1" bindtap="closeTimePreviewModal">再想想</button>
+        <button class="btn-modal-submit flex-1" bindtap="submitVenueForm">确认变更</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 批量调整营业时间弹窗 -->
+  <view class="modal-mask" wx:if="{{showBulkTimeModal}}">
+    <view class="modal-dialog card">
+      <view class="modal-title">批量调整所有场馆营业时间</view>
+      <view class="form-item">
+        <text class="f-label">营业时间 (开始 - 结束)</text>
+        <view class="time-range-inputs flex-row">
+          <picker mode="time" value="{{bulkTimeForm.openTime}}" bindchange="onBulkTimeChange" data-field="openTime">
+            <view class="f-input flex-1">{{bulkTimeForm.openTime}}</view>
+          </picker>
+          <text style="margin: 0 10rpx;">至</text>
+          <picker mode="time" value="{{bulkTimeForm.closeTime}}" bindchange="onBulkTimeChange" data-field="closeTime">
+            <view class="f-input flex-1">{{bulkTimeForm.closeTime}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="modal-btn-row flex-row">
+        <button class="btn-modal-cancel flex-1" bindtap="closeBulkTimeModal">取消</button>
+        <button class="btn-modal-submit flex-1" bindtap="submitBulkTime" disabled="{{submitting}}">{{submitting ? '调整中...' : '确认调整'}}</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 临时闭馆区间弹窗 -->
+  <view class="modal-mask" wx:if="{{showCloseRangeModal}}">
+    <view class="modal-dialog card">
+      <view class="modal-title">设置【{{closeRangeVenueName}}】临时闭馆</view>
+      <view class="form-item">
+        <text class="f-label">开始日期</text>
+        <picker mode="date" value="{{closeRangeForm.startDate}}" bindchange="onCloseRangeDateChange" data-field="startDate">
+          <view class="f-input">{{closeRangeForm.startDate || '请选择开始日期'}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="f-label">结束日期</text>
+        <picker mode="date" value="{{closeRangeForm.endDate}}" bindchange="onCloseRangeDateChange" data-field="endDate">
+          <view class="f-input">{{closeRangeForm.endDate || '请选择结束日期'}}</view>
+        </picker>
+      </view>
+      <view class="form-item">
+        <text class="f-label">闭馆原因</text>
+        <input class="f-input" value="{{closeRangeForm.reason}}" bindinput="onCloseRangeInput" data-field="reason" placeholder="请输入维护原因" />
+      </view>
+      <view class="modal-btn-row flex-row">
+        <button class="btn-modal-cancel flex-1" bindtap="closeCloseRangeModal">取消</button>
+        <button class="btn-modal-submit flex-1" bindtap="submitCloseRange" disabled="{{submitting}}">{{submitting ? '设置中...' : '确认闭馆'}}</button>
+      </view>
+    </view>
+  </view>
+
+</view>

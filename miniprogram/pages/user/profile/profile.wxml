@@ -1,0 +1,210 @@
+<view class="profile-page container">
+  <!-- 顶部用户信息卡片 (精致深邃科技蓝渐变) -->
+  <view class="user-header">
+    <view class="user-info-row flex-between" bindtap="{{isLoggedIn ? '' : 'goToLogin'}}">
+      <view class="user-left flex-row">
+        <image class="avatar" src="{{isLoggedIn ? (user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150') : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}}" />
+        <view class="user-text-info">
+          <view class="name-line flex-row">
+            <text class="nickname">{{isLoggedIn ? (user.nickname || '运动爱好者') : '未登录 · 游客模式'}}</text>
+            <view class="member-badge {{isLoggedIn ? (user.role === 'SUPER_ADMIN' ? 'badge-super' : (user.role === 'ADMIN' ? 'badge-admin' : 'badge-user')) : 'badge-user'}}">
+              {{isLoggedIn ? (user.role === 'SUPER_ADMIN' ? '👑 超级管理员' : (user.role === 'ADMIN' ? '🛡️ 场馆管理员' : '🏅 运动达人')) : '未登录'}}
+            </view>
+          </view>
+          <view class="phone-text">{{isLoggedIn ? ('📱 ' + maskedPhone) : '登录后查看预约与运动记录'}}</view>
+        </view>
+      </view>
+
+      <!-- 登录/切换入口 -->
+      <view class="switch-role-pill" bindtap="goToLogin" wx:if="{{!isLoggedIn}}">
+        <text class="switch-icon">🔐</text>
+        <text>去登录</text>
+      </view>
+      <view class="switch-role-pill" bindtap="goToLogin" wx:elif="{{isAdmin}}">
+        <text class="switch-icon">⇄</text>
+        <text>切换账号</text>
+      </view>
+    </view>
+
+    <!-- 运动数据统计条 -->
+    <view class="stats-card flex-between">
+      <view class="stat-item" bindtap="goToOrdersWithStatus" data-status="CONFIRMED">
+        <view class="stat-num">{{isLoggedIn ? (statsLoaded ? confirmedCount : '--') : '-'}}</view>
+        <view class="stat-label">待使用预约</view>
+      </view>
+      <view class="stat-line"></view>
+      <view class="stat-item" bindtap="goToOrders">
+        <view class="stat-num">{{isLoggedIn ? (statsLoaded ? totalBookingsCount : '--') : '-'}}</view>
+        <view class="stat-label">累计预约</view>
+      </view>
+      <view class="stat-line"></view>
+      <view class="stat-item">
+        <view class="stat-num">{{isLoggedIn ? (statsLoaded ? exerciseHours : '--') : '-'}}</view>
+        <view class="stat-label">已经预约总时长(h)</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的预约与订单快捷中心 (4 宫格点击可切换) -->
+  <view class="orders-shortcut-card card">
+    <view class="card-header-line flex-between">
+      <text class="c-title">我的预约订单</text>
+      <view class="c-more flex-row" bindtap="goToOrders">
+        <text>全部订单</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <view class="order-types-grid">
+      <view class="ot-item" bindtap="goToOrdersWithStatus" data-status="PENDING_PAYMENT">
+        <view class="ot-icon-box">
+          <text class="ot-icon">💳</text>
+          <view class="ot-badge" wx:if="{{isLoggedIn && pendingPayCount > 0}}">{{pendingPayCount}}</view>
+        </view>
+        <text class="ot-label">待付款</text>
+      </view>
+
+      <view class="ot-item" bindtap="goToOrdersWithStatus" data-status="CONFIRMED">
+        <view class="ot-icon-box">
+          <text class="ot-icon">🎟️</text>
+          <view class="ot-badge" wx:if="{{isLoggedIn && confirmedCount > 0}}">{{confirmedCount}}</view>
+        </view>
+        <text class="ot-label">待使用</text>
+      </view>
+
+      <view class="ot-item" bindtap="goToOrdersWithStatus" data-status="COMPLETED">
+        <view class="ot-icon-box">
+          <text class="ot-icon">✅</text>
+        </view>
+        <text class="ot-label">已完成</text>
+      </view>
+
+      <view class="ot-item" bindtap="goToOrdersWithStatus" data-status="REFUNDED">
+        <view class="ot-icon-box">
+          <text class="ot-icon">🔄</text>
+        </view>
+        <text class="ot-label">退改/取消</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员专属后台入口 (仅已登录的 ADMIN / SUPER_ADMIN 可见) -->
+  <view class="admin-entry-card card" wx:if="{{isLoggedIn && isAdmin}}">
+    <view class="admin-title-row flex-between">
+      <view class="admin-title flex-row">
+        <text class="admin-badge-icon">⚙️</text>
+        <text>场馆运营与管理工作台</text>
+      </view>
+      <text class="tag tag-orange">管理权限已激活</text>
+    </view>
+
+    <view class="admin-grid">
+      <!-- 管理员预约 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/venue/list/list">
+        <view class="a-icon-box bg-blue">🏸</view>
+        <text class="a-name">管理员预约</text>
+        <text class="a-desc">代预约/优先权</text>
+      </view>
+      <!-- 运营大屏 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/dashboard/dashboard">
+        <view class="a-icon-box bg-blue">📊</view>
+        <text class="a-name">运营大屏</text>
+        <text class="a-desc">营收与利用率</text>
+      </view>
+      <!-- 实时监控 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/realtime/realtime">
+        <view class="a-icon-box bg-green">📡</view>
+        <text class="a-name">实时监控</text>
+        <text class="a-desc">场馆负荷看板</text>
+      </view>
+      <!-- 扫码核销 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/checkin/checkin">
+        <view class="a-icon-box bg-purple">📱</view>
+        <text class="a-name">扫码核销</text>
+        <text class="a-desc">前台入场校验</text>
+      </view>
+      <!-- 场地维护 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/venues/venues">
+        <view class="a-icon-box bg-orange">🏸</view>
+        <text class="a-name">场地维护</text>
+        <text class="a-desc">排期与上下架</text>
+      </view>
+      <!-- 资金结算 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/settlement/settlement">
+        <view class="a-icon-box bg-blue">💰</view>
+        <text class="a-name">资金结算</text>
+        <text class="a-desc">营收明细分析</text>
+      </view>
+      <!-- 热力矩阵 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/heatmap/heatmap">
+        <view class="a-icon-box bg-green">🔥</view>
+        <text class="a-name">热力矩阵</text>
+        <text class="a-desc">时段热度分布</text>
+      </view>
+      <!-- 预约监管 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/bookings/bookings">
+        <view class="a-icon-box bg-purple">📑</view>
+        <text class="a-name">预约监管</text>
+        <text class="a-desc">全馆订单检索</text>
+      </view>
+      <!-- 控制台 -->
+      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/dev-console/dev-console" wx:if="{{isSuperAdmin}}">
+        <view class="a-icon-box bg-orange">⚡</view>
+        <text class="a-name">管理控制台</text>
+        <text class="a-desc">系统数据配置</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 常用功能与服务列表 -->
+  <view class="menu-card card">
+    <view class="menu-item flex-between" bindtap="goToNotifications">
+      <view class="menu-left flex-row">
+        <text class="menu-icon">🔔</text>
+        <text class="menu-title">消息通知中心</text>
+      </view>
+      <view class="menu-right flex-row">
+        <text class="tag tag-red" wx:if="{{isLoggedIn && unreadCount > 0}}">{{unreadCount}}条新通知</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+
+    <view class="menu-divider"></view>
+
+    <view class="menu-item flex-between" bindtap="goToOrdersWithStatus" data-status="CONFIRMED">
+      <view class="menu-left flex-row">
+        <text class="menu-icon">🎟️</text>
+        <text class="menu-title">我的入场核销码</text>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="menu-divider"></view>
+
+    <view class="menu-item flex-between" bindtap="showFeedback">
+      <view class="menu-left flex-row">
+        <text class="menu-icon">💬</text>
+        <text class="menu-title">意见反馈与客服</text>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="menu-divider"></view>
+
+    <view class="menu-item flex-between" bindtap="showAbout">
+      <view class="menu-left flex-row">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-title">关于 Slotify 智场通</text>
+      </view>
+      <view class="menu-right flex-row">
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部登录/退出操作按钮 -->
+  <view class="logout-wrap">
+    <button class="btn-primary-action" bindtap="goToLogin" wx:if="{{!isLoggedIn}}">立即登录</button>
+    <button class="btn-logout" bindtap="handleLogout" wx:else>退出当前账号</button>
+  </view>
+</view>

@@ -1,0 +1,132 @@
+.checkin-page {
+  background: #F4F6F9;
+}
+
+.checkin-header-card {
+  padding: 32rpx;
+}
+
+.ch-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 8rpx;
+}
+
+.ch-desc {
+  font-size: 24rpx;
+  color: #86909C;
+  line-height: 1.5;
+  margin-bottom: 28rpx;
+}
+
+.btn-scan-camera {
+  background: linear-gradient(135deg, #1677FF 0%, #0958D9 100%);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  padding: 22rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(22, 119, 255, 0.3);
+  margin-bottom: 24rpx;
+}
+
+.camera-icon {
+  font-size: 36rpx;
+}
+
+.input-verify-box {
+  background: #F4F6F9;
+  border-radius: 40rpx;
+  padding: 8rpx 10rpx 8rpx 24rpx;
+  align-items: center;
+}
+
+.code-input {
+  font-size: 26rpx;
+  color: #1F2329;
+}
+
+.btn-verify-action {
+  background: #1F2329;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  border-radius: 30rpx;
+  padding: 14rpx 28rpx;
+  border: none;
+}
+
+.demo-code-helper {
+  margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F2F3F5;
+}
+
+.helper-label {
+  font-size: 22rpx;
+  color: #86909C;
+  margin-bottom: 10rpx;
+}
+
+.h-tag {
+  background: #E6F4FF;
+  color: #1677FF;
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+/* 预检卡片 */
+.verify-result-card {
+  padding: 32rpx;
+}
+
+.vr-header {
+  padding-bottom: 18rpx;
+  border-bottom: 1rpx solid #F4F6F9;
+  margin-bottom: 20rpx;
+}
+
+.vr-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.vr-row {
+  padding: 12rpx 0;
+  font-size: 26rpx;
+}
+
+.vr-label {
+  color: #86909C;
+}
+
+.vr-val {
+  color: #1F2329;
+}
+
+.font-bold { font-weight: 700; }
+.text-primary { color: #1677FF; }
+.text-danger { color: #FF4D4F; }
+
+.confirm-btn-wrap {
+  margin-top: 32rpx;
+}
+
+.btn-confirm-checkin {
+  background: #00B96B;
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 700;
+  border-radius: 40rpx;
+  padding: 22rpx 0;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(0, 185, 107, 0.3);
+}

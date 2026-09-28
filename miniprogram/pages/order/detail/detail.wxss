@@ -1,0 +1,145 @@
+.order-detail-page {
+  background: #F4F6F9;
+  padding-bottom: 140rpx;
+}
+
+.detail-header-card {
+  padding: 30rpx;
+  background: #FFFFFF;
+}
+
+.status-title-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 6rpx;
+}
+
+.status-desc-text {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.info-card {
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 16rpx;
+}
+
+.venue-row {
+  align-items: center;
+  padding: 10rpx 0;
+}
+
+.v-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 18rpx;
+  background: #E5E6EB;
+}
+
+.v-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 4rpx;
+}
+
+.v-addr {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.arrow-right {
+  font-size: 32rpx;
+  color: #86909C;
+}
+
+.divider-line {
+  height: 1rpx;
+  background: #F2F3F5;
+  margin: 16rpx 0;
+}
+
+.item-row {
+  font-size: 26rpx;
+  padding: 10rpx 0;
+}
+
+.item-label {
+  color: #86909C;
+}
+
+.item-val {
+  color: #1F2329;
+  font-weight: 500;
+}
+
+.highlight {
+  color: #1677FF;
+  font-weight: 700;
+}
+
+.code-text {
+  font-family: monospace;
+  font-weight: 700;
+  color: #1677FF;
+  font-size: 28rpx;
+}
+
+.price-val {
+  color: #FF4D4F;
+  font-weight: 700;
+  font-size: 30rpx;
+}
+
+.text-danger {
+  color: #FF4D4F;
+}
+
+.text-success {
+  color: #00B96B;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #FFFFFF;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 16rpx 32rpx;
+  box-sizing: border-box;
+  gap: 20rpx;
+  z-index: 100;
+}
+
+.btn-cancel {
+  background: #F4F6F9;
+  color: #4E5969;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  border: none;
+}
+
+.btn-qr {
+  background: #1677FF;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  border: none;
+  box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.3);
+}

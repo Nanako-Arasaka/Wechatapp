@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "lib": ["es2020", "dom"],
+    "allowJs": true,
+    "checkJs": false,
+    "noEmitOnError": false,
+    "strict": false,
+    "noImplicitAny": false,
+    "moduleResolution": "node10",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "esModuleInterop": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./**/*.ts",
+    "./global.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

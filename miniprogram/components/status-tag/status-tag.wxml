@@ -1,0 +1,4 @@
+<view class="status-tag" style="color: {{meta.color}}; background: {{meta.bg}};">
+  <view class="status-dot" style="background: {{meta.color}};" wx:if="{{showDot}}"></view>
+  <text>{{meta.label}}</text>
+</view>

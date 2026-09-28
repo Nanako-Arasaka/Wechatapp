@@ -1,0 +1,83 @@
+<view class="fill-page container">
+  
+  <view class="summary-card card">
+    <view class="summary-title">订单摘要</view>
+    <view class="summary-row flex-between">
+      <text class="summary-label">场馆</text>
+      <text class="summary-value">{{venueName}}</text>
+    </view>
+    <view class="summary-row flex-between">
+      <text class="summary-label">场地</text>
+      <text class="summary-value">{{courtNo ? courtNo + '号场' : '主场地'}}</text>
+    </view>
+    <view class="summary-row flex-between">
+      <text class="summary-label">日期</text>
+      <text class="summary-value">{{date}}</text>
+    </view>
+    <view class="summary-row flex-between">
+      <text class="summary-label">时间</text>
+      <text class="summary-value">{{timeRange}}</text>
+    </view>
+    <view class="summary-row flex-between">
+      <text class="summary-label">数量</text>
+      <text class="summary-value">{{quantity}} 个名额</text>
+    </view>
+    <view class="summary-divider"></view>
+    <view class="summary-row flex-between summary-total">
+      <text class="summary-label">合计</text>
+      <text class="summary-value-total">¥{{(unitPrice * quantity) / 100}}</text>
+    </view>
+  </view>
+
+  
+  <view class="form-card card">
+    <view class="form-title">联系方式（入场核验用）</view>
+    <view class="form-row flex-between">
+      <text class="form-label">学号</text>
+      <input
+        class="form-input"
+        type="number"
+        maxlength="12"
+        value="{{studentNo}}"
+        placeholder="请输入 6-12 位数字学号"
+        placeholder-class="form-placeholder"
+        bindinput="onInputStudentNo"
+      />
+    </view>
+    <view class="form-row flex-between">
+      <text class="form-label">姓名</text>
+      <input
+        class="form-input"
+        maxlength="20"
+        value="{{contactName}}"
+        placeholder="请输入真实姓名"
+        placeholder-class="form-placeholder"
+        bindinput="onInputName"
+      />
+    </view>
+    <view class="form-row flex-between">
+      <text class="form-label">手机号</text>
+      <input
+        class="form-input"
+        type="number"
+        maxlength="11"
+        value="{{contactPhone}}"
+        placeholder="请输入 11 位手机号"
+        placeholder-class="form-placeholder"
+        bindinput="onInputPhone"
+      />
+    </view>
+  </view>
+
+  
+  <view class="bottom-bar">
+    <button
+      class="btn-primary btn-next {{submitting ? 'btn-disabled' : ''}}"
+      bindtap="onClickNext"
+      disabled="{{submitting}}"
+    >
+      {{submitting ? '加载中...' : '下一步'}}
+    </button>
+  </view>
+</view>
+

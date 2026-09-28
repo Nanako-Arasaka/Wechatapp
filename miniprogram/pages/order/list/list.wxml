@@ -1,0 +1,96 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
+<view class="order-list-page container">
+  <!-- 顶部 Tab 栏 -->
+  <view class="tab-bar-wrap">
+    <scroll-view class="tab-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+      <view
+        class="tab-item {{currentStatus === item.key ? 'active' : ''}}"
+        wx:for="{{statusTabs}}"
+        wx:key="key"
+        bindtap="onTabChange"
+        data-key="{{item.key}}"
+      >
+        <text>{{item.name}}</text>
+        <view class="tab-line" wx:if="{{currentStatus === item.key}}"></view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}" class="skeleton-wrap">
+    <view class="card skeleton-box" style="height: 220rpx;"></view>
+    <view class="card skeleton-box" style="height: 220rpx;"></view>
+  </view>
+
+  <!-- 加载失败：错误占位 + 重试 -->
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-icon">📡</text>
+    <text class="empty-title">订单加载失败</text>
+    <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <!-- 空状态 -->
+  <empty
+    wx:elif="{{orderList.length === 0}}"
+    icon="📋"
+    title="暂无相关订单"
+    description="您还没有该状态下的预约订单记录"
+    btnText="去预约场地"
+    bindbtnTap="goToVenues"
+  />
+
+  <!-- 订单列表 -->
+  <view wx:else class="orders-wrap">
+    <view
+      class="order-card card"
+      wx:for="{{orderList}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="order-header flex-between">
+        <text class="order-no">订单号：{{item.orderNo}}</text>
+        <status-tag status="{{item.bookingStatus}}" />
+      </view>
+
+      <view class="order-body-row flex-row">
+        <image class="venue-thumb" src="{{item.venueImage}}" mode="aspectFill" />
+        <view class="order-main-info flex-1">
+          <view class="venue-name">{{item.venueName}}</view>
+          <view class="time-range-text">📅 {{item.bookingDate}} {{item.timeRange}}</view>
+          <view class="count-text">数量：{{item.quantity}} 个场地名额</view>
+        </view>
+      </view>
+
+      <view class="order-footer flex-between">
+        <view class="footer-price">
+          <text class="price-label">总计：</text>
+          <text class="price-symbol">¥</text>
+          <text class="price-num">{{filters.formatMoney(item.amount)}}</text>
+          <text class="refund-tip" wx:if="{{item.refundAmount > 0}}">(已全额退款)</text>
+        </view>
+
+        <!-- 动态操作按钮 (规范统一 view 按钮，零错位) -->
+        <view class="footer-btn-group flex-row" catchtap="noBubble">
+          <!-- 待支付 -->
+          <block wx:if="{{item.bookingStatus === 'PENDING_PAYMENT'}}">
+            <view class="btn-action-cancel" catchtap="onCancelOrder" data-id="{{item.id}}">取消订单</view>
+            <view class="btn-action-primary" catchtap="goToPay" data-id="{{item.id}}">去支付</view>
+          </block>
+
+          <!-- 待使用 -->
+          <block wx:elif="{{item.bookingStatus === 'CONFIRMED'}}">
+            <view class="btn-action-cancel" catchtap="onCancelBooking" data-booking-id="{{item.bookingId}}">取消退订</view>
+            <view class="btn-action-primary" catchtap="goToQRCode" data-id="{{item.id}}" data-code="{{item.bookingCode}}">核销码</view>
+          </block>
+
+          <!-- 已入场 / 已完成 -->
+          <block wx:elif="{{item.bookingStatus === 'CHECKED_IN' || item.bookingStatus === 'COMPLETED'}}">
+            <view class="btn-action-primary" catchtap="onRebook" data-venue-id="{{item.venueId}}">再次预约</view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

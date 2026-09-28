@@ -1,0 +1,103 @@
+<view class="order-detail-page container" wx:if="{{order}}">
+  <!-- 头部状态 -->
+  <view class="detail-header-card card flex-between">
+    <view class="header-left">
+      <view class="status-title-text">{{order.booking.status === 'CONFIRMED' ? '预约成功 (待使用)' : (order.booking.status === 'CHECKED_IN' ? '已核销入场' : (order.booking.status === 'REFUNDED' ? '已取消并全额退款' : order.booking.status))}}</view>
+      <view class="status-desc-text">订单编号：{{order.orderNo}}</view>
+    </view>
+    <status-tag status="{{order.booking.status}}" />
+  </view>
+
+  <!-- 场馆与时段信息 -->
+  <view class="info-card card">
+    <view class="card-title">场馆与预约信息</view>
+    <view class="venue-row flex-row" bindtap="goToVenue" data-id="{{order.booking.venue.id}}">
+      <image class="v-img" src="{{order.booking.venue.coverImage}}" mode="aspectFill" />
+      <view class="v-text-box flex-1">
+        <view class="v-name">{{order.booking.venue.name}}</view>
+        <view class="v-addr">{{order.booking.venue.address}}</view>
+      </view>
+      <text class="arrow-right">›</text>
+    </view>
+
+    <view class="divider-line"></view>
+
+    <view class="item-row flex-between">
+      <text class="item-label">预约时段</text>
+      <text class="item-val highlight">{{order.booking.bookingDate}} {{order.booking.startTime}}-{{order.booking.endTime}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">预约数量</text>
+      <text class="item-val">{{order.booking.quantity}} 个场地名额</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">核销验证码</text>
+      <text class="item-val code-text">{{order.booking.bookingCode}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">预订联系人</text>
+      <text class="item-val">{{order.booking.contactName}} ({{order.booking.contactPhone}})</text>
+    </view>
+  </view>
+
+  <!-- 支付流水卡片 -->
+  <view class="info-card card" wx:if="{{order.payments.length > 0}}">
+    <view class="card-title">支付明细 (企业级模拟支付)</view>
+    <view class="item-row flex-between">
+      <text class="item-label">支付方式</text>
+      <text class="item-val">微信支付 (Mock)</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">支付流水号</text>
+      <text class="item-val">{{order.payments[0].paymentNo}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">商户交易单号</text>
+      <text class="item-val">{{order.payments[0].transactionNo}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">实付金额</text>
+      <text class="item-val price-val">¥{{order.paidAmount / 100}}</text>
+    </view>
+  </view>
+
+  <!-- 退款流水卡片 (若有) -->
+  <view class="info-card card" wx:if="{{order.refunds.length > 0}}">
+    <view class="card-title text-danger">退款记录</view>
+    <view class="item-row flex-between">
+      <text class="item-label">退款单号</text>
+      <text class="item-val">{{order.refunds[0].refundNo}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">退款金额</text>
+      <text class="item-val text-danger font-bold">¥{{order.refunds[0].amount / 100}} (全额原路退回)</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">退款原因</text>
+      <text class="item-val">{{order.refunds[0].reason || '用户主动取消'}}</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">退款状态</text>
+      <text class="tag tag-green">退款已到账</text>
+    </view>
+  </view>
+
+  <!-- 核销入场记录 (若有) -->
+  <view class="info-card card" wx:if="{{order.booking.checkinRecords.length > 0}}">
+    <view class="card-title text-success">核销入场记录</view>
+    <view class="item-row flex-between">
+      <text class="item-label">核销操作人</text>
+      <text class="item-val">{{order.booking.checkinRecords[0].operator.nickname}} (管理员)</text>
+    </view>
+    <view class="item-row flex-between">
+      <text class="item-label">核销时间</text>
+      <text class="item-val">{{order.booking.checkinRecords[0].checkinAt}}</text>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-action-bar flex-row" wx:if="{{order.booking.status === 'CONFIRMED'}}">
+    <button class="btn-cancel flex-1" bindtap="onCancelBooking">取消预约</button>
+    <button class="btn-qr flex-1" bindtap="goToQR">查看核销码</button>
+  </view>
+</view>

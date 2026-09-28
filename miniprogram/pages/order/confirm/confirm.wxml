@@ -1,0 +1,54 @@
+<view class="confirm-page">
+  <!-- 全屏半透明遮罩 -->
+  <view class="mask" bindtap="onMaskTap"></view>
+
+  <!-- 底部弹出 sheet -->
+  <view class="sheet" catchtap="noBubble">
+    <!-- 顶部小把手 -->
+    <view class="sheet-handle"></view>
+
+    <!-- 标题 -->
+    <view class="sheet-title">确认预约信息</view>
+    <view class="sheet-sub">请核对以下信息后提交</view>
+
+    <!-- 六行信息卡 -->
+    <view class="info-list card">
+      <view class="info-row flex-between">
+        <text class="info-label">场地</text>
+        <text class="info-value">{{venueName}} {{courtNo ? courtNo + '号场' : ''}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">日期</text>
+        <text class="info-value">{{date}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">时间</text>
+        <text class="info-value">{{timeRange}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">学号</text>
+        <text class="info-value">{{studentNo}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">姓名</text>
+        <text class="info-value">{{contactName}}</text>
+      </view>
+      <view class="info-row flex-between info-row-last">
+        <text class="info-label">联系方式</text>
+        <text class="info-value">{{contactPhone}}</text>
+      </view>
+    </view>
+
+    <!-- 双按钮 -->
+    <view class="sheet-actions flex-between">
+      <button class="btn-outline" bindtap="onModify" disabled="{{submitting}}">再想想</button>
+      <button
+        class="btn-primary btn-confirm {{submitting ? 'btn-disabled' : ''}}"
+        bindtap="onConfirmSheet"
+        disabled="{{submitting}}"
+      >
+        {{submitting ? '锁定中...' : '确认预约'}}
+      </button>
+    </view>
+  </view>
+</view>

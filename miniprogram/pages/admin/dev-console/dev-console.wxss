@@ -1,0 +1,73 @@
+.dev-console-page {
+  background: #F4F6F9;
+  padding-top: 10rpx;
+}
+
+.dev-header {
+  padding: 30rpx;
+  background: linear-gradient(135deg, #1F2329 0%, #303642 100%);
+  color: #FFFFFF;
+}
+
+.dev-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 8rpx;
+}
+
+.dev-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+.dev-desc {
+  font-size: 22rpx;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.tools-grid {
+  padding-top: 6rpx;
+}
+
+.tool-card {
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.tool-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.tool-desc {
+  font-size: 24rpx;
+  color: #4E5969;
+  line-height: 1.6;
+  margin: 16rpx 0 24rpx;
+}
+
+.btn-tool-action {
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  padding: 16rpx 0;
+  border: none;
+}
+
+.bg-red {
+  background: #FF4D4F;
+  box-shadow: 0 6rpx 20rpx rgba(255, 77, 79, 0.3);
+}
+
+.bg-orange {
+  background: #FA8C16;
+  box-shadow: 0 6rpx 20rpx rgba(250, 140, 22, 0.3);
+}
+
+.bg-blue {
+  background: #1677FF;
+  box-shadow: 0 6rpx 20rpx rgba(22, 119, 255, 0.3);
+}

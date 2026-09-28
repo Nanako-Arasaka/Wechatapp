@@ -1,0 +1,38 @@
+<view class="notifications-page container">
+  <!-- 加载骨架 -->
+  <view wx:if="{{loading}}" class="skeleton-wrap">
+    <view class="card skeleton-box" style="height: 140rpx; margin-bottom: 20rpx;"></view>
+    <view class="card skeleton-box" style="height: 140rpx; margin-bottom: 20rpx;"></view>
+    <view class="card skeleton-box" style="height: 140rpx;"></view>
+  </view>
+
+  <!-- 加载失败：错误占位 + 重试 -->
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-icon">📡</text>
+    <text class="empty-title">通知加载失败</text>
+    <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{notifications.length === 0}}" class="empty-state">
+    <text class="empty-icon">🔕</text>
+    <text class="empty-title">暂无消息通知</text>
+    <text class="empty-desc">预约、支付、退款动态会第一时间通知您</text>
+  </view>
+
+  <!-- 通知列表 -->
+  <block wx:else>
+    <view class="notify-card card" wx:for="{{notifications}}" wx:key="id">
+      <view class="notify-header flex-between">
+        <view class="notify-title-box flex-row">
+          <text class="notify-icon">{{item.type === 'BOOKING_SUCCESS' ? '🏸' : (item.type === 'PAYMENT_SUCCESS' ? '💰' : (item.type === 'REFUND' ? '🔄' : (item.type === 'REMINDER' ? '⏰' : (item.type === 'CANCELLED' ? '❌' : '🔔'))))}}</text>
+          <text class="notify-title">{{item.title}}</text>
+          <view class="unread-dot" wx:if="{{!item.isRead}}"></view>
+        </view>
+        <text class="notify-time">{{item.time}}</text>
+      </view>
+      <view class="notify-content">{{item.content}}</view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,51 @@
+<view class="realtime-page container">
+  <!-- 头部控制栏 -->
+  <view class="realtime-header flex-between">
+    <view class="header-left">
+      <view class="rt-title">全馆实时并发监控</view>
+      <view class="rt-sub">数据每 30 秒自动静默轮询更新</view>
+    </view>
+    <view class="rt-tag" bindtap="loadRealtimeData">
+      <text>🔄 立即刷新</text>
+    </view>
+  </view>
+
+  <!-- 场馆实时监控卡片列表 -->
+  <view class="venue-realtime-list">
+    <view
+      class="rt-card card"
+      wx:for="{{venueStatusList}}"
+      wx:key="venueId"
+    >
+      <view class="rt-card-top flex-between">
+        <view class="v-title-row flex-row">
+          <image class="v-mini-thumb" src="{{item.coverImage}}" mode="aspectFill" />
+          <view class="v-meta">
+            <view class="v-name">{{item.venueName}}</view>
+            <view class="v-type-text">{{item.venueType}}</view>
+          </view>
+        </view>
+        <view class="status-badge" style="background: {{item.statusColor}}15; color: {{item.statusColor}}; border: 2rpx solid {{item.statusColor}};">
+          {{item.statusText}}
+        </view>
+      </view>
+
+      <!-- 当前时段负荷槽 -->
+      <view class="current-slot-section">
+        <view class="slot-row flex-between">
+          <text class="slot-label">当前时段 ({{item.currentSlotRange}})</text>
+          <text class="slot-val">{{item.currentBooked}} / {{item.currentCapacity}} ({{item.currentRate}}%)</text>
+        </view>
+        <view class="rt-progress-track">
+          <view class="rt-progress-bar" style="width: {{item.currentRate}}%; background: {{item.statusColor}};"></view>
+        </view>
+      </view>
+
+      <!-- 下一时段余量预测 -->
+      <view class="next-slot-row flex-between">
+        <text class="next-label">下一时段 ({{item.nextSlotRange}})</text>
+        <text class="next-rem text-primary font-bold">剩余 {{item.nextRemaining}} 个名额</text>
+      </view>
+    </view>
+  </view>
+</view>

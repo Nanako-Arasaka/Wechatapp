@@ -1,0 +1,89 @@
+.heatmap-page {
+  background: #F4F6F9;
+  padding-top: 10rpx;
+}
+
+.hm-header {
+  padding: 30rpx;
+}
+
+.hm-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 8rpx;
+}
+
+.hm-desc {
+  font-size: 22rpx;
+  color: #86909C;
+  margin-bottom: 20rpx;
+}
+
+.hm-scale-bar {
+  align-items: center;
+  gap: 10rpx;
+}
+
+.scale-label {
+  font-size: 20rpx;
+  color: #86909C;
+}
+
+.scale-box {
+  width: 40rpx;
+  height: 20rpx;
+  border-radius: 4rpx;
+}
+
+.s-1 { background: #E6F4FF; }
+.s-2 { background: #91CAFF; }
+.s-3 { background: #4096FF; }
+.s-4 { background: #1677FF; }
+.s-5 { background: #002C8C; }
+
+/* 矩阵卡片 */
+.hm-matrix-card {
+  padding: 20rpx 10rpx;
+  overflow-x: auto;
+}
+
+.matrix-row {
+  margin-bottom: 8rpx;
+}
+
+.day-cell {
+  width: 80rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #4E5969;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-cell.header {
+  color: #86909C;
+  font-size: 20rpx;
+}
+
+.hour-cell {
+  height: 56rpx;
+  margin: 0 4rpx;
+  border-radius: 8rpx;
+  font-size: 18rpx;
+}
+
+.hour-cell.header {
+  height: auto;
+  font-size: 18rpx;
+  color: #86909C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10rpx;
+}
+
+.cell-num {
+  font-weight: 600;
+}

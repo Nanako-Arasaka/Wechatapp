@@ -1,0 +1,171 @@
+<view class="dashboard-page container">
+  <!-- 顶部深色科技感头部 -->
+  <view class="dash-header">
+    <view class="welcome-row flex-between">
+      <view class="welcome-left">
+        <view class="sys-title">智慧场馆数字化运营中心</view>
+        <view class="admin-greet">欢迎您，{{adminName}}</view>
+      </view>
+      <view class="refresh-tag" bindtap="loadDashboardData">
+        <text class="refresh-icon">🔄</text>
+        <text>刷新大屏</text>
+        <text class="refresh-time" wx:if="{{lastUpdated}}">{{lastUpdated}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 4 个核心 KPI 数据卡片 -->
+  <view class="kpi-grid">
+    <view class="kpi-card card">
+      <view class="kpi-label">今日订单数</view>
+      <view class="kpi-num">{{kpiLoaded ? kpi.todayOrders : '--'}}</view>
+      <view class="kpi-growth flex-row {{kpi.todayOrderGrowth >= 0 ? 'text-success' : 'text-danger'}}" wx:if="{{kpiLoaded}}">
+        <text class="arrow-icon">{{kpi.todayOrderGrowth >= 0 ? '↑' : '↓'}}</text>
+        <text>较昨日 {{kpi.todayOrderGrowth >= 0 ? '+' : ''}}{{kpi.todayOrderGrowth || 0}}%</text>
+      </view>
+    </view>
+
+    <view class="kpi-card card">
+      <view class="kpi-label">今日预约人次</view>
+      <view class="kpi-num">{{kpiLoaded ? kpi.todayBookings : '--'}}</view>
+      <view class="kpi-growth flex-row {{kpi.todayBookingGrowth >= 0 ? 'text-success' : 'text-danger'}}" wx:if="{{kpiLoaded}}">
+        <text class="arrow-icon">{{kpi.todayBookingGrowth >= 0 ? '↑' : '↓'}}</text>
+        <text>较昨日 {{kpi.todayBookingGrowth >= 0 ? '+' : ''}}{{kpi.todayBookingGrowth || 0}}%</text>
+      </view>
+    </view>
+
+    <view class="kpi-card card">
+      <view class="kpi-label">今日实际营收</view>
+      <view class="kpi-num price-text">{{kpiLoaded ? '¥' + (kpi.todayNetIncome || 0) : '--'}}</view>
+      <view class="kpi-growth flex-row {{kpi.todayIncomeGrowth >= 0 ? 'text-success' : 'text-danger'}}" wx:if="{{kpiLoaded}}">
+        <text class="arrow-icon">{{kpi.todayIncomeGrowth >= 0 ? '↑' : '↓'}}</text>
+        <text>环比 {{kpi.todayIncomeGrowth >= 0 ? '+' : ''}}{{kpi.todayIncomeGrowth || 0}}%</text>
+      </view>
+    </view>
+
+    <view class="kpi-card card">
+      <view class="kpi-label">实时在馆负荷</view>
+      <view class="kpi-num">{{kpiLoaded ? (kpi.realtimeUsage.used || 0) + ' / ' + (kpi.realtimeUsage.total || 0) : '--'}}</view>
+      <view class="kpi-growth flex-row text-primary" wx:if="{{kpiLoaded}}">
+        <text>利用率 {{kpi.realtimeUsage.rate || 0}}%</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理端快捷入口 -->
+  <view class="quick-entry-grid">
+    <view class="quick-entry-item" bindtap="navTo" data-url="/pages/venue/list/list">
+      <text class="qe-icon">🏸</text>
+      <text class="qe-label">管理员预约</text>
+    </view>
+    <view class="quick-entry-item" bindtap="navTo" data-url="/pages/admin/checkin/checkin">
+      <text class="qe-icon">📷</text>
+      <text class="qe-label">扫码核销</text>
+    </view>
+    <view class="quick-entry-item" bindtap="navTo" data-url="/pages/admin/venues/venues">
+      <text class="qe-icon">🏟️</text>
+      <text class="qe-label">场馆管理</text>
+    </view>
+    <view class="quick-entry-item" bindtap="navTo" data-url="/pages/admin/settlement/settlement">
+      <text class="qe-icon">💰</text>
+      <text class="qe-label">结算中心</text>
+    </view>
+    <view class="quick-entry-item" bindtap="navTo" data-url="/pages/admin/users/users">
+      <text class="qe-icon">👤</text>
+      <text class="qe-label">账号开通</text>
+    </view>
+  </view>
+
+  <!-- 近7天营收走势折线图 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="chart-title-box flex-row">
+        <text class="chart-bar-icon"></text>
+        <text class="chart-title">近 7 天营收走势 (元)</text>
+      </view>
+      <text class="tag tag-blue">实时统计</text>
+    </view>
+    <view class="canvas-box">
+      <canvas canvas-id="incomeTrendCanvas" class="trend-canvas"></canvas>
+    </view>
+  </view>
+
+  <!-- 场馆营收结构占比饼图 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="chart-title-box flex-row">
+        <text class="chart-bar-icon"></text>
+        <text class="chart-title">各场馆营收结构占比</text>
+      </view>
+      <text class="tag tag-green">近7天</text>
+    </view>
+    <view class="canvas-box">
+      <canvas canvas-id="venuePieCanvas" class="pie-canvas"></canvas>
+    </view>
+  </view>
+
+  <!-- 场馆今日利用率排行榜 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="chart-title-box flex-row">
+        <text class="chart-bar-icon"></text>
+        <text class="chart-title">场馆利用率实时排行</text>
+      </view>
+      <text class="tag tag-orange">今日</text>
+    </view>
+
+    <view class="ranking-list">
+      <view class="ranking-item" wx:for="{{venueRanking}}" wx:key="id">
+        <view class="rank-top flex-between">
+          <view class="rank-name-box flex-row">
+            <text class="rank-idx rank-{{index + 1}}">{{index + 1}}</text>
+            <text class="rank-venue-name">{{item.name}}</text>
+          </view>
+          <text class="rank-rate-text">{{item.utilization}}%</text>
+        </view>
+        <view class="progress-track">
+          <view class="progress-bar" style="width: {{item.utilization}}%; background: {{item.utilization >= 85 ? '#FF4D4F' : (item.utilization >= 60 ? '#FA8C16' : '#1677FF')}};"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日热门时段分布 -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="chart-title-box flex-row">
+        <text class="chart-bar-icon"></text>
+        <text class="chart-title">今日热门高峰时段</text>
+      </view>
+      <text class="tag tag-red">高峰预警</text>
+    </view>
+    <view class="hot-slots-grid">
+      <view class="hot-slot-item flex-between" wx:for="{{hotTimeSlots}}" wx:key="timeRange">
+        <text class="hs-time">🕒 {{item.timeRange}}</text>
+        <view class="hs-right flex-row">
+          <text class="hs-booked">已约 {{item.booked}}</text>
+          <text class="hs-rate tag tag-red">{{item.rate}}% 饱和</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 智能经营决策建议 (AI 规则引擎) -->
+  <view class="chart-card card">
+    <view class="chart-header flex-between">
+      <view class="chart-title-box flex-row">
+        <text class="chart-bar-icon"></text>
+        <text class="chart-title">智能运营诊断与调优策略</text>
+      </view>
+    </view>
+    <view class="suggestion-list">
+      <view class="sug-item" wx:for="{{suggestions}}" wx:key="id">
+        <view class="sug-top flex-between">
+          <text class="sug-title">{{item.title}}</text>
+          <text class="tag tag-{{item.level === 'warning' ? 'orange' : (item.level === 'success' ? 'green' : 'blue')}}">{{item.tag}}</text>
+        </view>
+        <view class="sug-content">{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,146 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const admin_service_1 = require("../../../services/admin.service");
+const auth_1 = require("../../../store/auth");
+const admin_guard_1 = require("../../../utils/admin-guard");
+/**
+ * 管理员账号开通与管理页
+ * - 普通管理员：只能开通普通用户账号
+ * - 超级管理员：可开通管理员账号，也可删除已有管理员账号
+ */
+Page({
+    data: {
+        isSuperAdmin: false,
+        activeTab: 'create', // 'create' | 'manage'
+        // 创建表单
+        username: '',
+        password: '',
+        nickname: '',
+        phone: '',
+        role: 'USER',
+        roleOptions: ['普通用户'],
+        roleIndex: 0,
+        submitting: false,
+        // 管理员列表
+        adminList: [],
+        listLoading: false,
+    },
+    onShow() {
+        if (!(0, admin_guard_1.guardAdminPage)())
+            return;
+        const isSuperAdmin = auth_1.AuthStore.isSuperAdmin();
+        const roleOptions = isSuperAdmin ? ['普通用户', '场馆管理员'] : ['普通用户'];
+        this.setData({ isSuperAdmin, roleOptions });
+        if (isSuperAdmin) {
+            this.loadAdmins();
+        }
+    },
+    switchTab(e) {
+        this.setData({ activeTab: e.currentTarget.dataset.tab });
+        if (e.currentTarget.dataset.tab === 'manage') {
+            this.loadAdmins();
+        }
+    },
+    onUsernameInput(e) {
+        this.setData({ username: e.detail.value });
+    },
+    onPasswordInput(e) {
+        this.setData({ password: e.detail.value });
+    },
+    onNicknameInput(e) {
+        this.setData({ nickname: e.detail.value });
+    },
+    onPhoneInput(e) {
+        const v = (e.detail.value || '').replace(/\D/g, '').slice(0, 11);
+        this.setData({ phone: v });
+    },
+    onRoleChange(e) {
+        const index = Number(e.detail.value);
+        this.setData({
+            roleIndex: index,
+            role: index === 1 ? 'ADMIN' : 'USER',
+        });
+    },
+    async onSubmit() {
+        if (this.data.submitting)
+            return;
+        const { username, password, nickname, phone, role, isSuperAdmin } = this.data;
+        if (!/^\w{3,32}$/.test(username)) {
+            wx.showToast({ title: '账号需 3-32 位字母/数字/下划线', icon: 'none' });
+            return;
+        }
+        if (password.length < 6 || password.length > 32) {
+            wx.showToast({ title: '密码需 6-32 位', icon: 'none' });
+            return;
+        }
+        if (nickname && nickname.length > 32) {
+            wx.showToast({ title: '昵称不超过 32 字', icon: 'none' });
+            return;
+        }
+        if (phone && !/^1[3-9]\d{9}$/.test(phone)) {
+            wx.showToast({ title: '手机号格式错误', icon: 'none' });
+            return;
+        }
+        if (role === 'ADMIN' && !isSuperAdmin) {
+            wx.showToast({ title: '只有超级管理员可开通管理员账号', icon: 'none' });
+            return;
+        }
+        this.setData({ submitting: true });
+        try {
+            await admin_service_1.AdminService.createUser({
+                username: username.trim(),
+                password,
+                nickname: nickname.trim() || username.trim(),
+                phone: phone || undefined,
+                role,
+            });
+            wx.showModal({
+                title: '开通成功',
+                content: `账号 ${username} 已创建，角色：${role === 'ADMIN' ? '场馆管理员' : '普通用户'}`,
+                showCancel: false,
+                success: () => {
+                    this.setData({ username: '', password: '', nickname: '', phone: '', roleIndex: 0, role: 'USER' });
+                },
+            });
+        }
+        catch (err) {
+            // request 拦截器已弹 Toast
+        }
+        finally {
+            this.setData({ submitting: false });
+        }
+    },
+    async loadAdmins() {
+        this.setData({ listLoading: true });
+        try {
+            const res = await admin_service_1.AdminService.getUsers('ADMIN', 1, 100);
+            this.setData({ adminList: res.data.list || [] });
+        }
+        catch (err) {
+            console.error('加载管理员列表失败:', err);
+        }
+        finally {
+            this.setData({ listLoading: false });
+        }
+    },
+    async onDeleteAdmin(e) {
+        const { id, username } = e.currentTarget.dataset;
+        if (!id)
+            return;
+        const res = await wx.showModal({
+            title: '确认删除',
+            content: `确定删除管理员账号「${username}」吗？删除后该账号将无法登录。`,
+            confirmColor: '#FF4D4F',
+        });
+        if (!res.confirm)
+            return;
+        try {
+            await admin_service_1.AdminService.deleteUser(id);
+            wx.showToast({ title: '删除成功', icon: 'success' });
+            this.loadAdmins();
+        }
+        catch (err) {
+            // request 拦截器已弹 Toast
+        }
+    },
+});

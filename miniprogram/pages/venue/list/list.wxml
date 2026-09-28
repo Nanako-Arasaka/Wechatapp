@@ -1,0 +1,124 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
+<view class="venue-list-page container">
+  <!-- 顶部搜索框 -->
+  <view class="search-header">
+    <view class="search-input-box flex-row">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input flex-1"
+        placeholder="搜索场地名称、项目或地址"
+        value="{{keyword}}"
+        bindinput="onKeywordInput"
+        bindconfirm="onSearchConfirm"
+        focus="{{autoFocus}}"
+      />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="onClearKeyword">✕</text>
+    </view>
+
+    <!-- 类型横向滚动 Tab 栏 -->
+    <scroll-view class="type-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+      <view
+        class="type-item {{currentType === item.key ? 'active' : ''}}"
+        wx:for="{{typeList}}"
+        wx:key="key"
+        bindtap="onSelectType"
+        data-key="{{item.key}}"
+      >
+        <text class="type-emoji">{{item.emoji}}</text>
+        <text class="type-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+
+    <!-- 排序筛选栏 -->
+    <view class="sort-bar flex-row">
+      <view class="sort-item {{sortBy === 'RECOMMEND' ? 'active' : ''}}" bindtap="onSelectSort" data-sort="RECOMMEND">
+        <text>综合推荐</text>
+      </view>
+      <view class="sort-item {{sortBy === 'PRICE_ASC' ? 'active' : ''}}" bindtap="onSelectSort" data-sort="PRICE_ASC">
+        <text>价格最优</text>
+      </view>
+      <view class="sort-item {{sortBy === 'REMAIN_DESC' ? 'active' : ''}}" bindtap="onSelectSort" data-sort="REMAIN_DESC">
+        <text>余量充裕</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}" class="skeleton-wrap">
+    <view class="card skeleton-box" style="height: 240rpx;"></view>
+    <view class="card skeleton-box" style="height: 240rpx;"></view>
+    <view class="card skeleton-box" style="height: 240rpx;"></view>
+  </view>
+
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-icon">📡</text>
+    <text class="empty-title">场地列表加载失败</text>
+    <text class="empty-desc">请检查网络连接后重试</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <!-- 空状态 -->
+  <empty
+    wx:elif="{{venueList.length === 0}}"
+    icon="🔍"
+    title="暂无匹配场地"
+    description="请尝试调整搜索关键词或选择其他运动项目分类"
+    btnText="重置筛选"
+    bindbtnTap="onResetFilter"
+  />
+
+  <!-- 场地列表 -->
+  <view wx:else class="venue-cards-list">
+    <view
+      class="venue-item-card card content-enter"
+      wx:for="{{venueList}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.id}}"
+      style="animation-delay: {{index * 55}}ms;"
+    >
+      <view class="card-main-row flex-row">
+        <!-- 封面图与余量徽标 -->
+        <view class="cover-box">
+          <image class="venue-cover" src="{{item.coverImage}}" mode="aspectFill" />
+          <view class="cover-badge {{item.totalRemaining === 0 ? 'badge-full' : (item.totalRemaining <= 2 ? 'badge-tight' : 'badge-avail')}}">
+            {{item.totalRemaining === 0 ? '已约满' : '今日余 ' + (item.totalRemaining || 8) + ' 位'}}
+          </view>
+        </view>
+
+        <!-- 场地主要信息 -->
+        <view class="venue-main-info flex-1">
+          <view class="title-line flex-between">
+            <text class="v-name">{{item.name}}</text>
+            <view class="v-badge tag tag-blue">{{filters.venueTypeName(item.type)}}</view>
+          </view>
+
+          <view class="v-addr">{{item.address}}</view>
+
+          <view class="v-open-time flex-row">
+            <text class="clock-icon">🕒</text>
+            <text>营业时间：{{item.openTime}}-{{item.closeTime}}</text>
+          </view>
+
+          <view class="v-facilities-row flex-row">
+            <text class="v-fac-tag" wx:for="{{item.facilities}}" wx:for-item="fac" wx:key="fac" wx:if="{{index < 3}}">{{fac}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 底部价格与操作栏 (完美严格对齐，零错位) -->
+      <view class="card-footer-row flex-between">
+        <view class="price-wrap">
+          <text class="price-symbol">¥</text>
+          <text class="price-num">{{filters.formatMoney(item.basePrice)}}</text>
+          <text class="price-unit">/小时起</text>
+        </view>
+
+        <view class="footer-actions flex-row" catchtap="noBubble">
+          <view class="btn-detail-action" catchtap="goToDetail" data-id="{{item.id}}">详情</view>
+          <view class="btn-book-action" catchtap="goToBooking" data-id="{{item.id}}">立即预约</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

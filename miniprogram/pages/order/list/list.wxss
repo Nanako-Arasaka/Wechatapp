@@ -1,0 +1,167 @@
+.order-list-page {
+  background: #F6F8FB;
+  padding-bottom: 40rpx;
+}
+
+.tab-bar-wrap {
+  background: #FFFFFF;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+}
+
+.tab-scroll {
+  display: flex;
+  white-space: nowrap;
+  padding: 0 10rpx;
+}
+
+.tab-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  color: #86909C;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tab-item.active {
+  color: #1677FF;
+  font-weight: 800;
+}
+
+.tab-line {
+  position: absolute;
+  bottom: 6rpx;
+  width: 44rpx;
+  height: 6rpx;
+  background: var(--primary-gradient);
+  border-radius: 4rpx;
+  box-shadow: 0 2rpx 8rpx rgba(22, 119, 255, 0.4);
+}
+
+.orders-wrap {
+  padding-top: 10rpx;
+}
+
+.order-card {
+  padding: 26rpx;
+  margin-bottom: 20rpx;
+  border-radius: 24rpx;
+}
+
+.order-header {
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #F4F6F9;
+}
+
+.order-no {
+  font-size: 24rpx;
+  color: #86909C;
+  font-family: monospace;
+}
+
+.order-body-row {
+  padding: 20rpx 0;
+  align-items: center;
+}
+
+.venue-thumb {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 16rpx;
+  margin-right: 20rpx;
+  background: #E5E6EB;
+  flex-shrink: 0;
+}
+
+.venue-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #1D2129;
+  margin-bottom: 8rpx;
+}
+
+.time-range-text {
+  font-size: 24rpx;
+  color: #1677FF;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.count-text {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.order-footer {
+  padding-top: 18rpx;
+  border-top: 1rpx solid #F4F6F9;
+  align-items: center;
+}
+
+.footer-price {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-label {
+  font-size: 24rpx;
+  color: #86909C;
+}
+
+.refund-tip {
+  font-size: 20rpx;
+  color: #00B96B;
+  margin-left: 8rpx;
+}
+
+.footer-btn-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.btn-action-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 24rpx;
+  background: #F4F6F9;
+  color: #86909C;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 28rpx;
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.btn-action-cancel:active {
+  opacity: 0.8;
+}
+
+.btn-action-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 30rpx;
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 28rpx;
+  box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.25);
+  box-sizing: border-box;
+  transition: opacity 0.15s ease;
+}
+
+.btn-action-primary:active {
+  opacity: 0.85;
+}

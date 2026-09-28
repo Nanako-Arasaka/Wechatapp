@@ -1,0 +1,131 @@
+/*P5确认预约信息*/
+
+.confirm-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+/* 半透明遮罩 */
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  animation: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 底部弹出 sheet */
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #F4F6F9;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 16rpx 24rpx calc(32rpx + env(safe-area-inset-bottom));
+  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* 顶部小把手 */
+.sheet-handle {
+  width: 56rpx;
+  height: 8rpx;
+  background: #E5E6EB;
+  border-radius: 4rpx;
+  margin: 0 auto 20rpx;
+}
+
+/* 标题区 */
+.sheet-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #1F2329;
+  text-align: center;
+  margin-bottom: 6rpx;
+}
+
+.sheet-sub {
+  font-size: 24rpx;
+  color: #86909C;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+/* 六行信息卡 */
+.info-list {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 8rpx 28rpx;
+  margin-bottom: 28rpx;
+}
+
+.info-row {
+  font-size: 28rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid #F2F3F5;
+}
+
+.info-row-last {
+  border-bottom: none;
+}
+
+.info-label {
+  color: #86909C;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #1F2329;
+  font-weight: 500;
+  text-align: right;
+  max-width: 460rpx;
+  word-break: break-all;
+}
+
+/* 底部双按钮 */
+.sheet-actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.sheet-actions .btn-outline,
+.sheet-actions .btn-confirm {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  padding: 24rpx 0;
+  margin: 0;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  color: #4E5969;
+  border: 2rpx solid #E5E6EB;
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #1677FF 0%, #4096FF 100%);
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+}

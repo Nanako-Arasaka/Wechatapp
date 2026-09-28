@@ -1,0 +1,77 @@
+<view class="checkin-page container">
+  <!-- 头部控制卡片 -->
+  <view class="checkin-header-card card">
+    <view class="ch-title">前台入场快速核销</view>
+    <view class="ch-desc">扫描客户出示的预约二维码，或输入 12 位核销码完成入场核验</view>
+
+    <!-- 扫码主按钮 -->
+    <button class="btn-scan-camera" bindtap="handleScanCode" disabled="{{parsing}}">
+      <text class="camera-icon">📷</text>
+      <text>{{parsing ? '解析中...' : '调用摄像头扫码核销'}}</text>
+    </button>
+
+    <view class="input-verify-box flex-row">
+      <input
+        class="code-input flex-1"
+        placeholder="输入核销码 (例如 SV...)"
+        value="{{inputCode}}"
+        bindinput="onCodeInput"
+      />
+      <button class="btn-verify-action" bindtap="handleManualVerify" disabled="{{parsing}}">{{parsing ? '解析中' : '解析核销码'}}</button>
+    </view>
+
+    <!-- 快捷测试码 (仅开发版显示) -->
+    <view class="demo-code-helper" wx:if="{{isDev}}">
+      <view class="helper-label">💡 快捷测试核销码：</view>
+      <view class="helper-tags flex-row">
+        <text class="h-tag" bindtap="fillDemoCode" data-code="{{demoCode}}">【待核销预约】{{demoCode}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预检结果展示卡片 -->
+  <view class="verify-result-card card" wx:if="{{verifyResult}}">
+    <view class="vr-header flex-between">
+      <text class="vr-title">核销凭证详情</text>
+      <status-tag status="{{verifyResult.status}}" />
+    </view>
+
+    <view class="vr-details">
+      <view class="vr-row flex-between">
+        <text class="vr-label">预约编号</text>
+        <text class="vr-val">{{verifyResult.bookingNo}}</text>
+      </view>
+      <view class="vr-row flex-between">
+        <text class="vr-label">预约人</text>
+        <text class="vr-val font-bold">{{verifyResult.userName}} ({{verifyResult.userPhone}})</text>
+      </view>
+      <view class="vr-row flex-between">
+        <text class="vr-label">预约场馆</text>
+        <text class="vr-val font-bold">{{verifyResult.venueName}}</text>
+      </view>
+      <view class="vr-row flex-between">
+        <text class="vr-label">预约时段</text>
+        <text class="vr-val text-primary font-bold">{{verifyResult.bookingDate}} {{verifyResult.timeRange}}</text>
+      </view>
+      <view class="vr-row flex-between" wx:if="{{verifyResult.courtNo}}">
+        <text class="vr-label">场地号</text>
+        <text class="vr-val text-primary font-bold">{{verifyResult.courtNo}} 号场</text>
+      </view>
+      <view class="vr-row flex-between">
+        <text class="vr-label">预约数量</text>
+        <text class="vr-val">{{verifyResult.quantity}} 个名额</text>
+      </view>
+      <view class="vr-row flex-between">
+        <text class="vr-label">实付金额</text>
+        <text class="vr-val text-danger font-bold">¥{{verifyResult.amount / 100}}</text>
+      </view>
+    </view>
+
+    <!-- 确认核销操作按钮 -->
+    <view class="confirm-btn-wrap" wx:if="{{verifyResult.canConfirm}}">
+      <button class="btn-confirm-checkin" bindtap="onConfirmCheckin" disabled="{{confirming}}">
+        {{confirming ? '核销中...' : '✓ 确认核销入场'}}
+      </button>
+    </view>
+  </view>
+</view>

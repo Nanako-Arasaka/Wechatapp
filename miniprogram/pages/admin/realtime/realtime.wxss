@@ -1,0 +1,116 @@
+.realtime-page {
+  background: #F4F6F9;
+}
+
+.realtime-header {
+  background: #1F2329;
+  padding: 24rpx 32rpx 36rpx;
+  color: #FFFFFF;
+}
+
+.rt-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 4rpx;
+}
+
+.rt-sub {
+  font-size: 22rpx;
+  opacity: 0.75;
+}
+
+.rt-tag {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 30rpx;
+  padding: 8rpx 20rpx;
+  font-size: 22rpx;
+}
+
+.venue-realtime-list {
+  padding-top: 10rpx;
+}
+
+.rt-card {
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.v-mini-thumb {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 12rpx;
+  margin-right: 18rpx;
+  background: #E5E6EB;
+}
+
+.v-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 4rpx;
+}
+
+.v-type-text {
+  font-size: 20rpx;
+  color: #86909C;
+}
+
+.status-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 6rpx 18rpx;
+  border-radius: 30rpx;
+}
+
+.current-slot-section {
+  background: #F8F9FB;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin: 18rpx 0 14rpx;
+}
+
+.slot-row {
+  margin-bottom: 10rpx;
+  font-size: 24rpx;
+}
+
+.slot-label {
+  color: #4E5969;
+  font-weight: 500;
+}
+
+.slot-val {
+  color: #1F2329;
+  font-weight: 700;
+}
+
+.rt-progress-track {
+  width: 100%;
+  height: 14rpx;
+  background: #E5E6EB;
+  border-radius: 7rpx;
+  overflow: hidden;
+}
+
+.rt-progress-bar {
+  height: 100%;
+  border-radius: 7rpx;
+  transition: width 0.3s;
+}
+
+.next-slot-row {
+  font-size: 24rpx;
+  padding: 4rpx 10rpx;
+}
+
+.next-label {
+  color: #86909C;
+}
+
+.next-rem {
+  color: #1677FF;
+}
+
+.font-bold {
+  font-weight: 700;
+}

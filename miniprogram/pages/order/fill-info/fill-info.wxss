@@ -1,0 +1,112 @@
+.fill-page {  
+  background: #F4F6F9;  
+  padding: 24rpx 24rpx 200rpx;  /*预留底部固定按钮空间 */
+}  
+  
+/* 订单摘要卡 */  
+.summary-card {  
+  padding: 28rpx 30rpx;  
+  margin-bottom: 24rpx;  
+}  
+  
+.summary-title {  
+  font-size: 30rpx;  
+  font-weight: 700;  
+  color: #1F2329;  
+  margin-bottom: 20rpx;  
+}  
+  
+.summary-row {  
+  font-size: 26rpx;  
+  padding: 12rpx 0;  
+}  
+  
+.summary-label {  
+  color: #86909C;  
+}  
+  
+.summary-value {  
+  color: #1F2329;  
+  font-weight: 500;  
+  max-width: 480rpx;  
+  text-align: right;  
+}  
+  
+.summary-divider {  
+  height: 1rpx;  
+  background: #E5E6EB;  
+  margin: 12rpx 0;  
+}  
+  
+.summary-total {  
+  padding: 8rpx 0 0;  
+}  
+  
+.summary-value-total {  
+  color: #FF4D4F;  
+  font-weight: 700;  
+  font-size: 32rpx;  
+}  
+  
+/* 联系信息表单卡 */  
+.form-card {  
+  padding: 28rpx 30rpx;  
+}  
+  
+.form-title {  
+  font-size: 30rpx;  
+  font-weight: 700;  
+  color: #1F2329;  
+  margin-bottom: 20rpx;  
+}  
+  
+.form-row {  
+  font-size: 28rpx;  
+  padding: 22rpx 0;  
+  border-bottom: 1rpx solid #F2F3F5;  
+}  
+  
+.form-row:last-child {  
+  border-bottom: none;  
+}  
+  
+.form-label {  
+  color: #1F2329;  
+  width: 140rpx;  
+  flex-shrink: 0;  
+}  
+  
+.form-input {  
+  flex: 1;  
+  text-align: right;  
+  color: #1F2329;  
+  font-size: 28rpx;  
+}  
+  
+.form-placeholder {  
+  color: #C9CDD4;  
+  font-size: 26rpx;  
+}  
+  
+/* 底部固定栏 */  
+.bottom-bar {  
+  position: fixed;  
+  left: 0;  
+  right: 0;  
+  bottom: 0;  
+  background: #FFFFFF;  
+  padding: 20rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));  
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.04);  
+}  
+  
+.btn-next {  
+  width: 100%;  
+  font-size: 30rpx;  
+  font-weight: 600;  
+  border-radius: 16rpx;  
+  padding: 24rpx 0;  
+}  
+  
+.btn-disabled {  
+  opacity: 0.5;  
+}

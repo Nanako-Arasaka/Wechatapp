@@ -1,0 +1,133 @@
+.settlement-page {
+  background: #F4F6F9;
+  padding-top: 10rpx;
+}
+
+.settlement-header {
+  background: linear-gradient(135deg, #1F2329 0%, #343C4A 100%);
+  color: #FFFFFF;
+  padding: 36rpx;
+  border-radius: 28rpx;
+}
+
+.sh-label {
+  font-size: 26rpx;
+  opacity: 0.85;
+}
+
+.sh-amount-box {
+  margin: 16rpx 0 20rpx;
+  align-items: baseline;
+}
+
+.sh-currency {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #00B96B;
+  margin-right: 6rpx;
+}
+
+.sh-amount {
+  font-size: 64rpx;
+  font-weight: 900;
+  letter-spacing: -1rpx;
+}
+
+.yesterday-text {
+  font-size: 22rpx;
+  opacity: 0.75;
+}
+
+.settle-rule-tag {
+  font-size: 20rpx;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4rpx 14rpx;
+  border-radius: 20rpx;
+}
+
+/* 4格卡片 */
+.money-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+  padding: 0 24rpx;
+  margin-top: 4rpx;
+}
+
+.m-card {
+  margin: 0;
+  padding: 24rpx;
+}
+
+.m-label {
+  font-size: 22rpx;
+  color: #86909C;
+  margin-bottom: 8rpx;
+}
+
+.m-val {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #1F2329;
+}
+
+.font-blue { color: #1677FF; }
+.font-orange { color: #FA8C16; }
+.font-danger { color: #FF4D4F; }
+
+/* 图表 */
+.chart-card {
+  padding: 28rpx;
+  margin-top: 20rpx;
+}
+
+.chart-header {
+  margin-bottom: 20rpx;
+}
+
+.c-bar {
+  width: 8rpx;
+  height: 28rpx;
+  background: #1677FF;
+  border-radius: 4rpx;
+  margin-right: 12rpx;
+}
+
+.c-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+}
+
+.canvas-wrap {
+  width: 100%;
+  height: 360rpx;
+}
+
+.trend-chart-canvas {
+  width: 100%;
+  height: 360rpx;
+}
+
+.pie-chart-canvas {
+  width: 100%;
+  height: 340rpx;
+}
+
+.info-note-card {
+  padding: 28rpx;
+}
+
+.note-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 12rpx;
+}
+
+.note-item {
+  font-size: 22rpx;
+  color: #4E5969;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}

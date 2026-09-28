@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "全馆预约与订单监管",
+  "navigationBarBackgroundColor": "#1F2329",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "status-tag": "../../../components/status-tag/status-tag",
+    "empty": "../../../components/empty/empty"
+  }
+}

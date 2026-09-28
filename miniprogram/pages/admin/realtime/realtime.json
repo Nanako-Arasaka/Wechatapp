@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "实时场馆监控大屏",
+  "navigationBarBackgroundColor": "#1F2329",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

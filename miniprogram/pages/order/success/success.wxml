@@ -1,0 +1,79 @@
+<view class="success-page container">
+  
+  <view class="status-top">
+    <view class="success-icon-box">
+      <text class="success-check">✓</text>
+    </view>
+    <view class="success-title">预约成功！</view>
+    <view class="success-sub">您的场地已锁定，请在运动时间前凭码入场</view>
+  </view>
+
+  
+  <view class="ticket-card card">
+    <view class="ticket-header flex-between">
+      <text class="ticket-type">入场核销凭证</text>
+      <text class="tag tag-blue">待使用</text>
+    </view>
+
+    
+    <view class="qrcode-wrapper flex-center">
+      <canvas canvas-id="qrcodeCanvas" class="qrcode-canvas"></canvas>
+    </view>
+
+    <view class="code-number-box">
+      <text class="code-label">核销码：</text>
+      <text class="code-val">{{bookingCode}}</text>
+    </view>
+
+    <view class="ticket-divider">
+      <view class="half-circle left"></view>
+      <view class="dash-line"></view>
+      <view class="half-circle right"></view>
+    </view>
+
+    
+    <view class="ticket-details">
+      <view class="detail-row flex-between">
+        <text class="d-label">预约场馆</text>
+        <text class="d-val">{{order.booking.venue.name}}</text>
+      </view>
+      <view class="detail-row flex-between">
+        <text class="d-label">预约时段</text>
+        <text class="d-val">{{order.booking.bookingDate}} {{order.booking.startTime}}-{{order.booking.endTime}}</text>
+      </view>
+      <view class="detail-row flex-between">
+        <text class="d-label">预约数量</text>
+        <text class="d-val">{{order.booking.quantity}} 个名额</text>
+      </view>
+      <view class="detail-row flex-between">
+        <text class="d-label">实付金额</text>
+        <text class="d-val text-price">¥{{order.paidAmount / 100}}</text>
+      </view>
+    </view>
+  </view>
+
+  
+  <view class="contact-card card">
+    <view class="contact-title">联系信息（入场核验）</view>
+    <view class="info-row flex-between">
+      <text class="info-label">学号</text>
+      <text class="info-value">{{studentNo}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="info-label">姓名</text>
+      <text class="info-value">{{contactName}}</text>
+    </view>
+    <view class="info-row flex-between info-row-last">
+      <text class="info-label">手机号</text>
+      <text class="info-value">{{contactPhone}}</text>
+    </view>
+  </view>
+
+  
+  <view class="actions-box">
+    <button class="btn-primary btn-location" bindtap="onOpenLocation">📍 查看场地位置</button>
+    <button class="btn-primary" bindtap="goToOrders">查看我的全部订单</button>
+    <button class="btn-outline-home" bindtap="goToHome">返回首页</button>
+  </view>
+</view>
+

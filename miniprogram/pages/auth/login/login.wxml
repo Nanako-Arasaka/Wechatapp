@@ -1,0 +1,50 @@
+<view class="login-page">
+  <!-- 顶部科技感背景与品牌标识 -->
+  <view class="login-header">
+    <view class="logo-box">
+      <text class="logo-emoji">🏸</text>
+    </view>
+    <view class="app-title">智场通 SmartVenue</view>
+    <view class="app-slogan">智能场馆预约与实时余量查询系统</view>
+    <view class="badge-tag">智慧体育场馆运营系统</view>
+  </view>
+
+  <view class="login-card card">
+    <view class="card-title">学工号登录</view>
+    <view class="card-subtitle">请输入学校统一身份认证的学工号与密码</view>
+
+    <view class="form-item">
+      <text class="f-label">学工号</text>
+      <input class="f-input" placeholder="请输入学工号" value="{{username}}" bindinput="onUsernameInput" />
+    </view>
+
+    <view class="form-item">
+      <text class="f-label">密码</text>
+      <input class="f-input" password placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+
+    <button class="btn-login" bindtap="handleLogin">登录</button>
+
+    <view class="demo-hint">
+      <text>暂无账号？请联系体育场馆管理中心开通预约权限。</text>
+      <text>管理员账号由后台统一分配，不在此页面注册。</text>
+    </view>
+
+    <view class="divider-row">
+      <view class="divider-line"></view>
+      <text class="divider-text">或者</text>
+      <view class="divider-line"></view>
+    </view>
+
+    <!-- 微信快捷一键登录 -->
+    <button class="btn-wechat" bindtap="handleWechatLogin">
+      <text class="wx-icon">💬</text>
+      <text>微信一键登录</text>
+    </button>
+    <view class="wechat-hint-text">首次微信登录将自动注册为普通用户</view>
+  </view>
+
+  <view class="login-footer">
+    <text>© 2026 SmartVenue 智场通 · 开发者: 茉黎</text>
+  </view>
+</view>

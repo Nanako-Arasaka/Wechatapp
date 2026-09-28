@@ -1,0 +1,215 @@
+.dashboard-page {
+  background: #F6F8FB;
+  padding-bottom: 50rpx;
+}
+
+.dash-header {
+  background: linear-gradient(135deg, #111827 0%, #1F2937 60%, #374151 100%);
+  padding: 36rpx 32rpx 56rpx;
+  color: #FFFFFF;
+  border-bottom-left-radius: 36rpx;
+  border-bottom-right-radius: 36rpx;
+  box-shadow: 0 10rpx 30rpx rgba(17, 24, 39, 0.2);
+}
+
+.sys-title {
+  font-size: 24rpx;
+  opacity: 0.75;
+  margin-bottom: 8rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.admin-greet {
+  font-size: 38rpx;
+  font-weight: 800;
+}
+
+.refresh-tag {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 40rpx;
+  padding: 10rpx 24rpx;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  backdrop-filter: blur(8px);
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.refresh-icon {
+  font-size: 24rpx;
+}
+
+/* KPI 卡片网格 */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  padding: 0 24rpx;
+  margin-top: -36rpx;
+}
+
+.kpi-card {
+  margin: 0;
+  padding: 28rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  box-shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.05);
+}
+
+.kpi-label {
+  font-size: 24rpx;
+  color: #86909C;
+  margin-bottom: 10rpx;
+  font-weight: 500;
+}
+
+.kpi-num {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #1D2129;
+  margin-bottom: 8rpx;
+}
+
+.price-text {
+  color: #1677FF;
+}
+
+.kpi-growth {
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.text-success { color: #00B96B; }
+.text-danger { color: #FF4D4F; }
+.text-primary { color: #1677FF; }
+
+.arrow-icon {
+  font-weight: 800;
+  margin-right: 4rpx;
+}
+
+/* 图表卡片通用 */
+.chart-card {
+  padding: 30rpx;
+  margin-top: 24rpx;
+  border-radius: 26rpx;
+}
+
+.chart-header {
+  margin-bottom: 22rpx;
+}
+
+.chart-bar-icon {
+  width: 8rpx;
+  height: 32rpx;
+  background: var(--primary-gradient);
+  border-radius: 4rpx;
+  margin-right: 14rpx;
+}
+
+.chart-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #1D2129;
+}
+
+.chart-unit {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: 380rpx;
+  border-radius: 16rpx;
+}
+
+/* 热门时段列表 */
+.hot-slots-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.hot-slot-item {
+  background: #F8FAFC;
+  padding: 18rpx 24rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid #F1F5F9;
+}
+
+.hs-time {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1D2129;
+}
+
+.hs-right {
+  gap: 14rpx;
+}
+
+.hs-booked {
+  font-size: 24rpx;
+  color: #86909C;
+}
+
+.hs-rate {
+  font-weight: 700;
+}
+
+/* 诊断建议 */
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.sug-item {
+  background: #F8FAFC;
+  padding: 22rpx;
+  border-radius: 16rpx;
+  border-left: 8rpx solid #1677FF;
+}
+
+.sug-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1D2129;
+  margin-bottom: 8rpx;
+}
+
+.sug-content {
+  font-size: 24rpx;
+  color: #4E5969;
+  line-height: 1.6;
+}
+
+.quick-entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 24rpx 32rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  padding: 24rpx 0;
+}
+
+.quick-entry-item {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 0;
+}
+
+.qe-icon {
+  font-size: 44rpx;
+  margin-bottom: 10rpx;
+}
+
+.qe-label {
+  font-size: 24rpx;
+  color: #4B5563;
+}

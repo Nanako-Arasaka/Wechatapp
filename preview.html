@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Slotify 智场通 - 前端预览</title>
+  <style>
+    :root { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #1d2129; background: #edf1f5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .app { position: relative; width: min(100%, 430px); min-height: 100dvh; margin: auto; background: #f6f8fb; box-shadow: 0 12px 48px #1d21291a; padding-bottom: 76px; }
+    .topbar { position: sticky; top: 0; z-index: 5; height: 54px; display: flex; align-items: center; justify-content: center; background: #fff; border-bottom: 1px solid #eef0f2; font-size: 16px; font-weight: 700; }
+    .back { position: absolute; left: 14px; top: 8px; width: 38px; height: 38px; border: 0; background: transparent; font-size: 27px; line-height: 1; }
+    .content { padding: 0 16px 24px; }
+    .home-top { margin: 0 -16px; padding: 16px 16px 20px; background: linear-gradient(180deg, #e6f0ff, #f6f8fb); }
+    .location { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .location-name { border: 0; padding: 8px 13px; border-radius: 20px; background: white; font-size: 13px; font-weight: 700; }
+    .icon-btn { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #fff; font-size: 18px; }
+    .search { display: flex; gap: 8px; align-items: center; padding: 7px 8px 7px 15px; border: 1px solid #d8e8ff; background: white; border-radius: 24px; box-shadow: 0 3px 14px #1677ff10; }
+    .search input { min-width: 0; flex: 1; outline: 0; border: 0; font-size: 13px; }
+    .search button, .primary { border: 0; color: white; background: #1677ff; font-weight: 700; }
+    .search button { padding: 8px 17px; border-radius: 18px; font-size: 13px; }
+    .banner { position: relative; height: 166px; overflow: hidden; border-radius: 8px; margin: 4px 0 18px; background: #1768bd; color: #fff; cursor: pointer; }
+    .banner img { position: absolute; width: 100%; height: 100%; object-fit: cover; animation: image-enter 650ms ease-out both; }
+    .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #073c75dc, #073c7520); }
+    .banner-copy { position: relative; z-index: 1; padding: 18px 20px; width: 80%; }
+    .banner-tag { display: inline-block; padding: 4px 9px; background: #ffffff35; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .banner h2 { margin: 14px 0 7px; font-size: 20px; line-height: 1.25; }
+    .banner p { margin: 0; font-size: 11px; line-height: 1.45; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 12px; }
+    .section-head h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 17px; }
+    .section-head h2::before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: #1677ff; }
+    .text-link { border: 0; background: none; color: #1677ff; font-size: 12px; font-weight: 600; }
+    .advice { padding: 16px; border-left: 4px solid #fa8c16; border-radius: 5px; background: white; box-shadow: 0 2px 12px #00000009; }
+    .advice strong { display: block; font-size: 15px; margin-bottom: 8px; }
+    .advice p { margin: 0; color: #4e5969; font-size: 12px; line-height: 1.6; }
+    .venue-card { display: flex; gap: 12px; padding: 12px; margin: 0 0 12px; background: white; border: 1px solid #f0f2f4; border-radius: 7px; box-shadow: 0 3px 12px #00000008; cursor: pointer; animation: card-enter 380ms ease-out both; transition: box-shadow 180ms ease; }
+    .venue-card:hover { box-shadow: 0 7px 20px #1d21291a; }
+    .venue-card img { transition: transform 180ms ease; }
+    .venue-card:hover img { transform: scale(1.03); }
+    .venue-card img { width: 100px; height: 108px; object-fit: cover; border-radius: 5px; background: #e5e6eb; flex: none; }
+    .venue-info { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+    .venue-info h3 { margin: 0 0 5px; font-size: 14px; line-height: 1.35; }
+    .muted { color: #86909c; font-size: 11px; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 auto; }
+    .chip { padding: 3px 6px; border-radius: 3px; background: #f3f6f8; color: #4e5969; font-size: 10px; }
+    .venue-bottom { display: flex; align-items: end; justify-content: space-between; margin-top: 8px; }
+    .price { color: #f04b54; font-size: 19px; font-weight: 800; }
+    .price small { color: #86909c; font-size: 10px; font-weight: 400; }
+    .small-primary { border: 0; border-radius: 5px; padding: 7px 10px; background: #1677ff; color: #fff; font-size: 11px; font-weight: 700; }
+    .horizontal { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+    .pill { flex: none; padding: 8px 12px; border-radius: 18px; border: 1px solid #e5e6eb; background: #fff; color: #4e5969; font-size: 12px; }
+    .pill.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .slots { display: flex; gap: 8px; overflow-x: auto; padding: 14px 0; scrollbar-width: none; }
+    .slot-mini { flex: none; min-width: 80px; padding: 10px 8px; border: 1px solid #92d6c0; border-radius: 5px; background: #eafaf5; text-align: center; color: #087b58; font-size: 11px; }
+    .slot-mini strong { display: block; font-size: 13px; margin-bottom: 3px; }
+    .slot-mini.full { color: #8c8c8c; border-color: #e5e6eb; background: #f5f5f5; }
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0; scrollbar-width: none; }
+    .filter { border: 1px solid #e5e6eb; border-radius: 5px; padding: 8px 11px; background: #fff; white-space: nowrap; color: #4e5969; font-size: 12px; }
+    .filter.active { border-color: #1677ff; background: #e6f4ff; color: #1677ff; font-weight: 700; }
+    .page-search { margin: 15px 0 2px; }
+    .detail-hero { margin: 0 -16px; height: 210px; width: calc(100% + 32px); object-fit: cover; background: #e5e6eb; }
+    .detail-title { margin: 18px 0 8px; font-size: 21px; line-height: 1.25; }
+    .detail-meta { margin: 0 0 18px; color: #4e5969; font-size: 13px; line-height: 1.5; }
+    .panel { margin: 14px 0; padding: 16px; border-radius: 7px; background: #fff; }
+    .panel h3 { margin: 0 0 12px; font-size: 15px; }
+    .panel p { margin: 0; color: #4e5969; font-size: 12px; line-height: 1.6; }
+    .fact-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid #f0f1f3; font-size: 12px; }
+    .fact-row:last-child { border: 0; }
+    .fact-row span:first-child { color: #86909c; }
+    .fact-row span:last-child { text-align: right; font-weight: 600; }
+    .action-bar { position: sticky; bottom: 66px; z-index: 4; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 16px; margin: 18px -16px -24px; border-top: 1px solid #e9ecef; background: #fff; }
+    .action-bar .primary { flex: 1; padding: 12px 16px; border-radius: 5px; }
+    .action-bar .primary:disabled { background: #c9cdd4; cursor: default; }
+    .slot-grid, .court-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .slot-cell, .court-cell { min-height: 72px; border: 1px solid #a8dccb; border-radius: 5px; background: #eafaf5; color: #087b58; text-align: center; padding: 10px 4px; }
+    .slot-cell strong, .court-cell strong { display: block; margin-bottom: 5px; font-size: 15px; }
+    .slot-cell span, .court-cell span { font-size: 11px; }
+    .slot-cell.disabled, .court-cell.disabled { border-color: #e5e6eb; background: #f4f5f6; color: #86909c; }
+    .slot-cell.selected, .court-cell.selected { border: 2px solid #1677ff; background: #e6f4ff; color: #1677ff; animation: selection-pop 260ms ease-out; }
+    .slot-cell:not(.disabled):hover, .court-cell:not(.disabled):hover { border-color: #1677ff; }
+    .notice { margin: 12px 0; color: #86909c; font-size: 12px; }
+    .order-tabs { display: flex; gap: 18px; margin: 0 -16px 16px; padding: 13px 16px; overflow-x: auto; background: #fff; }
+    .order-tabs button { padding: 4px 0; white-space: nowrap; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #4e5969; font-size: 13px; }
+    .order-tabs button.active { color: #1677ff; border-color: #1677ff; font-weight: 700; }
+    .order-head { display: flex; justify-content: space-between; border-bottom: 1px solid #f0f1f3; padding-bottom: 12px; font-size: 11px; }
+    .order-head strong { color: #00a86b; }
+    .order-body { display: flex; gap: 12px; padding: 14px 0; }
+    .order-body img { width: 74px; height: 70px; object-fit: cover; border-radius: 4px; }
+    .order-body h3 { margin: 0 0 7px; font-size: 14px; }
+    .order-body p { margin: 3px 0; color: #86909c; font-size: 11px; }
+    .order-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f1f3; padding-top: 12px; font-size: 12px; }
+    .profile-head { margin: 0 -16px; padding: 24px 16px 22px; color: #fff; background: linear-gradient(135deg, #1169e7, #20a6b4); }
+    .profile-person { display: flex; align-items: center; gap: 12px; }
+    .avatar { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #ffffff45; font-size: 24px; }
+    .profile-person h2 { margin: 0 0 4px; font-size: 17px; }
+    .profile-person p { margin: 0; font-size: 11px; opacity: .9; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 23px; text-align: center; }
+    .stats strong { display: block; font-size: 20px; margin-bottom: 5px; }
+    .stats span { font-size: 11px; opacity: .9; }
+    .shortcut { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; gap: 8px; }
+    .shortcut button { border: 0; background: transparent; color: #4e5969; font-size: 11px; }
+    .shortcut b { display: block; margin-bottom: 6px; font-size: 22px; }
+    .menu-row { display: flex; justify-content: space-between; width: 100%; padding: 13px 0; border: 0; border-bottom: 1px solid #f0f1f3; background: #fff; text-align: left; font-size: 13px; }
+    .menu-row:last-child { border-bottom: 0; }
+    .empty { padding: 55px 12px; text-align: center; color: #86909c; font-size: 13px; }
+    .tabbar { position: fixed; bottom: 0; z-index: 6; width: min(100%, 430px); height: 66px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #e9ecef; background: #fff; }
+    .tabbar button { border: 0; background: #fff; color: #86909c; font-size: 11px; }
+    .tabbar button.active { color: #1677ff; font-weight: 700; }
+    .tabbar img { display: block; width: 24px; height: 24px; object-fit: contain; margin: 0 auto 3px; }
+    @keyframes card-enter { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes image-enter { from { opacity: .7; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }
+    @keyframes selection-pop { 0% { transform: scale(.95); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) { .banner img, .venue-card, .slot-cell.selected, .court-cell.selected { animation: none; } }
+    @media (min-width: 600px) { .app { margin: 28px auto; min-height: calc(100dvh - 56px); border-radius: 10px; overflow: hidden; } .tabbar { bottom: 28px; border-radius: 0 0 10px 10px; } }
+  </style>
+</head>
+<body>
+  <div class="app"><header class="topbar" id="topbar"></header><main class="content" id="content"></main><nav class="tabbar" id="tabbar"></nav></div>
+  <script>
+    const venues = [
+      { id: 1, name: '星羽羽毛球馆 (A馆)', type: '羽毛球', address: '文体中心综合馆 2层 B区', price: 35, remain: 8, hours: '08:00-22:00', image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800', facilities: ['中央空调','专业照明','更衣淋浴'], desc: '国家级比赛标准木地板与专业防滑地胶，配备无影 LED 运动照明和恒温空调。' },
+      { id: 2, name: '冠军篮球中心 (室内主馆)', type: '篮球', address: '体育中心北区 1号竞技馆', price: 50, remain: 5, hours: '09:00-22:00', image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800', facilities: ['中央空调','电子计分器','淋浴间'], desc: 'FIBA 认证枫木地板，配备标准篮架与实时计分大屏。' },
+      { id: 3, name: '青春足球场 (人工草7人制)', type: '足球', address: '体育中心南区 户外足球场', price: 120, remain: 2, hours: '08:00-22:00', image: 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800', facilities: ['夜间照明','替补席','急救箱'], desc: '环保人造草坪，配备夜间照明和七人制标准球门。' },
+      { id: 4, name: '悦动网球馆 (红土&硬地)', type: '网球', address: '体育公园东侧 网球中心', price: 60, remain: 4, hours: '07:00-22:00', image: 'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800', facilities: ['发球机租借','夜间照明','淋浴间'], desc: '标准红土与硬地球场，夜间配备专业泛光照明。' },
+      { id: 5, name: '活力乒乓球馆', type: '乒乓球', address: '文体中心综合馆 3层 A区', price: 20, remain: 10, hours: '08:00-22:00', image: 'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800', facilities: ['空调','休息区','储物柜'], desc: '专业比赛球台与防滑地胶，提供独立隔断空间。' },
+      { id: 6, name: '蓝海游泳馆 (恒温50米)', type: '游泳', address: '体育中心水上运动馆 1层', price: 40, remain: 6, hours: '06:30-21:30', image: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800', facilities: ['恒温水质','淋浴间','救生员'], desc: '50 米恒温泳池，配备循环净化系统与专业救生员。' }
+    ];
+    const icons = ['home','venue','order','user'];
+    const tabs = ['首页','场地','订单','我的'];
+    const state = { page: '首页', venue: venues[0], type: '全部', keyword: '', slot: '', court: 0, quickVenue: 1, orderFilter: '全部' };
+    const byId = id => document.getElementById(id);
+    const attr = value => String(value).replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+    function venueCard(v, index=0) { return `<article class="venue-card" style="animation-delay:${Math.min(index,6)*55}ms" onclick="openVenue(${v.id})"><img src="${v.image}" alt="${attr(v.name)}"><div class="venue-info"><h3>${v.name}</h3><div class="muted truncate">${v.address}</div><div class="chips">${v.facilities.map(f => `<span class="chip">${f}</span>`).join('')}</div><div class="venue-bottom"><div class="price">¥${v.price}<small>/小时起</small></div><button class="small-primary" onclick="event.stopPropagation();startBooking(${v.id})">立即预约</button></div></div></article>`; }
+    function home() { return `<div class="home-top"><div class="location"><button class="location-name">武汉市 · 洪山区文体中心 ⌄</button><button class="icon-btn" title="通知" onclick="go('我的')">♧</button></div><div class="search"><span>⌕</span><input id="home-search" placeholder="搜索运动项目、场馆名称或场地设施" onkeydown="if(event.key==='Enter') searchHome()"><button onclick="searchHome()">搜索</button></div></div><div class="banner" onclick="openVenue(1)"><img src="${venues[0].image}" alt="羽毛球馆"><div class="banner-copy"><span class="banner-tag">热门推荐</span><h2>星羽羽毛球馆<br>A馆全新升级</h2><p>标准木地板 · 恒温中央空调</p></div></div><div class="advice"><strong>今日错峰建议</strong><p>今日 18:00-21:00 为晚高峰时段，建议选择 14:00-17:00 错峰运动，享受更舒适的场地体验。</p></div><div class="section-head"><h2>热门推荐场馆</h2><button class="text-link" onclick="go('场地')">查看全部 ›</button></div>${venues.slice(0,3).map(venueCard).join('')}<div class="section-head"><h2>今日时段实时余量</h2><span class="muted">● 实时同步</span></div><div class="horizontal">${venues.slice(0,4).map(v => `<button class="pill ${state.quickVenue===v.id?'active':''}" onclick="state.quickVenue=${v.id};render()">${v.name}</button>`).join('')}</div><div class="slots">${['09:00','10:00','14:00','15:00','18:00','19:00'].map((time,i) => `<button class="slot-mini ${i===5?'full':''}" onclick="startBooking(${state.quickVenue})"><strong>${time}</strong>${i===5?'已满':'✓ 可预约'}</button>`).join('')}</div>`; }
+    function list() { const filtered = venues.filter(v => (state.type==='全部'||v.type===state.type) && (`${v.name}${v.type}${v.address}${v.facilities.join('')}`).toLowerCase().includes(state.keyword.toLowerCase())); return `<div class="search page-search"><span>⌕</span><input id="list-search" value="${attr(state.keyword)}" placeholder="搜索场地名称、项目或地址" oninput="state.keyword=this.value;updateList()"><button onclick="state.keyword='';render()">清除</button></div><div class="filters">${['全部','羽毛球','篮球','足球','网球','乒乓球','游泳'].map(t => `<button class="filter ${state.type===t?'active':''}" onclick="state.type='${t}';render()">${t}</button>`).join('')}</div><div id="venue-results">${filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>'}</div>`; }
+    function detail() { const v=state.venue; return `<img class="detail-hero" src="${v.image}" alt="${attr(v.name)}"><h1 class="detail-title">${v.name}</h1><p class="detail-meta">${v.address}<br>营业时间 ${v.hours}</p><div class="panel"><h3>场馆介绍</h3><p>${v.desc}</p><div class="chips" style="margin-top:12px">${v.facilities.map(f=>`<span class="chip">${f}</span>`).join('')}</div></div><div class="panel"><h3>场馆信息</h3><div class="fact-row"><span>今日余量</span><span>${v.remain} 个名额</span></div><div class="fact-row"><span>开放时间</span><span>${v.hours}</span></div><div class="fact-row"><span>价格</span><span>¥${v.price}/小时起</span></div></div><div class="action-bar"><span class="price">¥${v.price}<small>/小时起</small></span><button class="primary" onclick="startBooking(${v.id})">开始预约</button></div>`; }
+    function booking() { const times=['09:00','10:00','11:00','14:00','15:00','16:00','18:00','19:00','20:00']; const date=new Date().toLocaleDateString('sv-SE'); return `<div class="panel"><h3>${state.venue.name}</h3><p>${state.venue.address}</p></div><div class="panel"><h3>选择预约时段</h3><p>今日 ${date} · 仅支持当天预约</p></div><div class="panel"><div class="slot-grid">${times.map((t,i)=>`<button class="slot-cell ${i===7?'disabled':''} ${state.slot===t?'selected':''}" onclick="selectSlot('${t}',${i===7})"><strong>${t}</strong><span>${i===7?'已满':'✓ 可预约'}</span></button>`).join('')}</div></div>${state.slot?`<div class="panel"><h3>已选时段</h3><div class="fact-row"><span>场馆</span><span>${state.venue.name}</span></div><div class="fact-row"><span>日期</span><span>${date}</span></div><div class="fact-row"><span>时间</span><span>${state.slot} - ${String(Number(state.slot.slice(0,2))+1).padStart(2,'0')}:00</span></div><div class="fact-row"><span>单价</span><span>¥${state.venue.price}</span></div></div>`:''}<div class="action-bar"><button class="primary" ${state.slot?'':'disabled'} onclick="go('选场地')">下一步</button></div>`; }
+    function court() { return `<div class="panel"><h3>已选时段</h3><div class="fact-row"><span>场馆</span><span>${state.venue.name}</span></div><div class="fact-row"><span>时间</span><span>${state.slot}</span></div><div class="fact-row"><span>单价</span><span>¥${state.venue.price}</span></div></div><div class="panel"><h3>请选择场地</h3><div class="court-grid">${Array.from({length:Math.min(state.venue.remain+2,10)},(_,i)=>`<button class="court-cell ${i===1?'disabled':''} ${state.court===i+1?'selected':''}" onclick="selectCourt(${i+1},${i===1})"><strong>${i+1}号场</strong><span>${i===1?'已占用':'✓ 可预约'}</span></button>`).join('')}</div><p class="notice">灰色场地已被预约</p></div><div class="action-bar"><button class="primary" ${state.court?'':'disabled'} onclick="go('填写信息')">下一步</button></div>`; }
+    function fill() { return `<div class="panel"><h3>订单摘要</h3><div class="fact-row"><span>场馆</span><span>${state.venue.name}</span></div><div class="fact-row"><span>场地</span><span>${state.court}号场</span></div><div class="fact-row"><span>时间</span><span>${state.slot}</span></div><div class="fact-row"><span>合计</span><span>¥${state.venue.price}</span></div></div><div class="panel"><h3>联系方式（入场核验用）</h3><div class="fact-row"><span>学号</span><input placeholder="请输入学号" style="border:0;text-align:right;outline:0;width:65%"></div><div class="fact-row"><span>姓名</span><input placeholder="请输入真实姓名" style="border:0;text-align:right;outline:0;width:65%"></div><div class="fact-row"><span>手机号</span><input placeholder="请输入手机号" style="border:0;text-align:right;outline:0;width:65%"></div></div><div class="action-bar"><button class="primary" onclick="alert('浏览器预览不提交真实预约，请在微信开发者工具中测试完整流程。')">下一步</button></div>`; }
+    function orders() { return `<div class="order-tabs">${['全部','待付款','待使用','已完成','已取消'].map(t=>`<button class="${state.orderFilter===t?'active':''}" onclick="state.orderFilter='${t}';render()">${t}</button>`).join('')}</div>${state.orderFilter==='全部'||state.orderFilter==='待使用'?`<div class="panel"><div class="order-head"><span>订单号：BK202608290088</span><strong>待使用</strong></div><div class="order-body"><img src="${venues[0].image}" alt="羽毛球馆"><div><h3>${venues[0].name}</h3><p>2026-08-29 18:00-19:00</p><p>数量：1 个场地名额</p></div></div><div class="order-foot"><span>总计：<b class="price">¥35</b></span><button class="small-primary" onclick="alert('核销码请在小程序中查看')">核销码</button></div></div>`:'<div class="empty">暂无相关订单</div>'}`; }
+    function profile() { return `<div class="profile-head"><div class="profile-person"><div class="avatar">人</div><div><h2>未登录 · 游客模式</h2><p>登录后查看预约与运动记录</p></div></div><div class="stats"><div><strong>-</strong><span>待使用预约</span></div><div><strong>-</strong><span>累计预约</span></div><div><strong>-</strong><span>预约时长(h)</span></div></div></div><div class="panel"><h3>我的预约订单</h3><div class="shortcut"><button onclick="go('订单')"><b>⌁</b>待付款</button><button onclick="go('订单')"><b>▣</b>待使用</button><button onclick="go('订单')"><b>✓</b>已完成</button><button onclick="go('订单')"><b>↻</b>退改/取消</button></div></div><div class="panel"><button class="menu-row" onclick="alert('请在小程序中登录后查看消息')">消息通知中心 <span>›</span></button><button class="menu-row" onclick="go('订单')">我的入场核销码 <span>›</span></button><button class="menu-row" onclick="alert('请在小程序中使用反馈功能')">意见反馈与客服 <span>›</span></button><button class="menu-row" onclick="alert('Slotify 智场通')">关于 Slotify 智场通 <span>›</span></button></div>`; }
+    function render() { const page=state.page; const root=['首页','场地','订单','我的'].includes(page); byId('topbar').innerHTML=`${root?'':`<button class="back" aria-label="返回" onclick="goBack()">‹</button>`}${page==='首页'?'Slotify 场地预约':page==='场地'?'场地列表':page==='场馆详情'?state.venue.name:page}`; byId('content').innerHTML=({首页:home,场地:list,场馆详情:detail,选择时间:booking,选场地:court,填写信息:fill,订单:orders,我的:profile}[page]||home)(); byId('tabbar').innerHTML=tabs.map((t,i)=>`<button class="${page===t?'active':''}" onclick="go('${t}')"><img src="miniprogram/assets/icons/${icons[i]}${page===t?'-active':''}.png" alt="">${t}</button>`).join(''); window.scrollTo(0,0); }
+    function go(page) { state.page=page; render(); }
+    function goBack() { go(state.page==='填写信息'?'选场地':state.page==='选场地'?'选择时间':state.page==='选择时间'?'场馆详情':'场地'); }
+    function openVenue(id) { state.venue=venues.find(v=>v.id===id)||venues[0]; go('场馆详情'); }
+    function startBooking(id) { state.venue=venues.find(v=>v.id===id)||venues[0]; state.slot=''; state.court=0; go('选择时间'); }
+    function selectSlot(time,disabled) { if(disabled)return; state.slot=time; render(); }
+    function selectCourt(no,disabled) { if(disabled)return; state.court=no; render(); }
+    function searchHome() { state.keyword=byId('home-search').value; go('场地'); }
+    function updateList() { const filtered=venues.filter(v=>(state.type==='全部'||v.type===state.type)&&`${v.name}${v.type}${v.address}${v.facilities.join('')}`.toLowerCase().includes(state.keyword.toLowerCase())); byId('venue-results').innerHTML=filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>'; }
+    render();
+  </script>
+</body>
+</html>

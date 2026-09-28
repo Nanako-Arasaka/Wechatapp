@@ -1,0 +1,120 @@
+.pay-page {
+  background: #F4F6F9;
+  padding-bottom: 140rpx;
+}
+
+.pay-header-card {
+  text-align: center;
+  padding: 40rpx 20rpx;
+  border-radius: 28rpx;
+}
+
+.countdown-tip {
+  font-size: 24rpx;
+  color: #86909C;
+}
+
+.time-highlight {
+  color: #FA8C16;
+  font-weight: 700;
+}
+
+.amount-box {
+  margin: 20rpx 0 10rpx;
+  color: #1F2329;
+}
+
+.currency {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-right: 4rpx;
+}
+
+.amount-val {
+  font-size: 64rpx;
+  font-weight: 800;
+  letter-spacing: -1rpx;
+}
+
+.order-no-text {
+  font-size: 22rpx;
+  color: #86909C;
+}
+
+.order-info-card, .pay-method-card {
+  padding: 28rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2329;
+  margin-bottom: 20rpx;
+}
+
+.info-row {
+  font-size: 26rpx;
+  padding: 12rpx 0;
+}
+
+.row-label {
+  color: #86909C;
+}
+
+.row-val {
+  color: #1F2329;
+  font-weight: 500;
+}
+
+.method-item {
+  padding: 20rpx;
+  background: #F8F9FB;
+  border-radius: 16rpx;
+  border: 2rpx solid #E6F4FF;
+}
+
+.wx-pay-icon {
+  font-size: 44rpx;
+  margin-right: 18rpx;
+  color: #07C160;
+}
+
+.method-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1F2329;
+}
+
+.method-sub {
+  font-size: 20rpx;
+  color: #86909C;
+  margin-top: 4rpx;
+}
+
+.radio-checked {
+  color: #07C160;
+  font-size: 32rpx;
+}
+
+.bottom-pay-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #FFFFFF;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 16rpx 32rpx;
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+.btn-confirm-pay {
+  background: #07C160;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: 40rpx;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(7, 193, 96, 0.25);
+}

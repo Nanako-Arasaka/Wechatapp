@@ -1,0 +1,78 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/venue/list/list",
+    "pages/venue/detail/detail",
+    "pages/venue/booking/booking",
+    "pages/venue/court/court",
+    "pages/order/list/list",
+    "pages/order/detail/detail",
+    "pages/order/pay/pay",
+    "pages/order/success/success",
+    "pages/user/profile/profile",
+    "pages/user/notifications/notifications",
+    "pages/auth/login/login",
+    "pages/admin/dashboard/dashboard",
+    "pages/admin/realtime/realtime",
+    "pages/admin/venues/venues",
+    "pages/admin/bookings/bookings",
+    "pages/order/fill-info/fill-info",
+    "pages/order/confirm/confirm",
+    "pages/admin/checkin/checkin",
+    "pages/admin/settlement/settlement",
+    "pages/admin/heatmap/heatmap",
+    "pages/admin/dev-console/dev-console",
+    "pages/admin/users/users"
+  ],
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于推荐附近的体育场馆与运动导航"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "Slotify 场地预约",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F6F8FA"
+  },
+  "tabBar": {
+    "color": "#8C8C8C",
+    "selectedColor": "#1677FF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/venue/list/list",
+        "text": "场地",
+        "iconPath": "assets/icons/venue.png",
+        "selectedIconPath": "assets/icons/venue-active.png"
+      },
+      {
+        "pagePath": "pages/order/list/list",
+        "text": "订单",
+        "iconPath": "assets/icons/order.png",
+        "selectedIconPath": "assets/icons/order-active.png"
+      },
+      {
+        "pagePath": "pages/user/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/icons/user.png",
+        "selectedIconPath": "assets/icons/user-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
