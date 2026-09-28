@@ -1,0 +1,1487 @@
+<!-- AI生成 -->
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>智场通 SmartVenue · 整站预览</title>
+<style>
+:root{
+  --primary:#1677FF;--primary-end:#3B82F6;--primary-light:#E6F4FF;
+  --success:#00B96B;--success-light:#E6FFFB;--warning:#FA8C16;--danger:#FF4D4F;
+  --text:#1D2129;--text2:#4E5969;--text3:#86909C;--bg:#F6F8FB;--card:#fff;
+  --ease-enter:cubic-bezier(.22,1,.36,1);--ease-move:cubic-bezier(.25,1,.5,1);
+  --ease-press:cubic-bezier(.25,.46,.45,.94);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+button,input{font:inherit}
+button{cursor:pointer;border:0;background:none}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:#E8EEF5;color:var(--text);-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 12px;
+}
+.phone{
+  width:min(430px,100%);height:min(900px,calc(100vh - 48px));
+  background:var(--bg);border-radius:28px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(29,35,41,.18);display:flex;flex-direction:column;position:relative;
+}
+.status-bar{
+  height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;font-size:12px;font-weight:600;background:#fff;z-index:5;
+}
+.nav{
+  height:48px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:#fff;font-size:16px;font-weight:700;position:relative;z-index:5;
+  border-bottom:1px solid #F0F1F3;
+}
+.nav .back{
+  position:absolute;left:8px;top:6px;width:36px;height:36px;font-size:26px;
+  color:var(--text);line-height:1;border-radius:50%;transition:transform 120ms var(--ease-press);
+}
+.nav .back:active{transform:scale(.92)}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.pad{padding:16px 16px 28px}
+.tabbar{
+  height:64px;flex:none;display:grid;grid-template-columns:repeat(4,1fr);
+  background:#fff;border-top:1px solid #EEF0F2;padding-bottom:env(safe-area-inset-bottom);
+}
+.tabbar button{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:var(--text3);font-size:11px;
+  transition:color 180ms ease,transform 120ms var(--ease-press);
+}
+.tabbar button:active{transform:scale(.94)}
+.tabbar button.active{color:var(--primary);font-weight:700}
+.tabbar .ic{font-size:18px;line-height:1}
+
+/* common */
+.card{
+  background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.02);
+  transition:transform 120ms var(--ease-press),box-shadow 220ms var(--ease-enter);
+}
+.card:active{transform:scale(.985)}
+.btn{
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--primary-end));
+  color:#fff;font-size:15px;font-weight:600;border-radius:999px;padding:13px 20px;
+  box-shadow:0 12px 36px rgba(22,119,255,.2);
+  transition:transform 120ms var(--ease-press),opacity 160ms ease,box-shadow 220ms var(--ease-enter);
+}
+.btn:active{opacity:.92;transform:scale(.97);box-shadow:0 6px 18px rgba(22,119,255,.18)}
+.btn.disabled,.btn:disabled{background:#C9CDD4;box-shadow:none;opacity:1;transform:none}
+.btn-outline{
+  border:1.5px solid var(--primary);color:var(--primary);background:transparent;
+  border-radius:999px;padding:11px 18px;font-size:13px;font-weight:600;
+  transition:background 160ms ease,transform 120ms var(--ease-press);
+}
+.btn-outline:active{background:var(--primary-light);transform:scale(.97)}
+.btn-sm{
+  background:linear-gradient(135deg,var(--primary),var(--primary-end));color:#fff;
+  border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;
+  transition:transform 120ms var(--ease-press),opacity 160ms ease;
+}
+.btn-sm:active{transform:scale(.94);opacity:.92}
+.tag{
+  display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;
+  font-size:11px;font-weight:600;background:var(--primary-light);color:var(--primary);
+}
+.tag.green{background:var(--success-light);color:var(--success)}
+.tag.orange{background:#FFF7E6;color:var(--warning)}
+.muted{color:var(--text3);font-size:12px;line-height:1.55}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section-title{
+  display:flex;align-items:center;gap:8px;margin:18px 0 12px;font-size:16px;font-weight:700;
+}
+.section-title::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--primary)}
+.enter{animation:rise 360ms var(--ease-enter) both}
+.d1{animation-delay:55ms}.d2{animation-delay:110ms}.d3{animation-delay:165ms}
+
+/* 页面差异化入场 — 重要性不同，不要一页一种动画 */
+/* 登录：hero 先落，卡片跟上 */
+.enter-login{animation:fadeUp 420ms var(--ease-enter) both}
+/* 首页：banner 轻微下压展开，内容错落 */
+.enter-home{animation:fadeUp 320ms var(--ease-enter) both}
+/* 列表/订单/我的：高频页，几乎隐形 */
+.enter-quiet{animation:fadeIn 180ms ease both}
+/* 详情：hero 横向揭示感 */
+.enter-detail{animation:slideIn 300ms var(--ease-move) both}
+/* 预约/选场：面板级，不重播卡片 */
+.enter-panel{animation:fadeUp 280ms var(--ease-enter) both}
+
+/* 跨页切入：前进自右、后退自左，避免生硬硬切 */
+.page-swap-in{animation:pageIn 320ms var(--ease-move) both}
+.page-swap-back{animation:pageBack 280ms var(--ease-move) both}
+@keyframes pageIn{
+  from{opacity:0;transform:translateX(22px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes pageBack{
+  from{opacity:0;transform:translateX(-18px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@media (prefers-reduced-motion: reduce){
+  .page-swap-in,.page-swap-back{animation:fadeIn 120ms ease both}
+}
+/* 成功：庆祝级 */
+.enter-festive{animation:fadeUp 400ms var(--ease-enter) both}
+
+/* 仅首次进入页面时叠加的加载骨架（不是每次交互） */
+.first-load{
+  animation:fadeIn 160ms ease both;
+}
+.micro-pop{animation:pop 240ms var(--ease-enter) both}
+/* 已选时段：仅首次出现轻入场；换时间不整卡跳 */
+.summary-first{animation:fadeUp 220ms var(--ease-enter) both}
+
+/* Apple 风格数字滚轮（odometer）——仅变化的位上下滚动 */
+.slot-val{
+  display:inline-flex;align-items:center;
+  font-variant-numeric:tabular-nums;letter-spacing:.5px;
+  color:#111827; /* 更深，保证可读 */
+  font-weight:700;
+  font-size:15px;
+}
+.odo-char{
+  display:inline-block;
+  height:1.35em;
+  line-height:1.35em;
+  overflow:hidden;
+  vertical-align:bottom;
+  position:relative;
+  color:#111827;
+}
+.odo-char.odo-static{overflow:visible;height:auto;line-height:inherit}
+.odo-strip{
+  display:flex;flex-direction:column;
+  will-change:transform;
+}
+.odo-strip > i{
+  font-style:normal;
+  height:1.35em;
+  line-height:1.35em;
+  display:block;
+  color:#111827;
+  font-weight:700;
+}
+/* 滚动方向：上翻（时间前进）new 从下方进；回退则相反 */
+.odo-char.rolling .odo-strip{
+  transition:transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.odo-char.rolling-up .odo-strip{transform:translateY(-50%)}
+.odo-char.rolling-down .odo-strip{transform:translateY(-50%)}
+/* 减弱动效 */
+@media (prefers-reduced-motion: reduce){
+  .odo-char.rolling .odo-strip{transition:none}
+  .summary-first,.val-flip{animation:none}
+}
+.refresh-spin{animation:spin 700ms linear}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.94)}55%{transform:scale(1.045)}100%{transform:scale(1)}}
+@keyframes ring{
+  0%{box-shadow:0 0 0 0 rgba(22,119,255,.45)}
+  70%{box-shadow:0 0 0 12px rgba(22,119,255,0)}
+  100%{box-shadow:0 0 0 0 rgba(22,119,255,0)}
+}
+@keyframes checkIn{0%{transform:scale(.4);opacity:0}50%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.86}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+
+/* home */
+.home-top{
+  margin:-16px -16px 0;padding:14px 16px 18px;
+  background:linear-gradient(180deg,#E6F0FF, #F6F8FB);
+}
+.search{
+  display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;
+  padding:8px 8px 8px 16px;border:1px solid rgba(22,119,255,.12);
+  box-shadow:0 6px 20px rgba(0,0,0,.04);
+  transition:box-shadow 220ms var(--ease-enter),border-color 220ms ease,transform 120ms var(--ease-press);
+}
+.search.focus{border-color:rgba(22,119,255,.45);box-shadow:0 8px 28px rgba(22,119,255,.16);transform:translateY(-1px)}
+.search input{flex:1;min-width:0;border:0;outline:0;font-size:13px;background:transparent}
+.banner{
+  position:relative;height:150px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(135deg,#1677FF,#3B82F6);color:#fff;cursor:pointer;
+  box-shadow:0 10px 28px rgba(22,119,255,.16);margin-bottom:14px;
+}
+.banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:rise 650ms ease-out both}
+.banner .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,35,65,.88),rgba(8,35,65,.15))}
+.banner .copy{position:relative;z-index:1;padding:20px 22px}
+.banner .copy h2{font-size:19px;margin:10px 0 6px;line-height:1.3}
+.banner .copy p{font-size:11px;opacity:.92}
+.advice{
+  border-left:4px solid var(--warning);background:#fff;border-radius:14px;
+  padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.04);margin-bottom:8px;
+}
+.advice strong{display:block;font-size:14px;margin-bottom:6px}
+.venue-card{
+  display:flex;gap:12px;padding:14px;background:#fff;border-radius:16px;margin-bottom:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.04);cursor:pointer;
+  transition:transform 120ms var(--ease-press),box-shadow 220ms var(--ease-enter);
+}
+.venue-card:active{transform:scale(.985)}
+.venue-card img{
+  width:92px;height:96px;object-fit:cover;border-radius:12px;flex:none;background:#E5E6EB;
+  transition:transform 220ms var(--ease-enter);
+}
+.venue-card:active img{transform:scale(1.05)}
+.venue-card h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{
+  padding:3px 8px;border-radius:6px;background:#F4F6F9;color:var(--text2);font-size:11px;
+}
+.price{color:#FF4D4F;font-size:20px;font-weight:800}
+.price small{color:var(--text3);font-size:11px;font-weight:400}
+.pill{
+  flex:none;padding:9px 14px;border-radius:999px;border:1px solid #E5E6EB;background:#fff;
+  color:var(--text2);font-size:12px;font-weight:600;
+  transition:background 220ms var(--ease-enter),color 220ms ease,transform 120ms var(--ease-press),box-shadow 220ms var(--ease-enter);
+}
+.pill:active{transform:scale(.95)}
+.pill.active{
+  background:var(--primary);border-color:var(--primary);color:#fff;
+  box-shadow:0 6px 18px rgba(22,119,255,.28);transform:scale(1.02);
+}
+.hscroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.hscroll::-webkit-scrollbar{display:none}
+.slot-mini{
+  flex:none;min-width:88px;padding:12px 10px;border-radius:14px;text-align:center;
+  background:var(--success-light);border:1.5px solid rgba(0,185,107,.35);color:#087B58;
+  transition:transform 120ms var(--ease-press),box-shadow 220ms var(--ease-enter);
+}
+.slot-mini:active{transform:scale(.95)}
+.slot-mini.full{background:#F0F1F3;border-color:#E5E6EB;color:var(--text3)}
+.slot-mini strong{display:block;font-size:13px;margin-bottom:3px}
+
+/* list */
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:8px 0 12px}
+.filters::-webkit-scrollbar{display:none}
+.filter{
+  flex:none;padding:9px 14px;border-radius:999px;background:#F4F6F9;color:var(--text2);
+  font-size:12px;font-weight:600;
+  transition:background 220ms var(--ease-enter),color 220ms ease,transform 120ms var(--ease-press),box-shadow 220ms var(--ease-enter);
+}
+.filter:active{transform:scale(.95)}
+.filter.active{background:var(--primary);color:#fff;box-shadow:0 6px 16px rgba(22,119,255,.28);transform:scale(1.03)}
+
+/* detail */
+.hero{width:calc(100% + 32px);margin:-16px -16px 0;height:200px;object-fit:cover;background:#E5E6EB;display:block}
+.detail-title{font-size:21px;font-weight:800;margin:16px 0 8px}
+.fact{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #F0F1F3;font-size:13px}
+.fact:last-child{border-bottom:0}
+.fact span:first-child{color:var(--text2);font-weight:500}
+.fact span:last-child{font-weight:600;text-align:right;color:#111827}
+
+/* slots / courts */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cell{
+  text-align:center;padding:14px 6px;border-radius:14px;
+  background:var(--success-light);border:1.5px solid rgba(0,185,107,.35);color:#087B58;
+  transition:transform 120ms var(--ease-press),background 220ms var(--ease-enter),
+             border-color 220ms var(--ease-enter),box-shadow 220ms var(--ease-enter);
+}
+.cell:not(.disabled):active{transform:scale(.95)}
+.cell.disabled{background:#F0F1F3;border-color:#E5E6EB;color:var(--text3);cursor:default}
+.cell.selected{
+  background:var(--primary-light);border-color:var(--primary);color:var(--primary);
+  box-shadow:0 10px 28px rgba(22,119,255,.22);transform:scale(1.02);
+  animation:pop 280ms var(--ease-enter) both,ring 520ms var(--ease-enter) both;font-weight:600;
+}
+.cell .t{font-size:15px;font-weight:700}
+.cell .s{font-size:11px;margin-top:4px;opacity:.9}
+
+/* form */
+.field{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 0;border-bottom:1px solid #F0F1F3;
+}
+.field:last-child{border-bottom:0}
+.field label{color:var(--text3);font-size:13px;flex:none}
+.field input{
+  border:0;outline:0;text-align:right;font-size:13px;width:65%;background:transparent;color:var(--text);
+}
+
+/* success */
+.success-icon{
+  width:88px;height:88px;border-radius:50%;background:var(--success);color:#fff;
+  display:grid;place-items:center;font-size:44px;font-weight:900;margin:0 auto;
+  box-shadow:0 8px 24px rgba(0,185,107,.3);animation:checkIn 560ms var(--ease-enter) both;position:relative;
+}
+.success-icon::before{
+  content:"";position:absolute;inset:-10px;border-radius:50%;
+  border:3px solid rgba(0,185,107,.35);animation:pulse 1.8s ease-in-out .35s 2;
+}
+.ticket{
+  background:#fff;border-radius:22px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,.04);
+  position:relative;animation:rise 480ms var(--ease-enter) 180ms both;
+}
+.qr{
+  width:180px;height:180px;margin:12px auto;background:
+    repeating-conic-gradient(#1D2129 0 25%, #fff 0 50%) 0 0/20px 20px;
+  border-radius:8px;border:8px solid #fff;box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+.dash{height:1px;margin:16px 0;background:repeating-linear-gradient(90deg,#E5E6EB 0 6px,transparent 6px 12px)}
+
+/* orders */
+.order-tabs{display:flex;gap:16px;overflow-x:auto;scrollbar-width:none;padding:4px 0 12px}
+.order-tabs::-webkit-scrollbar{display:none}
+.order-tabs button{
+  white-space:nowrap;padding:6px 2px;color:var(--text2);font-size:13px;
+  border-bottom:2px solid transparent;transition:color 180ms ease,transform 120ms var(--ease-press);
+}
+.order-tabs button:active{transform:scale(.96)}
+.order-tabs button.active{color:var(--primary);border-color:var(--primary);font-weight:700}
+
+/* profile */
+.profile-head{
+  margin:-16px -16px 0;padding:28px 16px 22px;color:#fff;
+  background:linear-gradient(135deg,#1677FF,#20A6B4);
+}
+.avatar{
+  width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.28);
+  display:grid;place-items:center;font-size:24px;
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;text-align:center}
+.stats strong{display:block;font-size:20px}
+.stats span{font-size:11px;opacity:.9}
+.menu-row{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  padding:14px 0;border-bottom:1px solid #F0F1F3;font-size:14px;text-align:left;
+  transition:transform 120ms var(--ease-press),opacity 160ms ease;
+}
+.menu-row:last-child{border-bottom:0}
+.menu-row:active{transform:scale(.98);opacity:.85}
+
+/* login */
+.login-hero{
+  margin:-16px -16px 18px;padding:48px 24px 36px;
+  background:linear-gradient(160deg,#1677FF 0%,#3B82F6 55%,#60A5FA 100%);
+  color:#fff;border-radius:0 0 28px 28px;
+}
+.login-hero h1{font-size:26px;margin:12px 0 8px}
+.login-hero p{opacity:.92;font-size:13px;line-height:1.6}
+.login-card input{
+  width:100%;border:0;background:#F4F6F9;border-radius:12px;padding:14px 16px;
+  margin-bottom:12px;font-size:14px;outline:0;
+  transition:box-shadow 180ms ease,background 180ms ease;
+}
+.login-card input:focus{background:#fff;box-shadow:0 0 0 2px rgba(22,119,255,.35)}
+
+/* toast */
+.toast{
+  position:absolute;left:50%;top:18%;transform:translateX(-50%) translateY(-8px);
+  background:rgba(29,35,41,.88);color:#fff;padding:12px 18px;border-radius:12px;
+  font-size:13px;opacity:0;pointer-events:none;transition:opacity 220ms ease,transform 220ms var(--ease-enter);
+  z-index:50;max-width:80%;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty{padding:48px 12px;text-align:center;color:var(--text3);font-size:13px}
+
+/* 选日 · 日历排版 */
+.cal-month{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin:2px 2px 10px;
+}
+.cal-month-title{font-size:16px;font-weight:800;color:#111827}
+.cal-hint{font-size:11px;color:var(--text3)}
+.cal-weekdays{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;
+  margin-bottom:6px;
+}
+.cal-weekdays span{
+  text-align:center;font-size:11px;color:var(--text3);font-weight:600;
+}
+.cal-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;
+  width:100%;
+}
+.cal-cell{
+  min-width:0;
+  width:100%;
+  height:64px;
+  border-radius:10px;
+  border:1.5px solid transparent;
+  background:#F7F9FC;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;padding:2px 1px;overflow:hidden;
+  box-sizing:border-box;
+  transition:transform 120ms var(--ease-press),border-color 220ms var(--ease-enter),box-shadow 220ms var(--ease-enter),background 220ms ease;
+}
+.cal-cell:not(.disabled):active{transform:scale(.92)}
+.cal-cell.today{background:#EEF5FF}
+.cal-cell.selected{
+  background:linear-gradient(160deg,#1677FF,#3B82F6);
+  border-color:transparent;
+  box-shadow:0 8px 20px rgba(22,119,255,.28);
+  color:#fff;
+}
+.cal-cell.selected .cal-num,
+.cal-cell.selected .cal-rem-label,
+.cal-cell.selected .day-rem{color:#fff}
+.cal-cell.disabled{background:#F0F1F3;cursor:default}
+.cal-cell.empty{background:transparent;border:none;pointer-events:none}
+.cal-num{font-size:15px;font-weight:800;color:#111827;line-height:1.1}
+.cal-cell.today .cal-num{color:var(--primary)}
+.cal-cell.disabled .cal-num{color:var(--text3)}
+.cal-rem-label{font-size:9px;color:var(--text3);line-height:1.1}
+.cal-cell .day-rem{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;min-height:1.2em;color:#111827;font-weight:700;
+  font-variant-numeric:tabular-nums;max-width:100%;
+}
+.cal-cell.disabled .day-rem{opacity:.7}
+.cal-tag{
+  font-size:9px;line-height:1.2;padding:0 3px;border-radius:3px;
+  background:rgba(22,119,255,.12);color:var(--primary);font-weight:600;
+}
+.cal-cell.selected .cal-tag{background:rgba(255,255,255,.22);color:#fff}
+.cal-cell.disabled .cal-tag{background:#E5E6EB;color:var(--text3)}
+.cal-open{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;
+  margin-top:10px;font-size:11px;color:var(--text3);
+}
+
+/* 我的预约快捷入口：线性 SVG（不用 emoji） */
+.prof-shortcut{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--text2);font-size:11px;font-weight:600;
+  transition:transform 120ms var(--ease-press);
+}
+.prof-shortcut:active{transform:scale(.94)}
+.prof-ic{
+  width:40px;height:40px;border-radius:12px;background:#F4F7FB;
+  display:grid;place-items:center;
+}
+.prof-ic svg{
+  width:22px;height:22px;stroke:var(--primary);fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+
+/* 日历首次入场：格子错落升起（仅未加载完的首帧） */
+.cal-grid .cal-cell.cal-in{
+  animation:calIn 380ms var(--ease-enter) both;
+}
+@keyframes calIn{
+  from{opacity:0;transform:translateY(12px) scale(.94)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@media (prefers-reduced-motion: reduce){
+  .cal-grid .cal-cell.cal-in{animation:none;opacity:1;transform:none}
+}
+
+/* 骨架屏：仅首次进入页面时出现 */
+.sk{
+  height:12px;border-radius:6px;margin:0 0 8px;
+  background:linear-gradient(90deg,#F0F2F5 25%,#E6E8EB 37%,#F0F2F5 63%);
+  background-size:400% 100%;
+  animation:shimmer 1.4s ease infinite;
+}
+
+/* Tab 图标：线性 SVG，对齐 Sportica 类运动预约 App */
+.tabbar .ic{width:22px;height:22px;display:block}
+.tabbar svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.active svg{stroke:var(--primary)}
+.tabbar .ic-refresh{display:inline-block;margin-right:2px}
+.refresh-spin .ic-refresh,.refresh-spin{animation:spin 700ms linear}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+  }
+  .btn:active,.btn-outline:active,.btn-sm:active,.venue-card:active,.cell.selected,.pill.active{transform:none}
+}
+</style>
+</head>
+<body>
+<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
+
+<div class="phone" id="phone">
+  <div class="status-bar"><span>09:41</span><span>5G · 100%</span></div>
+  <div class="nav" id="nav"></div>
+  <div class="scroll" id="scroll"><div class="pad" id="content"></div></div>
+  <nav class="tabbar" id="tabbar"></nav>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ========== 后端 API 契约（只前端；后端未就绪时用 mock，见 docs/backend-requests.md） ========== */
+const API_BASE = 'http://127.0.0.1:3000/api';
+const USE_API = false; // 不依赖后端进程；接好后改为 true
+
+async function apiGet(path) {
+  const res = await fetch(API_BASE + path, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const body = await res.json();
+  if (body && typeof body === 'object' && 'code' in body) {
+    if (body.code !== 0) throw new Error(body.message || ('code ' + body.code));
+    return body.data;
+  }
+  return body;
+}
+
+function fmtDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function weekdayName(d) {
+  return '周' + '日一二三四五六'[d.getDay()];
+}
+
+/** 今天 + 后 7 天；剩余数用 availability 汇总（后端暂无多日接口，见 backend-requests.md） */
+async function fetchDaySummaries(venueId) {
+  const days = [];
+  const now = new Date();
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    const date = fmtDate(d);
+    let totalRemaining = 0;
+    let availableSlotCount = 0;
+    let isClosed = false;
+    let closedReason = '';
+    try {
+      const av = await apiGet(`/venues/${venueId}/availability?date=${date}`);
+      isClosed = !!av.isClosed;
+      closedReason = av.closedReason || '';
+      (av.slots || []).forEach((s) => {
+        if (s.isSelectable) {
+          totalRemaining += (s.remaining || 0);
+          availableSlotCount += 1;
+        }
+      });
+    } catch (e) {
+      console.warn('availability fail', date, e);
+      // mock 降级
+      totalRemaining = isClosed ? 0 : Math.max(0, 20 - i * 2);
+      availableSlotCount = isClosed ? 0 : 6;
+    }
+    days.push({
+      date,
+      weekday: weekdayName(d),
+      isToday: i === 0,
+      isClosed,
+      closedReason,
+      totalRemaining,
+      availableSlotCount,
+    });
+  }
+  return days;
+}
+
+const venues = [
+  {id:1,name:'星羽羽毛球馆 (A馆)',type:'羽毛球',address:'文体中心综合馆 2层 B区',price:35,remain:8,hours:'08:00-22:00',image:'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800',facilities:['中央空调','专业照明','更衣淋浴'],desc:'国家级比赛标准木地板与专业防滑地胶，配备无影 LED 运动照明和恒温空调。'},
+  {id:2,name:'冠军篮球中心 (室内主馆)',type:'篮球',address:'体育中心北区 1号竞技馆',price:50,remain:5,hours:'09:00-22:00',image:'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800',facilities:['中央空调','电子计分器','淋浴间'],desc:'FIBA 认证枫木地板，配备标准篮架与实时计分大屏。'},
+  {id:3,name:'青春足球场 (人工草7人制)',type:'足球',address:'体育中心南区 户外足球场',price:120,remain:2,hours:'08:00-22:00',image:'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=800',facilities:['夜间照明','替补席','急救箱'],desc:'环保人造草坪，配备夜间照明和七人制标准球门。'},
+  {id:4,name:'悦动网球馆 (红土&硬地)',type:'网球',address:'体育公园东侧 网球中心',price:60,remain:4,hours:'07:00-22:00',image:'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800',facilities:['发球机租借','夜间照明','淋浴间'],desc:'标准红土与硬地球场，夜间配备专业泛光照明。'},
+  {id:5,name:'活力乒乓球馆',type:'乒乓球',address:'文体中心综合馆 3层 A区',price:20,remain:10,hours:'08:00-22:00',image:'https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800',facilities:['空调','休息区','储物柜'],desc:'专业比赛球台与防滑地胶，提供独立隔断空间。'},
+  {id:6,name:'蓝海游泳馆 (恒温50米)',type:'游泳',address:'体育中心水上运动馆 1层',price:40,remain:6,hours:'06:30-21:30',image:'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800',facilities:['恒温水质','淋浴间','救生员'],desc:'50 米恒温泳池，配备循环净化系统与专业救生员。'}
+];
+
+const S = {
+  page:'登录',
+  loggedIn:false,
+  venue:venues[0],
+  type:'全部',
+  keyword:'',
+  slot:'',
+  court:0,
+  quickVenue:1,
+  orderFilter:'全部',
+  form:{sid:'',name:'',phone:''},
+  // 预约日期（今天+7）
+  selectedDate:'',
+  selectedDateLabel:'',
+  daySummaries:[],
+  daysLoading:false,
+  daysError:false,
+  slotsByDate:{}, // date -> slots[]
+  viewOrder:null, // 订单页「出示核销码」时选中的订单
+  // 动效调度：仅首次进入页面播放入场；交互只用微动效
+  entered:{},
+  motion:'enter', // enter | micro | none
+  slotsLoading:false,
+  orders:[
+    {id:'BK202609280031',status:'待使用',venue:venues[0],date:'2026-09-28',time:'18:00-19:00',court:3,price:35},
+    {id:'BK202609200112',status:'已完成',venue:venues[1],date:'2026-09-20',time:'19:00-20:00',court:1,price:50}
+  ]
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast = (msg) => {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 1800);
+};
+
+/** 动效调度：仅首次进入播放入场；页内交互只用微动效（ui-animation） */
+function animClass(name, kind){
+  if (S.motion === 'micro') return '';
+  if (S.motion === 'none') return '';
+  if (!S.entered[name]) return kind;
+  return '';
+}
+function beginPage(name){
+  // go() 设 motion=enter 且未 entered → 播放入场并标记
+  S._pageName = name;
+}
+function finishEnter(name){
+  S.entered[name] = true;
+  S.motion = 'none';
+}
+
+function venueCard(v, i=0){
+  const cls = animClass('home','enter-home') || animClass('list','enter-quiet') || '';
+  const delay = cls && S.motion==='enter' ? `style="animation-delay:${Math.min(i,5)*55}ms"` : '';
+  return `<article class="venue-card ${cls}" ${delay} onclick="openVenue(${v.id})">
+    <img src="${v.image}" alt="${esc(v.name)}" />
+    <div style="min-width:0;flex:1;display:flex;flex-direction:column">
+      <h3 class="truncate">${v.name}</h3>
+      <div class="muted truncate">${v.address}</div>
+      <div class="chips">${v.facilities.slice(0,3).map(f=>`<span class="chip">${f}</span>`).join('')}</div>
+      <div class="between" style="margin-top:auto">
+        <div class="price">¥${v.price}<small>/小时起</small></div>
+        <button class="btn-sm" onclick="event.stopPropagation();startBooking(${v.id})">立即预约</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ---------- pages ---------- */
+function pageLogin(){
+  return `<div class="login-hero ${animClass('登录','enter-login')}">
+    <div class="tag" style="background:rgba(255,255,255,.22);color:#fff">智场通 SmartVenue</div>
+    <h1>校园场馆预约</h1>
+    <p>真实场地库存 · 防超卖 · 扫码入场<br>登录后即可预约羽毛球、篮球、游泳等场地</p>
+  </div>
+  <div class="card login-card ${animClass('登录','enter-login')} d1">
+    <div class="section-title" style="margin-top:0">学工号登录</div>
+    <input id="login-user" placeholder="请输入学工号 / 账号" value="user" />
+    <input id="login-pass" type="password" placeholder="请输入密码" value="user123" />
+    <button class="btn" style="width:100%;margin-top:4px" onclick="doLogin()">登录</button>
+    <button class="btn-outline" style="width:100%;margin-top:10px" onclick="doLogin(true)">微信一键登录（演示）</button>
+    <p class="muted" style="margin-top:14px">演示账号：user/user123 · admin/admin123<br>正式环境由后端返回角色，前端不暴露密码。</p>
+  </div>`;
+}
+
+function pageHome(){
+  return `<div class="home-top">
+    <div class="between" style="margin-bottom:12px">
+      <button class="pill active" style="background:#fff;color:var(--text);border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)">📍 武汉市 · 洪山区文体中心</button>
+      <button class="pill" style="background:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)" onclick="toast('消息中心（演示）')">🔔</button>
+    </div>
+    <div class="search" id="searchBox">
+      <span>🔍</span>
+      <input id="homeSearch" placeholder="搜索运动项目、场馆名称..." onfocus="this.parentElement.classList.add('focus')" onblur="this.parentElement.classList.remove('focus')" />
+      <button class="btn-sm" onclick="S.keyword=$('homeSearch').value||'';go('场地')">搜索</button>
+    </div>
+  </div>
+
+  <div class="banner ${animClass('首页','enter-home')}" onclick="openVenue(1)">
+    <img src="${venues[0].image}" alt="" />
+    <div class="shade"></div>
+    <div class="copy">
+      <span class="tag" style="background:rgba(255,255,255,.28);color:#fff">热门推荐</span>
+      <h2>星羽羽毛球馆 A馆全新升级</h2>
+      <p>国家级比赛标准木地板 · 恒温中央空调</p>
+    </div>
+  </div>
+
+  <div class="advice ${animClass('首页','enter-home')} d1">
+    <strong>今日错峰建议</strong>
+    <p class="muted">今日 18:00-21:00 为晚高峰，余量紧张。建议选择 14:00-17:00 错峰运动，体验更舒适。</p>
+  </div>
+
+  <div class="section-title">热门推荐场馆</div>
+  ${venues.slice(0,3).map(venueCard).join('')}
+
+  <div class="section-title">
+    <span>今日时段实时余量</span>
+    <button class="btn-sm" style="margin-left:auto;background:#F4F6F9;color:var(--text2);font-weight:600" data-act="refresh-slots" title="刷新余量">
+      <span class="ic-refresh">⟳</span> 刷新
+    </button>
+  </div>
+  <div class="hscroll" style="margin-bottom:10px">
+    ${venues.map(v=>`<button class="pill ${S.quickVenue===v.id?'active':''}" onclick="S.quickVenue=${v.id};S.motion='micro';render()">${v.name.replace(/\s*\(.*\)/,'')}</button>`).join('')}
+  </div>
+  <div class="hscroll">
+    ${['09:00','10:00','14:00','15:00','18:00','19:00'].map((t,i)=>{
+      const full=i===5;
+      return `<button class="slot-mini ${full?'full':''}" data-act="quick-slot" data-full="${full?1:0}" data-venue="${S.quickVenue}">
+        <strong>${t}</strong>${full?'满':'✓ 有空'}
+      </button>`;
+    }).join('')}
+  </div>`;
+}
+
+function pageList(){
+  const filtered = venues.filter(v =>
+    (S.type==='全部'||v.type===S.type) &&
+    (`${v.name}${v.type}${v.address}${v.facilities.join('')}`).toLowerCase().includes(S.keyword.toLowerCase())
+  );
+  return `
+  <div class="search ${animClass('场地','enter-quiet')}" id="searchBox" style="margin-bottom:8px">
+    <span>🔍</span>
+    <input id="listSearch" value="${esc(S.keyword)}" placeholder="搜索场地名称、项目或地址"
+      oninput="S.keyword=this.value;updateList()"
+      onfocus="this.parentElement.classList.add('focus')"
+      onblur="this.parentElement.classList.remove('focus')" />
+    <button class="btn-sm" onclick="S.keyword='';S.motion='micro';render()">清除</button>
+  </div>
+  <div class="filters ${animClass('场地','enter-quiet')} d1">
+    ${['全部','羽毛球','篮球','足球','网球','乒乓球','游泳'].map(t=>
+      `<button class="filter ${S.type===t?'active':''}" onclick="S.type='${t}';S.motion='micro';render()">${t}</button>`
+    ).join('')}
+  </div>
+  <div id="venue-results">
+    ${filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>'}
+  </div>`;
+}
+
+function updateList(){
+  S.motion='micro';
+  const filtered = venues.filter(v =>
+    (S.type==='全部'||v.type===S.type) &&
+    (`${v.name}${v.type}${v.address}${v.facilities.join('')}`).toLowerCase().includes(S.keyword.toLowerCase())
+  );
+  $('venue-results').innerHTML = filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>';
+}
+
+function pageDetail(){
+  const v=S.venue;
+  return `<img class="hero ${animClass('场馆详情','enter-detail')}" src="${v.image}" alt="" />
+  <h1 class="detail-title ${animClass('场馆详情','enter-detail')} d1">${v.name}</h1>
+  <p class="muted ${animClass('场馆详情','enter-detail')} d1" style="margin-bottom:14px">${v.address}<br>营业时间 ${v.hours}</p>
+  <div class="card ${animClass('场馆详情','enter-detail')} d2">
+    <div class="section-title" style="margin-top:0">场馆介绍</div>
+    <p class="muted">${v.desc}</p>
+    <div class="chips" style="margin-top:12px">${v.facilities.map(f=>`<span class="chip">${f}</span>`).join('')}</div>
+  </div>
+  <div class="card ${animClass('场馆详情','enter-detail')} d3">
+    <div class="section-title" style="margin-top:0">场馆信息</div>
+    <div class="fact"><span>今日余量</span><span>${v.remain} 个名额</span></div>
+    <div class="fact"><span>开放时间</span><span>${v.hours}</span></div>
+    <div class="fact"><span>起订价</span><span>¥${v.price}/小时</span></div>
+    <div class="fact"><span>场地类型</span><span>${v.type}</span></div>
+  </div>
+  <div class="row" style="position:sticky;bottom:8px;margin-top:8px">
+    <div class="price">¥${v.price}<small>/小时起</small></div>
+    <button class="btn" style="flex:1" onclick="startBooking(${v.id})">开始预约</button>
+  </div>`;
+}
+
+/** 选日页 · 日历排版：今天 + 后 7 天，每日剩余数 */
+function pageSelectDate(){
+  const loading = S.daysLoading;
+  const err = S.daysError;
+  const days = S.daySummaries || [];
+  // 仅在「有日历内容的首帧」播 cal-in；loading 骨架不播也不算已进入
+  const first = !S.entered['选择日期'] && !loading && !err;
+
+  // 日历：从「本周一」起铺 7 列，覆盖今天起 8 天（含前导空白格）
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart = new Date(today);
+  const wd = (today.getDay() + 6) % 7; // 周一=0
+  weekStart.setDate(today.getDate() - wd);
+
+  const byDate = {};
+  days.forEach(d => { byDate[d.date] = d; });
+
+  // 铺 2 周（14 格）保证 8 天都在
+  const cells = [];
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
+    const key = fmtDate(d);
+    const info = byDate[key];
+    const inRange = !!info;
+    cells.push({ d, key, info, inRange });
+  }
+
+  const monthLabel = `${today.getFullYear()}年${today.getMonth() + 1}月`;
+
+  return `
+  <div class="card ${animClass('选择日期','enter-panel')}">
+    <div class="between">
+      <div>
+        <div style="font-weight:700;font-size:15px">选择预约日期</div>
+        <div class="muted">可预约未来 7 天 · ${esc(S.venue.name)}</div>
+      </div>
+      <button class="btn-sm" style="background:#F4F6F9;color:var(--text2)" data-act="refresh-days">⟳ 刷新</button>
+    </div>
+  </div>
+
+  ${loading ? `<div class="card" style="overflow:hidden">
+    <div class="sk" style="width:40%;height:16px;margin-bottom:12px"></div>
+    <div class="cal-grid">
+      ${Array.from({length:14},()=>`<div class="sk" style="height:64px;border-radius:10px;margin:0"></div>`).join('')}
+    </div>
+  </div>` : ''}
+
+  ${!loading && err ? `<div class="card" style="text-align:center;padding:28px">
+    <div class="muted">日期余量加载失败</div>
+    <button class="btn-sm" style="margin-top:12px" data-act="refresh-days">点击重试</button>
+  </div>` : ''}
+
+  ${!loading && !err ? `
+  <div class="card" style="overflow:hidden">
+    <div class="cal-month">
+      <div class="cal-month-title">${monthLabel}</div>
+      <div class="cal-hint">点选日期 · 数字为当日剩余</div>
+    </div>
+    <div class="cal-weekdays">
+      <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+    </div>
+    <div class="cal-grid">
+      ${cells.map((c, i) => {
+        if (!c.inRange) {
+          return `<div class="cal-cell empty ${first?'cal-in':''}" style="animation-delay:${Math.min(i,13)*28}ms"></div>`;
+        }
+        const d = c.info;
+        const disabled = d.isClosed || (d.isToday && d.totalRemaining <= 0);
+        const dayNum = c.d.getDate();
+        return `<button class="cal-cell ${d.isToday?'today':''} ${S.selectedDate===d.date?'selected':''} ${disabled?'disabled':''} ${first?'cal-in':''}"
+          style="animation-delay:${Math.min(i,13)*28}ms"
+          data-act="select-date" data-date="${d.date}" data-label="${d.date} ${d.weekday}" data-disabled="${disabled?1:0}">
+          <div class="cal-num">${dayNum}</div>
+          ${d.isToday ? '<div class="cal-tag">今天</div>' : ''}
+          ${disabled && !d.isToday ? '<div class="cal-tag">休</div>' : ''}
+          <div class="cal-rem-label">${d.isClosed ? '闭馆' : '剩余'}</div>
+          <div class="day-rem" id="rem-${d.date}">
+            ${d.isClosed ? '<span class="odo-static"><span class="odo-strip"><i>—</i></span></span>' : remMarkup(d.totalRemaining)}
+          </div>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="cal-open">
+      <span>● 蓝色为已选 / 今天</span>
+      <span>灰色为闭馆或无可约</span>
+    </div>
+  </div>` : ''}
+
+  <button class="btn ${S.selectedDate?'':'disabled'}" style="width:100%;margin-top:12px" ${S.selectedDate?'':'disabled'}
+    data-act="go" data-page="选择时间">下一步 · 选择时段</button>`;
+}
+
+function remMarkup(n){
+  return String(n).split('').map((ch,i)=>`<span class="odo-char odo-static" data-i="${i}" data-ch="${ch}"><span class="odo-strip"><i>${ch}</i></span></span>`).join('');
+}
+
+function pageBooking(){
+  const date = S.selectedDate || fmtDate(new Date());
+  const slots = S.slotsByDate[date] || mockSlots(date);
+  const first = !S.entered['选择时间'];
+
+  // 仅首次进入：骨架；切时段不重播
+  if (S.slotsLoading) {
+    return `
+    <div class="card first-load">
+      <div class="row">
+        <div class="sk" style="width:56px;height:56px;border-radius:12px;margin:0"></div>
+        <div style="flex:1">
+          <div class="sk" style="width:55%;height:14px"></div>
+          <div class="sk" style="width:75%;height:11px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card first-load">
+      <div class="sk" style="width:40%;height:14px"></div>
+      <div class="grid3" style="margin-top:14px">
+        ${Array.from({length:6},()=>`<div class="sk" style="height:72px;border-radius:14px;margin:0"></div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="card ${animClass('选择时间','enter-panel')}">
+    <div class="row">
+      <img src="${S.venue.image}" style="width:56px;height:56px;border-radius:12px;object-fit:cover" alt="" />
+      <div style="min-width:0">
+        <div style="font-weight:700" class="truncate">${S.venue.name}</div>
+        <div class="muted truncate">${S.venue.address}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card ${animClass('选择时间','enter-panel')} d1">
+    <div class="between">
+      <div>
+        <div style="font-weight:700;font-size:15px">选择预约时段</div>
+        <div class="muted">${esc(S.selectedDateLabel || date)} · 可选当日</div>
+      </div>
+      <div class="row" style="gap:8px">
+        <button class="btn-sm" style="background:#F4F6F9;color:var(--text2)" data-act="back-date">改日期</button>
+        <button class="btn-sm" style="background:#F4F6F9;color:var(--text2)" data-act="refresh-slots" title="刷新时段余量">
+          ⟳ 刷新
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card ${animClass('选择时间','enter-panel')} d2">
+    <div class="grid3">
+      ${slots.map((item)=>{
+        const disabled=item.disabled;
+        return `<button class="cell ${disabled?'disabled':''} ${S.slot===item.t?'selected':''}"
+          data-act="select-slot" data-t="${item.t}" data-disabled="${disabled?1:0}" data-reason="${item.reason||''}">
+          <div class="t">${item.t}</div>
+          <div class="s">${item.statusText}</div>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>
+  ${S.slot?`<div class="card ${summaryAnimClass()}">
+    <div class="section-title" style="margin-top:0;color:var(--primary)">已选时段</div>
+    <div class="fact"><span>场馆</span><span>${S.venue.name}</span></div>
+    <div class="fact"><span>日期</span><span>${esc(S.selectedDateLabel || date)}</span></div>
+    <div class="fact"><span>时间段</span><span class="slot-val" id="slotVal">${timeText(S.slot)}</span></div>
+    <div class="fact"><span>单价</span><span style="color:var(--warning)">¥${S.venue.price}</span></div>
+  </div>`:''}
+  <button class="btn ${S.slot?'':'disabled'}" style="width:100%;margin-top:8px" ${S.slot?'':'disabled'}
+    data-act="go" data-page="选场地">下一步</button>`;
+}
+
+function pageCourt(){
+  const count=Math.min(S.venue.remain+3,12);
+  return `
+  <div class="card ${animClass('选场地','enter-panel')}">
+    <div class="section-title" style="margin-top:0">已选时段</div>
+    <div class="fact"><span>场馆</span><span>${S.venue.name}</span></div>
+    <div class="fact"><span>日期</span><span>${new Date().toLocaleDateString('sv-SE')}</span></div>
+    <div class="fact"><span>时间段</span><span>${S.slot||'--'}</span></div>
+    <div class="fact"><span>单价</span><span style="color:var(--warning)">¥${S.venue.price}</span></div>
+  </div>
+  <div class="card ${animClass('选场地','enter-panel')} d1">
+    <div class="between" style="margin-bottom:12px">
+      <div class="section-title" style="margin:0">请选择场地</div>
+      <div class="row" style="gap:6px">
+        <span class="chip" style="background:var(--success-light);color:var(--success)">✓ 可预约</span>
+        <span class="chip">满 / 占用</span>
+      </div>
+    </div>
+    <div class="grid3">
+      ${Array.from({length:count},(_,i)=>{
+        const no=i+1, disabled=(i===1||i===5);
+        return `<button class="cell ${disabled?'disabled':''} ${S.court===no?'selected':''}"
+          data-act="select-court" data-no="${no}" data-disabled="${disabled?1:0}">
+          <div class="t">${no}号场</div>
+          <div class="s">${disabled?'× 已占用':'✓ 可预约'}</div>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>
+  <button class="btn ${S.court?'':'disabled'}" style="width:100%;margin-top:8px" ${S.court?'':'disabled'}
+    data-act="go" data-page="填写信息">下一步</button>`;
+}
+
+function pageFill(){
+  return `
+  <div class="card ${animClass('填写信息','enter-panel')}">
+    <div class="section-title" style="margin-top:0">订单摘要</div>
+    <div class="fact"><span>场馆</span><span>${S.venue.name}</span></div>
+    <div class="fact"><span>场地</span><span>${S.court}号场</span></div>
+    <div class="fact"><span>时间</span><span>${S.slot}</span></div>
+    <div class="fact"><span>合计</span><span style="color:#FF4D4F;font-size:18px">¥${S.venue.price}</span></div>
+  </div>
+  <div class="card ${animClass('填写信息','enter-panel')} d1">
+    <div class="section-title" style="margin-top:0">联系方式（入场核验）</div>
+    <div class="field"><label>学号</label><input id="f-sid" placeholder="请输入学号" value="${esc(S.form.sid)}" oninput="S.form.sid=this.value" /></div>
+    <div class="field"><label>姓名</label><input id="f-name" placeholder="请输入真实姓名" value="${esc(S.form.name)}" oninput="S.form.name=this.value" /></div>
+    <div class="field"><label>手机号</label><input id="f-phone" placeholder="请输入手机号" value="${esc(S.form.phone)}" oninput="S.form.phone=this.value" /></div>
+  </div>
+  <button class="btn" style="width:100%;margin-top:8px" onclick="submitBooking()">提交预约 · 模拟支付</button>
+  <p class="muted" style="margin-top:10px">预览模式不会产生真实订单；完整流程请在微信开发者工具中运行小程序。</p>`;
+}
+
+function pageSuccess(){
+  const o = S.viewOrder || S.orders[0];
+  return `
+  <div class="${animClass('预约成功','enter-festive')}" style="text-align:center;margin:12px 0 18px">
+    <div class="success-icon">✓</div>
+    <div style="font-size:22px;font-weight:700;margin-top:14px">${S.viewOrder ? '入场核销码' : '预约成功！'}</div>
+    <div class="muted" style="margin-top:6px">请向工作人员出示下方二维码完成核销</div>
+  </div>
+  <div class="ticket ${animClass('预约成功','enter-festive')}">
+    <div class="between">
+      <strong>入场核销凭证</strong>
+      <span class="tag">${o.status || '待使用'}</span>
+    </div>
+    <div class="qr" title="演示二维码"></div>
+    <div class="muted" style="text-align:center;letter-spacing:1px">核销码：BK${String(o.id).slice(-8)}</div>
+    <div class="dash"></div>
+    <div class="fact"><span>预约场馆</span><span>${o.venue.name}</span></div>
+    <div class="fact"><span>预约时段</span><span>${o.date} ${o.time}</span></div>
+    <div class="fact"><span>场地</span><span>${o.court}号场</span></div>
+    <div class="fact"><span>实付金额</span><span style="color:#FF4D4F">¥${o.price}</span></div>
+  </div>
+  <div class="row" style="margin-top:14px;flex-direction:column;gap:10px">
+    <button class="btn" style="width:100%" onclick="S.viewOrder=null;go('订单')">返回订单列表</button>
+    <button class="btn-outline" style="width:100%" onclick="S.viewOrder=null;go('首页')">返回首页</button>
+  </div>`;
+}
+
+function pageOrders(){
+  const tabs=['全部','待付款','待使用','已完成','已取消'];
+  const list = S.orders.filter(o => S.orderFilter==='全部' || o.status===S.orderFilter);
+  return `
+  <div class="order-tabs ${animClass('订单','enter-quiet')}">
+    ${tabs.map(t=>`<button class="${S.orderFilter===t?'active':''}" onclick="S.orderFilter='${t}';S.motion='micro';render()">${t}</button>`).join('')}
+  </div>
+  ${list.length?list.map((o,i)=>`
+    <div class="card ${animClass('订单','enter-quiet')}">
+      <div class="between" style="margin-bottom:12px">
+        <span class="muted">订单号：${o.id}</span>
+        <strong style="color:${o.status==='待使用'?'var(--success)':o.status==='已完成'?'var(--text3)':'var(--warning)'}">${o.status}</strong>
+      </div>
+      <div class="row" style="align-items:flex-start">
+        <img src="${o.venue.image}" style="width:72px;height:68px;border-radius:10px;object-fit:cover" alt="" />
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:700" class="truncate">${o.venue.name}</div>
+          <div class="muted">${o.date} ${o.time} · ${o.court}号场</div>
+        </div>
+      </div>
+      <div class="between" style="margin-top:12px;padding-top:12px;border-top:1px solid #F0F1F3">
+        <span class="muted">总计 <b class="price" style="font-size:16px">¥${o.price}</b></span>
+        ${o.status==='待使用'
+          ? `<button class="btn-sm" data-act="show-code" data-id="${o.id}">出示核销码</button>`
+          : o.status==='待付款'
+            ? `<button class="btn-sm" onclick="toast('预览模式不发起支付')">去支付</button>`
+            : `<button class="btn-sm" style="background:#F4F6F9;color:var(--text2)" onclick="startBooking(${o.venue.id})">再次预约</button>`}
+      </div>
+    </div>`).join(''):'<div class="empty">暂无相关订单</div>'}`;
+}
+
+function pageProfile(){
+  return `
+  <div class="profile-head ${animClass('我的','enter-quiet')}">
+    <div class="row">
+      <div class="avatar">👤</div>
+      <div>
+        <div style="font-size:18px;font-weight:700">演示用户</div>
+        <div style="opacity:.9;font-size:12px">学工号 ${S.form.sid||'2024001'} · 普通用户</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div><strong>${S.orders.filter(o=>o.status==='待使用').length}</strong><span>待使用预约</span></div>
+      <div><strong>${S.orders.length}</strong><span>累计预约</span></div>
+      <div><strong>${S.orders.length}</strong><span>预约时长(h)</span></div>
+    </div>
+  </div>
+  <div class="card ${animClass('我的','enter-quiet')} d1" style="margin-top:14px">
+    <div class="section-title" style="margin-top:0">我的预约</div>
+    <div class="row" style="justify-content:space-between;text-align:center">
+      ${[
+        ['待付款', `<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h4"/></svg>`, '待付款'],
+        ['待使用', `<svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V8z"/><path d="M12 8v8"/></svg>`, '待使用'],
+        ['已完成', `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.2 2.3 2.3 4.7-5"/></svg>`, '已完成'],
+        ['退改/取消', `<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 5v4h4"/></svg>`, '已取消'],
+      ].map(([t, svg, filter])=>
+        `<button class="prof-shortcut" onclick="S.orderFilter='${filter}';go('订单')">
+          <span class="prof-ic">${svg}</span>${t}
+        </button>`
+      ).join('')}
+    </div>
+  </div>
+  <div class="card ${animClass('我的','enter-quiet')} d2">
+    <button class="menu-row" onclick="toast('消息通知中心（演示）')">消息通知中心 <span class="muted">›</span></button>
+    <button class="menu-row" onclick="go('订单')">我的入场核销码 <span class="muted">›</span></button>
+    <button class="menu-row" onclick="toast('感谢反馈！')">意见反馈与客服 <span class="muted">›</span></button>
+    <button class="menu-row" onclick="toast('智场通 SmartVenue v2')">关于智场通 <span class="muted">›</span></button>
+    <button class="menu-row" onclick="logout()">退出登录 <span class="muted">›</span></button>
+  </div>`;
+}
+
+/* ---------- router ---------- */
+const rootTabs=['首页','场地','订单','我的'];
+function go(page){
+  const back = arguments[1] === 'back';
+  S.page=page;
+  S.motion='enter';
+  S._pageSwap = back ? 'page-swap-back' : 'page-swap-in';
+  $('scroll').scrollTop=0;
+  render();
+}
+function goBack(){
+  const map={'场馆详情':'场地','选择日期':'场馆详情','选择时间':'选择日期','选场地':'选择时间','填写信息':'选场地','预约成功':'订单'};
+  go(map[S.page]||'首页', 'back');
+}
+function openVenue(id){
+  S.venue=venues.find(v=>v.id===id)||venues[0];
+  go('场馆详情');
+}
+function startBooking(id){
+  S.venue=venues.find(v=>v.id===id)||venues[0];
+  S.slot=''; S.court=0; S.selectedDate=''; S.selectedDateLabel='';
+  // 每次开始预约都重播选日/选时切入，避免生硬
+  delete S.entered['选择日期'];
+  delete S.entered['选择时间'];
+  go('选择日期');
+  loadDaySummaries();
+}
+
+async function loadDaySummaries(){
+  S.daysLoading = true; S.daysError = false; S.motion = S.entered['选择日期'] ? 'none' : 'enter';
+  render();
+  try {
+    if (USE_API) {
+      S.daySummaries = await fetchDaySummaries(S.venue.id);
+    } else {
+      S.daySummaries = mockDaySummaries();
+    }
+    S.daysLoading = false;
+    // 首次看到日历内容时再播 cal-in
+    if (!S.entered['选择日期']) S.motion = 'enter';
+    render();
+  } catch (e) {
+    console.warn(e);
+    S.daySummaries = mockDaySummaries();
+    S.daysLoading = false;
+    S.daysError = false; // 降级 mock 仍展示
+    if (!S.entered['选择日期']) S.motion = 'enter';
+    render();
+    toast('已使用演示余量（后端未连接）');
+  }
+}
+
+function mockDaySummaries(){
+  const now = new Date();
+  return Array.from({length: 8}, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    return {
+      date: fmtDate(d),
+      weekday: weekdayName(d),
+      isToday: i === 0,
+      isClosed: i === 3,
+      closedReason: i === 3 ? '场馆维护' : '',
+      totalRemaining: i === 3 ? 0 : Math.max(0, 24 - i * 3),
+      availableSlotCount: i === 3 ? 0 : 8,
+    };
+  });
+}
+
+async function selectDate(date, label){
+  S.selectedDate = date;
+  S.selectedDateLabel = label || date;
+  S.slot = '';
+  S.motion = 'micro';
+  render();
+  await loadSlotsForDate(date);
+}
+
+function loadSlotsForDate(date){
+  S.slotsLoading = true;
+  S.motion = 'none';
+  render();
+  return (async () => {
+  try {
+    if (USE_API) {
+      const av = await apiGet(`/venues/${S.venue.id}/availability?date=${date}`);
+      S.slotsByDate[date] = (av.slots || []).map((s) => ({
+        id: s.id,
+        t: s.startTime,
+        end: s.endTime,
+        remaining: s.remaining ?? 0,
+        disabled: !s.isSelectable,
+        reason: s.isSelectable ? '' : (s.statusText === '已过时段' || s.status === 'CLOSED' ? 'past' : 'full'),
+        statusText: s.isSelectable ? ('✓ 余 ' + (s.remaining ?? 0)) : (s.statusText === '已过时段' || s.status === 'CLOSED' ? '已过' : '满'),
+      }));
+    } else {
+      S.slotsByDate[date] = mockSlots(date);
+    }
+    S.slotsLoading = false;
+    if (!S.entered['选择时间']) S.motion = 'enter';
+    if (S.page === '选择时间') render();
+  } catch (e) {
+    console.warn(e);
+    S.slotsByDate[date] = mockSlots(date);
+    S.slotsLoading = false;
+    if (!S.entered['选择时间']) S.motion = 'enter';
+    if (S.page === '选择时间') { render(); toast('时段数据来自演示'); }
+  }
+  })();
+}
+
+function mockSlots(dateStr){
+  // 仅「当天」才用系统时间过滤已过时段；未来日期整天可约
+  const todayStr = fmtDate(new Date());
+  const isToday = !dateStr || dateStr === todayStr;
+  const nowH = new Date().getHours();
+  return ['09:00','10:00','11:00','14:00','15:00','16:00','18:00','19:00','20:00'].map((t) => {
+    const hour = Number(t.slice(0,2));
+    const isPast = isToday && hour < nowH;
+    const isFull = !isPast && t === '19:00';
+    return {
+      id: t,
+      t,
+      remaining: isPast || isFull ? 0 : 3 + (hour % 5),
+      disabled: isPast || isFull,
+      reason: isPast ? 'past' : (isFull ? 'full' : ''),
+      statusText: isPast ? '已过' : (isFull ? '满' : '✓ 余 ' + (3 + (hour % 5))),
+    };
+  });
+}
+/** 时间段文案：10:00 - 11:00 */
+function timeText(slot){
+  const end = String(Number(slot.slice(0,2))+1).padStart(2,'0') + ':00';
+  return `${slot} - ${end}`;
+}
+
+/** 把字符串拆成可滚动的字符 DOM（静态字符不动） */
+function mountOdometer(root, text){
+  root.innerHTML = text.split('').map((ch, i) =>
+    `<span class="odo-char odo-static" data-i="${i}" data-ch="${ch}"><span class="odo-strip"><i>${ch}</i></span></span>`
+  ).join('');
+}
+
+/**
+ * Apple 风格数字滚轮：仅变化的位上下滚动
+ * timeAdvancing: 新时间更晚 → 旧字上移、新字从下方进；回退则相反
+ */
+function rollOdometer(root, oldText, newText, timeAdvancing){
+  const len = Math.max(oldText.length, newText.length);
+  const oldP = oldText.padStart(len, ' ').split('');
+  const newP = newText.padStart(len, ' ').split('');
+  let delay = 0;
+
+  for (let i = 0; i < len; i++) {
+    const o = oldP[i] || ' ';
+    const n = newP[i] || ' ';
+    const cell = root.querySelector(`[data-i="${i}"]`);
+    if (!cell) continue;
+
+    if (o === n) continue;
+
+    // 数字位才滚；冒号/短横保持瞬切（更干净）
+    if (!/\d/.test(o) && !/\d/.test(n)) {
+      cell.innerHTML = `<span class="odo-strip"><i>${n}</i></span>`;
+      cell.dataset.ch = n;
+      continue;
+    }
+
+    // 结构：[old, new] 一条 strip，按方向 translateY
+    // 上翻（前进）：strip 里 old 在上、new 在下，滚到 -50% → new 露出
+    // 下翻（回退）：new 在上、old 在下，初始 -50%，滚到 0 → new 露出
+    const goingUp = timeAdvancing;
+    const html = goingUp
+      ? `<span class="odo-strip"><i>${o}</i><i>${n}</i></span>`
+      : `<span class="odo-strip"><i>${n}</i><i>${o}</i></span>`;
+
+    cell.classList.remove('odo-static');
+    cell.classList.add('rolling', goingUp ? 'rolling-up' : 'rolling-down');
+    cell.innerHTML = html;
+    cell.dataset.ch = n;
+
+    const strip = cell.querySelector('.odo-strip');
+    if (!goingUp) {
+      // 回退：先停在上半（显示 old 在下半...）—— 简化：两种方向都用「新字滑入」
+      // 回退时 new 在上：从 -50%（露 old）滚到 0（露 new）
+      strip.style.transform = 'translateY(-50%)';
+    } else {
+      strip.style.transform = 'translateY(0)';
+    }
+
+    // 轻微错峰，苹果卷轴手感（每位 +12ms，总时长仍 < 300ms + 12*n）
+    const d = Math.min(delay, 60);
+    delay += 12;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        strip.style.transitionDelay = d + 'ms';
+        strip.style.transform = goingUp ? 'translateY(-50%)' : 'translateY(0)';
+      });
+    });
+
+    // 动画结束后固化为静态单字符
+    setTimeout(() => {
+      cell.classList.remove('rolling', 'rolling-up', 'rolling-down');
+      cell.classList.add('odo-static');
+      cell.innerHTML = `<span class="odo-strip"><i>${n}</i></span>`;
+    }, 360 + d);
+  }
+}
+
+/** 已选时段摘要：仅首次出现 fade-up；换时间不整卡跳跃 */
+function summaryAnimClass(){
+  if (S._summaryFirst) {
+    S._summaryFirst = false;
+    return 'summary-first';
+  }
+  return '';
+}
+
+function selectSlot(t){
+  const firstSummary = !S.slot && !!t;
+  const prev = S.slot;
+  S.slot=t;
+  // 格子 CSS selection-pop；摘要卡仅首次出现；时间段用数字滚轮
+  S.motion = 'none';
+  S._summaryFirst = firstSummary;
+  render();
+
+  const val = document.getElementById('slotVal');
+  if (!val) return;
+
+  if (firstSummary || !prev) {
+    mountOdometer(val, timeText(t));
+    return;
+  }
+  if (prev === t) return;
+
+  // 时间前进还是回退：比 start HH
+  const advancing = Number(t.slice(0,2)) >= Number(prev.slice(0,2));
+  // render() 已用新文案重绘，需要先恢复旧文案再滚到新文案
+  mountOdometer(val, timeText(prev));
+  requestAnimationFrame(() => {
+    rollOdometer(val, timeText(prev), timeText(t), advancing);
+  });
+}
+function selectCourt(n){
+  S.court=n;
+  S.motion='micro';
+  render();
+}
+function refreshSlots(){
+  const btn=document.querySelector('[data-act="refresh-slots"]');
+  if(btn){ btn.classList.add('refresh-spin'); setTimeout(()=>btn.classList.remove('refresh-spin'),720); }
+  const date = S.selectedDate || fmtDate(new Date());
+  loadSlotsForDate(date).then(() => {
+    S.motion = 'none';
+    if (S.page === '选择时间') render();
+    toast('已刷新时段余量');
+  });
+}
+
+async function refreshDays(){
+  const btn=document.querySelector('[data-act="refresh-days"]');
+  if(btn){ btn.classList.add('refresh-spin'); setTimeout(()=>btn.classList.remove('refresh-spin'),720); }
+  const prev = {};
+  (S.daySummaries||[]).forEach(d => { prev[d.date] = d.totalRemaining; });
+  await loadDaySummaries();
+  // 数字变化：Apple 滚轮
+  requestAnimationFrame(() => {
+    S.daySummaries.forEach(d => {
+      const oldN = prev[d.date];
+      if (oldN === undefined || oldN === d.totalRemaining || d.isClosed) return;
+      const root = document.getElementById('rem-' + d.date);
+      if (!root) return;
+      mountOdometer(root, String(oldN));
+      requestAnimationFrame(() => {
+        rollOdometer(root, String(oldN), String(d.totalRemaining), d.totalRemaining >= oldN);
+      });
+    });
+  });
+}
+function doLogin(wx){
+  S.loggedIn=true;
+  toast(wx?'微信登录成功':'登录成功');
+  go('首页');
+}
+function logout(){
+  S.loggedIn=false;
+  toast('已退出登录');
+  go('登录');
+}
+function submitBooking(){
+  if(!S.form.sid||!S.form.name||!S.form.phone){ toast('请填写完整联系方式'); return; }
+  const order={
+    id:'BK'+Date.now().toString().slice(-10),
+    status:'待使用',
+    venue:S.venue,
+    date:new Date().toLocaleDateString('sv-SE'),
+    time:`${S.slot}-${String(Number(S.slot.slice(0,2))+1).padStart(2,'0')}:00`,
+    court:S.court,
+    price:S.venue.price
+  };
+  S.orders.unshift(order);
+  toast('支付成功');
+  setTimeout(()=>go('预约成功'),200);
+}
+
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act;
+  if (act === 'go') {
+    if (el.disabled) return;
+    go(el.dataset.page);
+  } else if (act === 'select-slot') {
+    if (el.dataset.disabled === '1') {
+      toast(el.dataset.reason === 'past' ? '该时段已过，不可预约' : '该时段已满');
+      return;
+    }
+    selectSlot(el.dataset.t);
+  } else if (act === 'select-court') {
+    if (el.dataset.disabled === '1') { toast('该场地已被占用'); return; }
+    selectCourt(Number(el.dataset.no));
+  } else if (act === 'quick-slot') {
+    if (el.dataset.full === '1') { toast('该时段已满'); return; }
+    startBooking(Number(el.dataset.venue));
+  } else if (act === 'refresh-slots') {
+    refreshSlots();
+  } else if (act === 'refresh-days') {
+    refreshDays();
+  } else if (act === 'select-date') {
+    if (el.dataset.disabled === '1') { toast('该日闭馆或无可约时段'); return; }
+    selectDate(el.dataset.date, el.dataset.label);
+  } else if (act === 'back-date') {
+    go('选择日期');
+    loadDaySummaries();
+  } else if (act === 'show-code') {
+    const id = el.dataset.id;
+    const order = S.orders.find(x => x.id === id) || S.orders[0];
+    S.viewOrder = order;
+    go('预约成功');
+  }
+});
+
+/* Sportica 风格线性 Tab 图标（避免 emoji / AI 味） */
+const TAB_ICONS = {
+  '首页': `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>`,
+  '场地': `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M3.5 12h17M12 5v14M8 8.5h.01M16 8.5h.01M8 15.5h.01M16 15.5h.01"/></svg>`,
+  '订单': `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a1 1 0 0 1 1 1v15l-3-1.5L12 20l-3-1.5L6 20V5a1 1 0 0 1 1-1z"/><path d="M9 9h6M9 13h4"/></svg>`,
+  '我的': `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5.5 19.5c1.6-3.2 4-4.8 6.5-4.8s4.9 1.6 6.5 4.8"/></svg>`
+};
+
+function render(){
+  const page=S.page;
+  const isRoot=rootTabs.includes(page);
+  $('nav').innerHTML=`${isRoot||page==='登录'?'':'<button class="back" aria-label="返回" onclick="goBack()">‹</button>'}${
+    page==='登录'?'登录':page==='首页'?'智场通':page==='场馆详情'?esc(S.venue.name.replace(/\s*\(.*\)/,'')):page
+  }`;
+  const views={
+    '登录':pageLogin,'首页':pageHome,'场地':pageList,'场馆详情':pageDetail,
+    '选择日期':pageSelectDate,'选择时间':pageBooking,'选场地':pageCourt,'填写信息':pageFill,
+    '预约成功':pageSuccess,'订单':pageOrders,'我的':pageProfile
+  };
+  const swap = S._pageSwap ? ` ${S._pageSwap}` : '';
+  $('content').innerHTML=`<div class="page-body${swap}">${(views[page]||pageHome)()}</div>`;
+  S._pageSwap = '';
+  $('tabbar').innerHTML=['首页','场地','订单','我的'].map((t)=>{
+    const show=!( !S.loggedIn && page==='登录');
+    return show?`<button class="${page===t?'active':''}" onclick="go('${t}')">
+      <span class="ic">${TAB_ICONS[t]||''}</span>${t}</button>`:'';
+  }).join('');
+  // 首次入场：loading 骨架不算「已看过」，要等真实内容那一帧
+  const stillLoading = (page === '选择日期' && S.daysLoading) || (page === '选择时间' && S.slotsLoading);
+  if (S.motion === 'enter' && !stillLoading) {
+    S.entered[page] = true;
+    S.motion = 'none';
+  }
+}
+render();
+</script>
+</body>
+</html>

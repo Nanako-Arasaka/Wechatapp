@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+miniprogram_npm/
+
+# Build
+server/dist/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.local
+
+# Database
+*.db
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE / tooling caches
+.idea/
+.vscode/
+.playwright-cli/
+e370/
+output/playwright/
+
+# WeChat
+project.private.config.json
