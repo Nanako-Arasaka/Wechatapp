@@ -1,6 +1,7 @@
 import { User, Role } from '../types';
 
 const TOKEN_KEY = 'SMART_VENUE_TOKEN';
+const REFRESH_TOKEN_KEY = 'SMART_VENUE_REFRESH_TOKEN';
 const USER_KEY = 'SMART_VENUE_USER';
 
 export class AuthStore {
@@ -10,6 +11,22 @@ export class AuthStore {
 
   static setToken(token: string) {
     wx.setStorageSync(TOKEN_KEY, token);
+  }
+
+  static getRefreshToken(): string {
+    return wx.getStorageSync(REFRESH_TOKEN_KEY) || '';
+  }
+
+  static setRefreshToken(refreshToken: string) {
+    wx.setStorageSync(REFRESH_TOKEN_KEY, refreshToken);
+  }
+
+  /** 同时保存 access / refresh token */
+  static setTokens(token: string, refreshToken?: string) {
+    this.setToken(token);
+    if (refreshToken) {
+      this.setRefreshToken(refreshToken);
+    }
   }
 
   static getUser(): User | null {
@@ -36,6 +53,7 @@ export class AuthStore {
 
   static clear() {
     wx.removeStorageSync(TOKEN_KEY);
+    wx.removeStorageSync(REFRESH_TOKEN_KEY);
     wx.removeStorageSync(USER_KEY);
   }
 }

@@ -63,7 +63,15 @@
   border: 2rpx solid rgba(0, 185, 107, 0.35);
   border-radius: var(--radius-md);
   box-sizing: border-box;
-  transition: all 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press),
+              background-color var(--dur-ui) var(--ease-enter),
+              border-color var(--dur-ui) var(--ease-enter),
+              box-shadow var(--dur-ui) var(--ease-enter),
+              color var(--dur-hover) ease;
+}
+
+.slot-cell:not(.disabled):active {
+  transform: scale(0.95);
 }
 
 /* 每行第 3 个去掉右间距 */
@@ -77,12 +85,13 @@
   border-color: var(--border-color);
 }
 
-/* 选中态：主色描边 + 浅蓝底 + 轻微上浮 */
+/* 选中态：主色描边 + 浅蓝底 + 轻微上浮 + 光环 */
 .slot-cell.selected {
   background: var(--primary-light);
   border-color: var(--primary-color);
-  box-shadow: var(--shadow-float);
-  animation: selection-pop 260ms ease-out;
+  box-shadow: 0 10rpx 28rpx rgba(22, 119, 255, 0.22);
+  animation: selection-pop 280ms var(--ease-enter) both, selection-ring 520ms var(--ease-enter) both;
+  transform: scale(1.02);
 }
 
 .slot-time {
@@ -125,6 +134,27 @@
   border: 2rpx solid var(--primary-color);
 }
 
+/* 已选时段：仅首次出现轻入场 */
+.summary-first {
+  animation: summary-in 220ms var(--ease-enter) both;
+}
+
+/* 换时间：仅时间段数值微动，不整卡跳 */
+.summary-time.val-flip {
+  display: inline-block;
+  animation: val-pulse 200ms var(--ease-enter) both;
+}
+
+@keyframes summary-in {
+  from { opacity: 0; transform: translateY(16rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes val-pulse {
+  0% { opacity: 0.55; transform: translateY(6rpx); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 .summary-title {
   font-size: 30rpx;
   font-weight: 700;
@@ -149,6 +179,12 @@
   font-size: 26rpx;
   color: var(--text-main);
   font-weight: 600;
+}
+
+.summary-time {
+  color: #111827;
+  font-weight: 700;
+  font-size: 28rpx;
 }
 
 .summary-price {

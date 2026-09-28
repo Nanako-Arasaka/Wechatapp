@@ -14,7 +14,7 @@
     </view>
 
     <!-- 真实可交互搜索栏 -->
-    <view class="search-bar flex-row">
+    <view class="search-bar flex-row {{searchFocused ? 'focus' : ''}}">
       <text class="search-icon">🔍</text>
       <input
         class="search-input flex-1"
@@ -24,6 +24,8 @@
         confirm-type="search"
         bindinput="onSearchInput"
         bindconfirm="onSearchConfirm"
+        bindfocus="onSearchFocus"
+        bindblur="onSearchBlur"
       />
       <view class="search-btn" bindtap="onSearchConfirm">搜索</view>
     </view>

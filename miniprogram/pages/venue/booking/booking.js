@@ -25,6 +25,8 @@ Page({
         selectedSlotId: '', // 当前选中的时段 ID
         selectedSlot: null, // 当前选中的时段对象
         selectedPriceText: '', // 选中时段单价展示文本
+        summaryEnter: false, // 已选时段摘要：仅首次出现播放入场
+        summaryTimeFlip: false, // 换时间时仅时间段数值微动
         isClosed: false, // 场馆今日是否闭馆
         closedReason: '', // 闭馆原因
         loading: true,
@@ -57,11 +59,20 @@ Page({
                 venue_service_1.VenueService.getVenueDetail(venueId),
                 venue_service_1.VenueService.getAvailability(venueId, today),
             ]);
+            // 已过时段：与约满同样置灰、不可点
+            const nowH = new Date().getHours();
+            const slots = (avail.slots || []).map((s) => {
+                const hour = Number(String(s.startTime || s.timeRange || '').slice(0, 2));
+                if (!Number.isNaN(hour) && hour < nowH && s.isSelectable !== false) {
+                    return { ...s, isSelectable: false, status: 'PAST', statusText: '已过', statusColor: 'gray' };
+                }
+                return s;
+            });
             this.setData({
                 venue,
                 today,
                 todayText: `${today} ${(0, format_1.getWeekdayName)(today)}`,
-                slots: avail.slots,
+                slots,
                 isClosed: avail.isClosed,
                 closedReason: avail.closedReason || '',
                 selectedSlotId: '',
@@ -70,7 +81,7 @@ Page({
             });
             // 支持外部携带 preselectSlotId 直达选中（该时段须仍可选）
             if (preselectSlotId && !avail.isClosed) {
-                const found = avail.slots.find((s) => s.id === preselectSlotId && s.isSelectable);
+                const found = slots.find((s) => s.id === preselectSlotId && s.isSelectable);
                 if (found) {
                     this.applySelectedSlot(found);
                 }
@@ -113,13 +124,30 @@ Page({
     },
     /**
      * 应用选中时段并刷新摘要信息
+     * 动效策略：时段格子用 CSS selection-pop；摘要卡仅首次出现入场，
+     * 换时间只让时间段数值微动，避免整卡跳跃。
      */
     applySelectedSlot(slot) {
+        const hadSlot = !!this.data.selectedSlot;
+        const changed = this.data.selectedSlotId !== slot.id;
         this.setData({
             selectedSlotId: slot.id,
             selectedSlot: slot,
             selectedPriceText: (0, format_1.formatMoney)(slot.price),
+            summaryEnter: !hadSlot,
+            summaryTimeFlip: hadSlot && changed,
         });
+        if (hadSlot && changed) {
+            // 关闭 val-flip，便于下次换时间重新触发
+            setTimeout(() => {
+                this.setData({ summaryTimeFlip: false, summaryEnter: false });
+            }, 240);
+        }
+        else if (!hadSlot) {
+            setTimeout(() => {
+                this.setData({ summaryEnter: false });
+            }, 240);
+        }
     },
     /**
      * 点击【下一步】：携带预约基础信息跳转 P3 可选场地页

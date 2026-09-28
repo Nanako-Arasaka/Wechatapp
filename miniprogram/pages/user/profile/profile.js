@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth_1 = require("../../../store/auth");
+const auth_service_1 = require("../../../services/auth.service");
 const order_service_1 = require("../../../services/order.service");
 const notification_service_1 = require("../../../services/notification.service");
 Page({
@@ -168,9 +169,10 @@ Page({
         wx.showModal({
             title: '确认退出登录',
             content: '退出后将返回未登录状态。',
-            success: (res) => {
+            success: async (res) => {
                 if (res.confirm) {
-                    auth_1.AuthStore.clear();
+                    // 调用 POST /auth/logout 吊销 refreshToken，并清理本地会话
+                    await auth_service_1.AuthService.logout();
                     const app = getApp();
                     if (app && app.globalData) {
                         app.globalData.userInfo = null;

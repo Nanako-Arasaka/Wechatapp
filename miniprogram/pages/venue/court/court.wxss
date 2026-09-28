@@ -64,7 +64,7 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.35);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--dur-ui) ease;
   pointer-events: none;
   z-index: 20;
 }
@@ -83,8 +83,9 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
   transform: translateY(100%);
-  transition: transform 0.28s ease;
+  transition: transform var(--dur-panel) var(--ease-move);
   z-index: 21;
+  box-shadow: 0 -12rpx 40rpx rgba(0, 0, 0, 0.12);
 }
 
 .court-sheet.show {
@@ -154,7 +155,14 @@
   text-align: center;
   border-radius: var(--radius-md);
   box-sizing: border-box;
-  transition: all 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press),
+              background-color var(--dur-ui) var(--ease-enter),
+              border-color var(--dur-ui) var(--ease-enter),
+              box-shadow var(--dur-ui) var(--ease-enter);
+}
+
+.court-cell.available:active {
+  transform: scale(0.95);
 }
 
 /* 每行第 3 个去掉右间距 */
@@ -174,12 +182,17 @@
   border: 2rpx solid var(--border-color);
 }
 
-/* 选中态：主色描边 + 轻微上浮 */
+/* 选中态：主色描边 + 轻微上浮 + 光环 */
 .court-cell.selected {
   background: var(--primary-light);
   border-color: var(--primary-color);
-  box-shadow: var(--shadow-float);
-  animation: selection-pop 260ms ease-out;
+  box-shadow: 0 10rpx 28rpx rgba(22, 119, 255, 0.22);
+  animation: selection-pop 280ms var(--ease-enter) both, selection-ring 520ms var(--ease-enter) both;
+  transform: scale(1.03);
+}
+
+.court-check {
+  animation: check-draw 360ms var(--ease-enter) both;
 }
 
 .court-no {

@@ -1,4 +1,5 @@
 import { AuthStore } from '../../../store/auth';
+import { AuthService } from '../../../services/auth.service';
 import { OrderService } from '../../../services/order.service';
 import { NotificationService } from '../../../services/notification.service';
 import { User } from '../../../types';
@@ -180,9 +181,10 @@ Page({
     wx.showModal({
       title: '确认退出登录',
       content: '退出后将返回未登录状态。',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          AuthStore.clear();
+          // 调用 POST /auth/logout 吊销 refreshToken，并清理本地会话
+          await AuthService.logout();
           const app = getApp<any>();
           if (app && app.globalData) {
             app.globalData.userInfo = null;

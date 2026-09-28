@@ -39,6 +39,17 @@ page {
   --radius-lg: 26rpx;
   --radius-xl: 36rpx;
   --radius-pill: 999rpx;
+
+  /* Motion tokens — ui-animation defaults */
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-move: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-press: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --dur-press: 120ms;
+  --dur-hover: 160ms;
+  --dur-ui: 220ms;
+  --dur-panel: 280ms;
+  --dur-enter: 360ms;
   
   --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
   --shadow-card: 0 6rpx 24rpx rgba(0, 0, 0, 0.04), 0 1rpx 4rpx rgba(0, 0, 0, 0.02);
@@ -93,7 +104,13 @@ page {
   box-shadow: var(--shadow-card);
   box-sizing: border-box;
   border: 1rpx solid rgba(0, 0, 0, 0.02);
-  transition: transform 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-ui) var(--ease-enter);
+}
+
+.card.pressed,
+.card:active {
+  transform: scale(0.985);
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
 }
 
 /* 按钮通用体系 */
@@ -107,12 +124,14 @@ page {
   text-align: center;
   box-shadow: var(--shadow-float);
   border: none;
-  transition: all 0.2s ease;
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
 }
 
-.btn-primary:active {
-  opacity: 0.9;
-  transform: scale(0.98);
+.btn-primary:active,
+.btn-primary.hover-press {
+  opacity: 0.92;
+  transform: scale(0.97);
+  box-shadow: 0 6rpx 18rpx rgba(22, 119, 255, 0.18);
 }
 
 .btn-primary.disabled {
@@ -120,6 +139,8 @@ page {
   color: #FFFFFF;
   box-shadow: none;
   cursor: not-allowed;
+  transform: none;
+  opacity: 1;
 }
 
 .btn-outline {
@@ -131,11 +152,13 @@ page {
   border-radius: var(--radius-pill);
   padding: 18rpx 32rpx;
   text-align: center;
-  transition: all 0.2s;
+  transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-press), border-color var(--dur-hover) ease;
 }
 
-.btn-outline:active {
+.btn-outline:active,
+.btn-outline.hover-press {
   background: var(--primary-light);
+  transform: scale(0.97);
 }
 
 .btn-danger-outline {
@@ -260,19 +283,146 @@ page {
 
 @keyframes selection-pop {
   0% { transform: scale(0.94); }
-  60% { transform: scale(1.04); }
+  55% { transform: scale(1.045); }
   100% { transform: scale(1); }
 }
 
+@keyframes selection-ring {
+  0% { box-shadow: 0 0 0 0 rgba(22, 119, 255, 0.45); }
+  70% { box-shadow: 0 0 0 12rpx rgba(22, 119, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 119, 255, 0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(48rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(28rpx); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes mask-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes sheet-rise {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes check-draw {
+  0% { transform: scale(0.4); opacity: 0; }
+  50% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes check-stroke {
+  0% { stroke-dashoffset: 48; opacity: 0; }
+  40% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.86; }
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
 .content-enter {
-  animation: content-rise 380ms ease-out both;
+  animation: content-rise var(--dur-enter) var(--ease-enter) both;
+}
+
+.slide-enter {
+  animation: slide-up var(--dur-enter) var(--ease-enter) both;
+}
+
+.fade-enter {
+  animation: fade-in var(--dur-ui) ease both;
+}
+
+.pop-on-select {
+  animation: selection-pop 280ms var(--ease-enter) both;
+}
+
+.ring-on-select {
+  animation: selection-ring 480ms var(--ease-enter) both;
 }
 
 .delay-short { animation-delay: 70ms; }
 .delay-medium { animation-delay: 140ms; }
+.delay-long { animation-delay: 210ms; }
+.delay-xlong { animation-delay: 280ms; }
+
+/* 按压反馈：配合 hover-class="hover-press" */
+.hover-press {
+  transform: scale(0.97);
+}
+
+/* 高频操作条：入场稍慢、出场快 */
+.panel-enter {
+  animation: slide-up var(--dur-panel) var(--ease-move) both;
+}
+
+/* 成功勾选 */
+.success-check-pop {
+  animation: check-draw 520ms var(--ease-enter) both;
+}
+
+.success-halo {
+  animation: pulse-soft 1.6s ease-in-out 0.4s 2;
+}
+
+/* 弹层遮罩 / 底部抽屉 */
+.mask-enter {
+  animation: mask-fade var(--dur-ui) ease both;
+}
+
+.sheet-enter {
+  animation: sheet-rise var(--dur-panel) var(--ease-move) both;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .content-enter, .skeleton-box { animation: none; }
+  .content-enter,
+  .slide-enter,
+  .fade-enter,
+  .pop-on-select,
+  .ring-on-select,
+  .panel-enter,
+  .success-check-pop,
+  .success-halo,
+  .skeleton-box {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .btn-primary:active,
+  .btn-primary.hover-press,
+  .btn-outline:active,
+  .btn-outline.hover-press,
+  .card:active,
+  .card.pressed,
+  .hover-press {
+    transform: none;
+  }
+
+  .btn-primary,
+  .btn-outline,
+  .card {
+    transition: opacity 100ms linear, background-color 100ms linear;
+  }
 }
 
 /* ============ 通用空状态 / 错误重试占位 ============ */
@@ -313,10 +463,13 @@ page {
   font-size: 28rpx;
   font-weight: 600;
   border-radius: 999rpx;
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease;
 }
 
-.btn-retry:active {
-  opacity: 0.85;
+.btn-retry:active,
+.btn-retry.hover-press {
+  opacity: 0.88;
+  transform: scale(0.96);
 }
 
 /* 未读小红点 */

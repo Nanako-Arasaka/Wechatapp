@@ -11,7 +11,52 @@ export interface RequestOptions {
   showLoading?: boolean;
   loadingTitle?: string;
   showErrorToast?: boolean;
+  /** 401 时是否用 refreshToken 自动续期后重试（登录/刷新/退出等接口应关闭） */
   retryOn401?: boolean;
+  /** 完全跳过 401 刷新流程（避免 refresh/logout 自身死循环） */
+  skipAuthRefresh?: boolean;
+}
+
+/** 并发 401 时合并为一次 refresh */
+let refreshInFlight: Promise<string> | null = null;
+
+function refreshAccessToken(): Promise<string> {
+  if (refreshInFlight) {
+    return refreshInFlight;
+  }
+
+  const refreshToken = AuthStore.getRefreshToken();
+  if (!refreshToken) {
+    return Promise.reject(new Error('NO_REFRESH_TOKEN'));
+  }
+
+  refreshInFlight = new Promise<string>((resolve, reject) => {
+    wx.request({
+      url: `${CONFIG.API_BASE_URL}/auth/refresh`,
+      method: 'POST',
+      data: { refreshToken },
+      header: { 'Content-Type': 'application/json' },
+      timeout: 5000,
+      success: (res) => {
+        const body = res.data as ApiResponse<{ token: string; refreshToken: string }>;
+        const ok = (res.statusCode === 200 || res.statusCode === 201) && body && body.code === 0 && body.data?.token;
+        if (ok) {
+          // refresh 轮换：保存新的 access + refresh
+          AuthStore.setTokens(body.data.token, body.data.refreshToken);
+          resolve(body.data.token);
+        } else {
+          reject(new Error(body?.message || 'REFRESH_FAILED'));
+        }
+      },
+      fail: (err) => {
+        reject(new Error(err.errMsg || 'REFRESH_FAILED'));
+      },
+    });
+  }).finally(() => {
+    refreshInFlight = null;
+  });
+
+  return refreshInFlight;
 }
 
 /**
@@ -26,8 +71,9 @@ export function request<T = any>(
   const {
     showLoading = false,
     loadingTitle = '加载中...',
-    showErrorToast = false, // 默认静默，防止外部真机体验版弹出连接失败
+    showErrorToast = false,
     retryOn401 = true,
+    skipAuthRefresh = false,
   } = options;
 
   if (showLoading) {
@@ -43,7 +89,6 @@ export function request<T = any>(
     header['Authorization'] = `Bearer ${token}`;
   }
 
-  // 清洗过滤无效参数
   let cleanData = data;
   if (data && typeof data === 'object' && !Array.isArray(data)) {
     cleanData = {};
@@ -83,6 +128,22 @@ export function request<T = any>(
             reject(new Error(errorMsg));
           }
         } else if (statusCode === 401) {
+          // access token 过期：尝试用 refreshToken 续期后重放一次
+          const canRefresh = !skipAuthRefresh && retryOn401 && !!AuthStore.getRefreshToken();
+          if (canRefresh) {
+            try {
+              await refreshAccessToken();
+              const retryRes = await request<T>(url, method, data, {
+                ...options,
+                retryOn401: false,
+              });
+              resolve(retryRes);
+              return;
+            } catch (refreshErr) {
+              // 刷新失败视为会话失效
+            }
+          }
+
           AuthStore.clear();
           wx.showToast({ title: '登录已过期，请重新登录', icon: 'none', duration: 2500 });
           reject(new Error('未授权'));
@@ -104,7 +165,6 @@ export function request<T = any>(
         if (showLoading) {
           wx.hideLoading();
         }
-        // 静默失败，由上层 Service 自动降级为自愈数据引擎
         reject(new Error(err.errMsg || 'NETWORK_FAIL'));
       },
     });

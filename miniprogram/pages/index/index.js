@@ -6,6 +6,7 @@ Page({
     data: {
         currentLocation: wx.getStorageSync('CURRENT_LOCATION') || '武汉市 · 洪山区文体中心',
         keyword: '',
+        searchFocused: false,
         venues: [],
         selectedVenueId: '',
         quickSlots: [],
@@ -119,6 +120,12 @@ Page({
      */
     onSearchInput(e) {
         this.setData({ keyword: e.detail.value });
+    },
+    onSearchFocus() {
+        this.setData({ searchFocused: true });
+    },
+    onSearchBlur() {
+        this.setData({ searchFocused: false });
     },
     /**
      * 触发搜索：携参切换到【场地】TabBar 页面并立即过滤

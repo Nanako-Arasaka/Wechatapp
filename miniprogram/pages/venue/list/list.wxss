@@ -51,18 +51,32 @@
   margin-right: 16rpx;
   font-size: 24rpx;
   color: #4E5969;
-  transition: all 0.2s;
+  transition: background-color var(--dur-ui) var(--ease-enter),
+              color var(--dur-ui) var(--ease-enter),
+              transform var(--dur-press) var(--ease-press),
+              box-shadow var(--dur-ui) var(--ease-enter);
+}
+
+.type-item:active {
+  transform: scale(0.95);
 }
 
 .type-item.active {
   background: #1677FF;
   color: #FFFFFF;
   font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(22, 119, 255, 0.28);
+  transform: scale(1.03);
 }
 
 .type-emoji {
   margin-right: 8rpx;
   font-size: 24rpx;
+  transition: transform var(--dur-ui) var(--ease-enter);
+}
+
+.type-item.active .type-emoji {
+  transform: scale(1.12);
 }
 
 /* 排序栏 */
@@ -77,11 +91,31 @@
   text-align: center;
   font-size: 24rpx;
   color: #86909C;
+  position: relative;
+  transition: color var(--dur-ui) ease, transform var(--dur-press) var(--ease-press);
+  padding-bottom: 8rpx;
+}
+
+.sort-item:active {
+  transform: scale(0.96);
 }
 
 .sort-item.active {
   color: #1677FF;
   font-weight: 700;
+}
+
+.sort-item.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 36rpx;
+  height: 6rpx;
+  border-radius: 6rpx;
+  background: #1677FF;
+  transform: translateX(-50%);
+  animation: fade-in 180ms ease both;
 }
 
 /* 场馆列表 */
@@ -93,6 +127,16 @@
   padding: 26rpx;
   margin-bottom: 20rpx;
   border-radius: 24rpx;
+  transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-ui) var(--ease-enter);
+}
+
+.venue-item-card:active {
+  transform: scale(0.985);
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
+}
+
+.venue-item-card:active .venue-cover {
+  transform: scale(1.05);
 }
 
 .cover-box {
@@ -110,6 +154,7 @@
   height: 100%;
   border-radius: 18rpx;
   background: #E5E6EB;
+  transition: transform 220ms var(--ease-enter);
 }
 
 .cover-badge {
@@ -226,11 +271,13 @@
   font-weight: 600;
   border-radius: 28rpx;
   box-sizing: border-box;
-  transition: opacity 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, background-color var(--dur-hover) ease;
 }
 
 .btn-detail-action:active {
-  opacity: 0.8;
+  opacity: 0.85;
+  transform: scale(0.94);
+  background: #E8ECF1;
 }
 
 .btn-book-action {
@@ -246,9 +293,11 @@
   border-radius: 28rpx;
   box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.25);
   box-sizing: border-box;
-  transition: opacity 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .btn-book-action:active {
-  opacity: 0.85;
+  opacity: 0.92;
+  transform: scale(0.94);
+  box-shadow: 0 2rpx 8rpx rgba(22, 119, 255, 0.2);
 }

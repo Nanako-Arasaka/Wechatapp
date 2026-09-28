@@ -20,11 +20,13 @@
   box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
   max-width: 540rpx;
+  transition: transform var(--dur-press) var(--ease-press), background-color var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .loc-left:active {
   background: #FFFFFF;
-  transform: scale(0.98);
+  transform: scale(0.97);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
 .loc-icon {
@@ -61,11 +63,12 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: transform var(--dur-press) var(--ease-press), background-color var(--dur-hover) ease;
 }
 
 .map-picker-btn:active {
   background: #F2F3F5;
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
 
 .map-icon {
@@ -82,10 +85,21 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: transform var(--dur-press) var(--ease-press), background-color var(--dur-hover) ease;
+}
+
+.notify-btn-box:active {
+  transform: scale(0.92);
+  background: #F2F3F5;
 }
 
 .notify-bell {
   font-size: 34rpx;
+  transition: transform var(--dur-ui) var(--ease-enter);
+}
+
+.notify-btn-box:active .notify-bell {
+  transform: rotate(-12deg) scale(1.08);
 }
 
 .badge-dot {
@@ -97,6 +111,8 @@
   background: #FF4D4F;
   border-radius: 50%;
   border: 2rpx solid #FFFFFF;
+  animation: pulse-soft 2s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .search-bar {
@@ -106,12 +122,25 @@
   box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.04);
   border: 1rpx solid rgba(22, 119, 255, 0.12);
   align-items: center;
+  transition: box-shadow var(--dur-ui) var(--ease-enter), border-color var(--dur-ui) ease, transform var(--dur-press) var(--ease-press);
+}
+
+.search-bar.focus {
+  border-color: rgba(22, 119, 255, 0.45);
+  box-shadow: 0 8rpx 28rpx rgba(22, 119, 255, 0.16);
+  transform: translateY(-2rpx);
 }
 
 .search-icon {
   font-size: 28rpx;
   margin-right: 14rpx;
   color: #86909C;
+  transition: color var(--dur-hover) ease, transform var(--dur-ui) var(--ease-enter);
+}
+
+.search-bar.focus .search-icon {
+  color: #1677FF;
+  transform: scale(1.08);
 }
 
 .search-input {
@@ -134,10 +163,13 @@
   border-radius: 30rpx;
   margin-left: 12rpx;
   box-shadow: 0 4rpx 12rpx rgba(22, 119, 255, 0.25);
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .search-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.93);
+  opacity: 0.92;
+  box-shadow: 0 2rpx 8rpx rgba(22, 119, 255, 0.2);
 }
 
 /* Banner 轮播图 */
@@ -290,14 +322,20 @@
   display: flex;
   padding: 24rpx;
   margin-bottom: 20rpx;
+  transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-ui) var(--ease-enter);
+}
+
+.venue-card:active {
+  transform: scale(0.985);
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.04);
 }
 
 .venue-card:active .venue-img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 .venue-img {
-  transition: transform 180ms ease-out;
+  transition: transform 220ms var(--ease-enter);
 }
 
 .venue-img-wrap {
@@ -411,11 +449,13 @@
   justify-content: center;
   box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.28);
   box-sizing: border-box;
+  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .btn-primary-sm:active {
-  transform: scale(0.96);
-  opacity: 0.9;
+  transform: scale(0.94);
+  opacity: 0.92;
+  box-shadow: 0 2rpx 8rpx rgba(22, 119, 255, 0.2);
 }
 
 /* 场馆快速切换 Tab 胶囊 */
@@ -440,15 +480,24 @@
   color: #4E5969;
   font-size: 24rpx;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: background-color var(--dur-ui) var(--ease-enter),
+              border-color var(--dur-ui) var(--ease-enter),
+              color var(--dur-ui) var(--ease-enter),
+              transform var(--dur-press) var(--ease-press),
+              box-shadow var(--dur-ui) var(--ease-enter);
   flex-shrink: 0;
+}
+
+.venue-pill:active {
+  transform: scale(0.95);
 }
 
 .venue-pill.active {
   background: #1677FF;
   border-color: #1677FF;
   color: #FFFFFF;
-  box-shadow: 0 4rpx 14rpx rgba(22, 119, 255, 0.25);
+  box-shadow: 0 6rpx 18rpx rgba(22, 119, 255, 0.28);
+  transform: scale(1.02);
 }
 
 .vp-text {
@@ -500,11 +549,12 @@
   border-radius: 18rpx;
   margin-right: 14rpx;
   text-align: center;
-  transition: transform 0.15s ease;
+  transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-ui) var(--ease-enter), opacity var(--dur-hover) ease;
 }
 
 .slot-bubble:active {
-  transform: scale(0.96);
+  transform: scale(0.94);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
 .slot-bubble.slot-green {

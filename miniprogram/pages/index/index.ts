@@ -7,6 +7,7 @@ Page({
   data: {
     currentLocation: wx.getStorageSync('CURRENT_LOCATION') || '武汉市 · 洪山区文体中心',
     keyword: '',
+    searchFocused: false,
     venues: [] as Venue[],
     selectedVenueId: '',
     quickSlots: [] as VenueSlot[],
@@ -126,6 +127,14 @@ Page({
    */
   onSearchInput(e: any) {
     this.setData({ keyword: e.detail.value });
+  },
+
+  onSearchFocus() {
+    this.setData({ searchFocused: true });
+  },
+
+  onSearchBlur() {
+    this.setData({ searchFocused: false });
   },
 
   /**

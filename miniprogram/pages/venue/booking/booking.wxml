@@ -66,7 +66,8 @@
   </view>
 
   <!-- 选中时段摘要信息 -->
-  <view class="summary-card card content-enter" wx:if="{{!loading && !loadError && selectedSlot}}">
+  <!-- 选中时段摘要：仅首次出现轻入场；换时间不整卡跳跃，只微动时间段 -->
+  <view class="summary-card card {{summaryEnter ? 'summary-first' : ''}}" wx:if="{{!loading && !loadError && selectedSlot}}">
     <view class="summary-title">已选时段</view>
     <view class="summary-row flex-between">
       <text class="summary-label">场馆</text>
@@ -78,7 +79,7 @@
     </view>
     <view class="summary-row flex-between">
       <text class="summary-label">时间段</text>
-      <text class="summary-value">{{selectedSlot.timeRange}}（1小时）</text>
+      <text class="summary-value summary-time {{summaryTimeFlip ? 'val-flip' : ''}}">{{selectedSlot.timeRange}}（1小时）</text>
     </view>
     <view class="summary-row flex-between">
       <text class="summary-label">单价</text>

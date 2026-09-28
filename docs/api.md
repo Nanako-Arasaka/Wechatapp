@@ -27,9 +27,16 @@
 ## 二、核心接口清单
 
 ### 1. 认证模块 (Auth)
-- `POST /api/auth/demo-login` - 快捷角色与测试账号登录 (支持 USER, ADMIN, SUPER_ADMIN)
-- `POST /api/auth/wechat-login` - 模拟微信快捷授权登录
+- `POST /api/auth/login` - 账号密码登录（响应含 `token` 与 `refreshToken`，`user` 信息）
+- `POST /api/auth/wechat-login` - 模拟微信快捷授权登录（响应含 `token` 与 `refreshToken`）
 - `GET /api/auth/profile` - 查询当前登录用户信息
+- `POST /api/auth/refresh` - 刷新凭证：body `{ refreshToken }`，返回 `{ token, refreshToken }`（access 过期 401 时调用）
+- `POST /api/auth/logout` - 退出登录并吊销凭证：body `{ refreshToken }`
+
+**Token 约定（前端已按此接入）：**
+- 登录响应新增 `refreshToken` 字段，`token` 字段含义不变（Bearer access token）
+- access token 过期返回 401 时，前端自动用 `POST /auth/refresh` 换新并重放原请求
+- 退出登录调用 `POST /auth/logout` 传 `refreshToken`；本地同时清除双 token
 
 ### 2. 场馆与余量模块 (Venues)
 - `GET /api/venues` - 场馆列表与综合推荐检索 (支持 keyword, type, date)
