@@ -14,12 +14,12 @@
       <view class="sort-item {{sortBy === 'REMAIN_DESC' ? 'active' : ''}}" bindtap="onSelectSort" data-sort="REMAIN_DESC">余量充裕</view>
     </view>
   </view>
-  <view class="venue-results {{filterLeaving ? 'filter-leaving' : ''}}">
+  <view class="venue-results">
     <view wx:if="{{loading}}" class="skeleton-wrap"><view class="card skeleton-box" style="height:240rpx"></view><view class="card skeleton-box" style="height:240rpx"></view></view>
     <view wx:elif="{{loadError}}" class="empty-state"><view class="empty-title">场地列表加载失败</view><view class="empty-desc">请检查网络后重试</view><button class="btn-retry" bindtap="onRetry">点击重试</button></view>
-    <empty wx:elif="{{!venueList.length}}" title="暂无匹配场地" description="试试其他关键词或运动项目" btnText="重置筛选" bindbtnTap="onResetFilter" />
-    <view wx:else class="venue-cards-list">
-      <view class="venue-card-shell" wx:for="{{venueList}}" wx:key="id">
+    <view wx:else class="venue-cards-list" style="{{listStyle}}">
+      <empty wx:if="{{!venueList.length && !filterAnimating}}" title="暂无匹配场地" description="试试其他关键词或运动项目" btnText="重置筛选" bindbtnTap="onResetFilter" />
+      <view class="venue-card-shell" wx:for="{{venueList}}" wx:key="id" data-id="{{item.id}}" style="{{cardStyles[item.id] || ''}}">
         <venue-card venue="{{item}}" bind:open="goToDetail" bind:book="goToBooking" />
       </view>
     </view>

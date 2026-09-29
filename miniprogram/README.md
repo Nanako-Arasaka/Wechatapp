@@ -17,6 +17,10 @@
 `components/rolling-number/`，页面动效在 `styles/preview-motion.wxss`。
 基础颜色继续由 `app.wxss` 管理；原生导航栏与 TabBar 由 `app.json` 管理。
 
+场馆分类切换由 `utils/venue-filter-motion.ts` 控制：不匹配项先淡出，
+保留项平滑补位；切回全部时，保留项滑回完整排序中的位置，其余项淡入。
+页面通过原生视图查询提供卡片的位置、高度和透明度，连续切换从当前画面接续。
+
 在仓库根目录运行：
 
 ```sh

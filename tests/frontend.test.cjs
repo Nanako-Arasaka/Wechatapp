@@ -568,51 +568,29 @@ test('时段刷新和旧响应不会覆盖较新的数据，已满时段撤销�
   assert.equal(page.data.slots.length, 0);
 });
 
-test('筛选动画在切页或新的搜索后停止，不覆盖新列表', () => {
-  const callbacks = [];
+test('筛选测量晚于搜索或离开页面时，不覆盖新列表', () => {
+  const measurements = [];
   const { page } = load('pages/venue/list/list.js', {}, {}, {
-    setTimeout: (callback) => { callbacks.push(callback); return callbacks.length; },
+    setTimeout: () => { throw new Error('已取消的动画不应启动'); },
     clearTimeout() {},
   });
+  page.createSelectorQuery = () => {
+    const query = { select: () => query, selectAll: () => query, boundingClientRect: () => query, fields: () => query, exec: (callback) => measurements.push(callback) };
+    return query;
+  };
   page.data.rawVenues = [{ ...sampleVenue, type: 'BADMINTON' }, { ...sampleVenue, id: 'venue-2', name: '篮球馆', type: 'BASKETBALL' }];
   page.data.loading = false;
   page.filterAndSort();
   page.onSelectType(tapData({ key: 'BASKETBALL' }));
   page.onHide();
   const snapshot = JSON.stringify(page.data);
-  callbacks[0]();
+  measurements[0]([{ top: 0, height: 200 }, []]);
   assert.equal(JSON.stringify(page.data), snapshot);
   page.onSelectType(tapData({ key: 'BADMINTON' }));
   page.onKeywordInput({ detail: { value: '不存在' } });
-  callbacks.at(-1)();
+  measurements.at(-1)([{ top: 0, height: 200 }, []]);
   assert.equal(page.data.venueList.length, 0);
-  assert.equal(page.data.filterLeaving, false);
-});
-
-test('连续切换分类只显示最后的结果，空列表也能切回全部', () => {
-  const callbacks = [];
-  const { page } = load('pages/venue/list/list.js', {}, {}, {
-    setTimeout: (callback) => { callbacks.push(callback); return callbacks.length; },
-    clearTimeout() {},
-  });
-  page.data.loading = false;
-  page.data.rawVenues = [{ ...sampleVenue, type: 'BADMINTON' }, { ...sampleVenue, id: 'venue-2', type: 'BASKETBALL' }];
-  page.filterAndSort();
-  page.onSelectType(tapData({ key: 'BASKETBALL' }));
-  page.onSelectType(tapData({ key: 'BADMINTON' }));
-  callbacks[0]();
-  assert.equal(page.data.filterLeaving, true);
-  callbacks[1]();
-  assert.equal(page.data.filterLeaving, false);
-  assert.deepEqual(Array.from(page.data.venueList, (venue) => venue.id), [sampleVenue.id]);
-  page.onSelectType(tapData({ key: 'SWIMMING' }));
-  callbacks.at(-1)();
-  assert.equal(page.data.venueList.length, 0);
-  assert.equal(page.data.filterLeaving, false);
-  page.onSelectType(tapData({ key: '' }));
-  callbacks.at(-1)();
-  assert.equal(page.data.venueList.length, 2);
-  assert.equal(page.data.filterLeaving, false);
+  assert.equal(page.data.filterAnimating, false);
 });
 
 test('视图回调晚于搜索、排序或离开页面时，不再启动旧动画', () => {
@@ -624,6 +602,12 @@ test('视图回调晚于搜索、排序或离开页面时，不再启动旧动�
       clearTimeout() {},
     });
     page.data.loading = false;
+    page.data.rawVenues = [{ ...sampleVenue, type: 'BADMINTON' }];
+    page.filterAndSort();
+    page.createSelectorQuery = () => {
+      const query = { select: () => query, selectAll: () => query, boundingClientRect: () => query, fields: () => query, exec: (callback) => callback([{ top: 200, height: 100 }, [{ dataset: { id: sampleVenue.id }, top: 200, height: 100, opacity: '1' }]]) };
+      return query;
+    };
     const setData = page.setData;
     page.setData = (values, callback) => { setData(values); if (callback) callbacks.push(callback); };
     page.onSelectType(tapData({ key: 'BASKETBALL' }));
@@ -632,7 +616,9 @@ test('视图回调晚于搜索、排序或离开页面时，不再启动旧动�
     callbacks.forEach((callback) => callback());
     assert.equal(timers.length, 0, cancel);
     assert.equal(JSON.stringify(page.data), snapshot, cancel);
-    assert.equal(page.data.filterLeaving, false, cancel);
+    assert.equal(page.data.filterAnimating, false, cancel);
+    assert.equal(page.data.listStyle, '', cancel);
+    assert.deepEqual(Object.keys(page.data.cardStyles), [], cancel);
   }
 });
 

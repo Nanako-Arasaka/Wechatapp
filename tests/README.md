@@ -18,6 +18,12 @@ responses, cancellation of filter animations and the full date → slot → cour
 contact → booking request chain. Service calls are mocked, so this validates
 frontend behavior without creating backend orders.
 
+`venue-motion.test.cjs` checks that category filters fade only removed cards,
+keep matching cards opaque while moving, and restore their full-list positions.
+It also covers different card heights, reversing an active transition, empty
+results, and stale measurements or timers after cancellation. Geometry is mocked;
+these checks do not replace viewing the animation in WeChat.
+
 For an independent scan of the rendered QR pixels, install jsQR outside the repo
 and point `QR_DECODER` to its CommonJS module:
 

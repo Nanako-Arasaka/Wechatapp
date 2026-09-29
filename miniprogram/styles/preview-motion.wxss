@@ -97,6 +97,5 @@
   }
   .venue-card-shell {
     transition: none !important;
-    transform: none !important;
   }
 }

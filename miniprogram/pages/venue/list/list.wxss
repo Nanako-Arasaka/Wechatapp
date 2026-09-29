@@ -72,29 +72,20 @@
   color: #1677ff;
 }
 .venue-cards-list {
-  padding: 0 32rpx;
-}
-.venue-results {
-  transition:
-    opacity 200ms ease,
-    transform 240ms var(--ease-enter);
-}
-.venue-results.filter-leaving {
-  opacity: 0;
-  transform: translateY(8rpx);
-  transition-duration: 140ms;
-  pointer-events: none;
+  position: relative;
+  margin: 0 32rpx;
 }
 .venue-card-shell {
   position: relative;
+  /* 独立格式化上下文，测得的高度包含组件底部间距。 */
+  display: flow-root;
 }
 @media (prefers-reduced-motion: reduce) {
-  .venue-results,
   .type-item,
   .search-input-box {
     transition: none;
   }
-  .venue-results.filter-leaving {
-    transform: none;
+  .venue-card-shell {
+    transition: none !important;
   }
 }

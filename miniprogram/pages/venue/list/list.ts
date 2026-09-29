@@ -1,6 +1,7 @@
 import { VenueService } from "../../../services/venue.service";
 import { Venue } from "../../../types";
 import { getVenueTypeName, safeDecode } from "../../../utils/format";
+import { VenueFilterMotion } from "../../../utils/venue-filter-motion";
 
 Page({
   data: {
@@ -11,7 +12,9 @@ Page({
     sortBy: "RECOMMEND",
     autoFocus: false,
     searchFocused: false,
-    filterLeaving: false,
+    filterAnimating: false,
+    cardStyles: {} as Record<string, string>,
+    listStyle: "",
     rawVenues: [] as Venue[],
     venueList: [] as Venue[],
     typeList: [
@@ -26,9 +29,8 @@ Page({
       { key: "MULTI", name: "综合馆", emoji: "🏟️" },
     ],
   },
-  _filterId: 0,
   _loadId: 0,
-  _filterTimer: null as ReturnType<typeof setTimeout> | null,
+  _filterMotion: null as VenueFilterMotion | null,
 
   onHide() {
     this.cancelFilter();
@@ -37,11 +39,36 @@ Page({
     this.cancelFilter();
     this._loadId++;
   },
-  cancelFilter(resetView = true) {
-    this._filterId++;
-    if (this._filterTimer !== null) clearTimeout(this._filterTimer);
-    this._filterTimer = null;
-    if (resetView) this.setData({ filterLeaving: false });
+  cancelFilter() {
+    this.filterAndSort();
+  },
+  getFilterMotion(): VenueFilterMotion {
+    if (!this._filterMotion) {
+      this._filterMotion = new VenueFilterMotion({
+        measure: (callback) => {
+          const query = this.createSelectorQuery();
+          query.select(".venue-cards-list").boundingClientRect();
+          query.selectAll(".venue-card-shell").fields({
+            dataset: true,
+            rect: true,
+            size: true,
+            computedStyle: ["opacity"],
+          });
+          query.exec((results: any[]) => {
+            const [bounds, cards] = results || [];
+            callback(
+              bounds
+                ? { top: bounds.top, height: bounds.height, cards: cards || [] }
+                : null,
+            );
+          });
+        },
+        render: (values, callback) => this.setData(values, callback),
+        schedule: (callback, ms) => setTimeout(callback, ms),
+        unschedule: (timer) => clearTimeout(timer),
+      });
+    }
+    return this._filterMotion;
   },
   onSearchFocus() {
     this.setData({ searchFocused: true });
@@ -100,7 +127,13 @@ Page({
   },
 
   filterAndSort(sourceList?: Venue[]) {
-    this.setData({ venueList: this.getFilteredVenues(sourceList) });
+    this._filterMotion?.cancel();
+    this.setData({
+      venueList: this.getFilteredVenues(sourceList),
+      cardStyles: {},
+      listStyle: "",
+      filterAnimating: false,
+    });
   },
 
   getFilteredVenues(sourceList?: Venue[]): Venue[] {
@@ -185,26 +218,16 @@ Page({
   onSelectType(e: any) {
     const key = e.currentTarget.dataset.key;
     if (key === this.data.currentType) return;
-    this.cancelFilter(false);
-    const filterId = this._filterId;
+    this.setData({ currentType: key });
     if (this.data.loading || this.data.loadError) {
-      this.setData({ currentType: key, filterLeaving: false });
       this.filterAndSort();
       return;
     }
-    // 只移动结果容器，避免卡片入场、列表退场和 FLIP 同时修改 transform。
-    // 从视图更新完成后开始计时；连续切换时保留当前退场状态。
-    this.setData({ currentType: key, filterLeaving: true }, () => {
-      if (filterId !== this._filterId) return;
-      this._filterTimer = setTimeout(() => {
-        if (filterId !== this._filterId) return;
-        this._filterTimer = null;
-        this.setData({
-          venueList: this.getFilteredVenues(),
-          filterLeaving: false,
-        });
-      }, 140);
-    });
+    this.getFilterMotion().transition(
+      this.data.venueList,
+      this.getFilteredVenues(),
+      key === "",
+    );
   },
 
   onSelectSort(e: any) {
