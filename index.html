@@ -97,37 +97,94 @@ body{
   display:flex;align-items:center;gap:8px;margin:18px 0 12px;font-size:16px;font-weight:700;
 }
 .section-title::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--primary)}
-.enter{animation:rise 360ms var(--ease-enter) both}
+.enter{animation:rise 520ms var(--ease-enter) both}
 .d1{animation-delay:55ms}.d2{animation-delay:110ms}.d3{animation-delay:165ms}
 
 /* 页面差异化入场 — 重要性不同，不要一页一种动画 */
 /* 登录：hero 先落，卡片跟上 */
-.enter-login{animation:fadeUp 420ms var(--ease-enter) both}
+.enter-login{animation:fadeUp 620ms var(--ease-enter) both}
 /* 首页：banner 轻微下压展开，内容错落 */
-.enter-home{animation:fadeUp 320ms var(--ease-enter) both}
+.enter-home{animation:fadeUp 480ms var(--ease-enter) both}
 /* 列表/订单/我的：高频页，几乎隐形 */
-.enter-quiet{animation:fadeIn 180ms ease both}
+.enter-quiet{animation:fadeIn 300ms ease both}
 /* 详情：hero 横向揭示感 */
-.enter-detail{animation:slideIn 300ms var(--ease-move) both}
+.enter-detail{animation:slideIn 500ms var(--ease-move) both}
 /* 预约/选场：面板级，不重播卡片 */
-.enter-panel{animation:fadeUp 280ms var(--ease-enter) both}
+.enter-panel{animation:fadeUp 420ms var(--ease-enter) both}
 
-/* 跨页切入：前进自右、后退自左，避免生硬硬切 */
-.page-swap-in{animation:pageIn 320ms var(--ease-move) both}
-.page-swap-back{animation:pageBack 280ms var(--ease-move) both}
+/* 跨页切入：按页面气质差异化，避免四个 Tab 全一样 */
+.page-swap-in{animation:pageIn 720ms var(--ease-move) both;will-change:transform,opacity}
+.page-swap-back{animation:pageBack 580ms var(--ease-move) both;will-change:transform,opacity}
+
+/* 首页：内容上浮，偏「开屏」 */
+.swap-home{animation:tabHome 640ms var(--ease-enter) both;will-change:transform,opacity}
+@keyframes tabHome{
+  0%{opacity:0;transform:translateY(18px) scale(1.01)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* 场地列表：自上而下落下（放慢，便于肉眼跟上） */
+.swap-list{animation:tabList 980ms var(--ease-enter) both;will-change:transform,opacity}
+@keyframes tabList{
+  0%{opacity:0;transform:translateY(-56px)}
+  45%{opacity:1}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+/* 订单：高频页，极轻淡入 */
+.swap-orders{animation:tabQuiet 320ms ease both}
+@keyframes tabQuiet{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+/* 我的：轻缩放淡入，偏「个人」 */
+.swap-profile{animation:tabProfile 540ms var(--ease-enter) both;will-change:transform,opacity}
+@keyframes tabProfile{
+  0%{opacity:0;transform:scale(0.97)}
+  100%{opacity:1;transform:scale(1)}
+}
+
+/* 列表卡片：自上而下错落（场地页，更慢更清楚） */
+.cascade-down > *{
+  animation:cardDrop 780ms var(--ease-enter) both;
+}
+@keyframes cardDrop{
+  0%{opacity:0;transform:translateY(-36px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+.cascade-down > *:nth-child(1){animation-delay:0ms}
+.cascade-down > *:nth-child(2){animation-delay:140ms}
+.cascade-down > *:nth-child(3){animation-delay:280ms}
+.cascade-down > *:nth-child(4){animation-delay:420ms}
+.cascade-down > *:nth-child(5){animation-delay:560ms}
+.cascade-down > *:nth-child(6){animation-delay:700ms}
+.cascade-down > *:nth-child(n+7){animation-delay:820ms}
+
+/* 场地卡片：自上而下落下 */
+.card-drop{animation:cardDrop 520ms var(--ease-enter) both}
+@keyframes cardDrop{
+  0%{opacity:0;transform:translateY(-36px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
 @keyframes pageIn{
-  from{opacity:0;transform:translateX(22px)}
-  to{opacity:1;transform:translateX(0)}
+  0%{opacity:0;transform:translateX(48px) scale(.97)}
+  55%{opacity:1}
+  100%{opacity:1;transform:translateX(0) scale(1)}
 }
 @keyframes pageBack{
-  from{opacity:0;transform:translateX(-18px)}
-  to{opacity:1;transform:translateX(0)}
+  0%{opacity:0;transform:translateX(-40px) scale(.97)}
+  55%{opacity:1}
+  100%{opacity:1;transform:translateX(0) scale(1)}
 }
 @media (prefers-reduced-motion: reduce){
-  .page-swap-in,.page-swap-back{animation:fadeIn 120ms ease both}
+  .page-swap-in,.page-swap-back,.swap-home,.swap-list,.swap-orders,.swap-profile,.cascade-down > *{
+    animation:fadeIn 120ms ease both !important;
+  }
 }
 /* 成功：庆祝级 */
-.enter-festive{animation:fadeUp 400ms var(--ease-enter) both}
+.enter-festive{animation:fadeUp 620ms var(--ease-enter) both}
 
 /* 仅首次进入页面时叠加的加载骨架（不是每次交互） */
 .first-load{
@@ -135,7 +192,7 @@ body{
 }
 .micro-pop{animation:pop 240ms var(--ease-enter) both}
 /* 已选时段：仅首次出现轻入场；换时间不整卡跳 */
-.summary-first{animation:fadeUp 220ms var(--ease-enter) both}
+.summary-first{animation:fadeUp 380ms var(--ease-enter) both}
 
 /* Apple 风格数字滚轮（odometer）——仅变化的位上下滚动 */
 .slot-val{
@@ -169,7 +226,7 @@ body{
 }
 /* 滚动方向：上翻（时间前进）new 从下方进；回退则相反 */
 .odo-char.rolling .odo-strip{
-  transition:transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition:transform 480ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 .odo-char.rolling-up .odo-strip{transform:translateY(-50%)}
 .odo-char.rolling-down .odo-strip{transform:translateY(-50%)}
@@ -274,6 +331,31 @@ body{
 .filter:active{transform:scale(.95)}
 .filter.active{background:var(--primary);color:#fff;box-shadow:0 6px 16px rgba(22,119,255,.28);transform:scale(1.03)}
 
+/* 类型筛选：全部→单项：非匹配淡出 + 保留卡 FLIP；项→项：交叉淡入淡出 */
+.fade-out-item{
+  opacity:0;transform:scale(0.97) translateY(12px);
+  transition:opacity 720ms cubic-bezier(0.4, 0, 0.2, 1),
+             transform 720ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events:none;
+}
+.fade-in-item{
+  animation:fadeInSoft 720ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes fadeInSoft{
+  0%{opacity:0;transform:translateY(14px) scale(0.985)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.list-fade-out{
+  opacity:0;transform:translateY(10px);
+  transition:opacity 480ms cubic-bezier(0.4, 0, 0.2, 1),
+             transform 480ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.list-fade-in{
+  animation:fadeUp 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.flip-card{will-change:transform}
+
+
 /* detail */
 .hero{width:calc(100% + 32px);margin:-16px -16px 0;height:200px;object-fit:cover;background:#E5E6EB;display:block}
 .detail-title{font-size:21px;font-weight:800;margin:16px 0 8px}
@@ -295,7 +377,7 @@ body{
 .cell.selected{
   background:var(--primary-light);border-color:var(--primary);color:var(--primary);
   box-shadow:0 10px 28px rgba(22,119,255,.22);transform:scale(1.02);
-  animation:pop 280ms var(--ease-enter) both,ring 520ms var(--ease-enter) both;font-weight:600;
+  animation:pop 420ms var(--ease-enter) both,ring 720ms var(--ease-enter) both;font-weight:600;
 }
 .cell .t{font-size:15px;font-weight:700}
 .cell .s{font-size:11px;margin-top:4px;opacity:.9}
@@ -468,9 +550,21 @@ body{
   stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
 }
 
+/* 首页定位 / 通知：与 Tab 同风格线性图标 */
+.home-loc,.home-notify{
+  display:inline-flex;align-items:center;gap:6px;
+}
+.home-ic{
+  width:18px;height:18px;flex:none;
+  stroke:var(--primary);fill:none;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+.home-notify .home-ic{width:20px;height:20px}
+.search-ic{width:18px;height:18px;flex:none;margin-right:2px}
+
 /* 日历首次入场：格子错落升起（仅未加载完的首帧） */
 .cal-grid .cal-cell.cal-in{
-  animation:calIn 380ms var(--ease-enter) both;
+  animation:calIn 560ms var(--ease-enter) both;
 }
 @keyframes calIn{
   from{opacity:0;transform:translateY(12px) scale(.94)}
@@ -645,10 +739,18 @@ function finishEnter(name){
   S.motion = 'none';
 }
 
-function venueCard(v, i=0){
-  const cls = animClass('home','enter-home') || animClass('list','enter-quiet') || '';
-  const delay = cls && S.motion==='enter' ? `style="animation-delay:${Math.min(i,5)*55}ms"` : '';
-  return `<article class="venue-card ${cls}" ${delay} onclick="openVenue(${v.id})">
+function venueCard(v, i=0, mode){
+  // mode: 'list' 场地页自上而下；默认首页错落上浮
+  let cls = '';
+  if (mode === 'list') {
+    cls = animClass('场地', 'card-drop');
+  } else {
+    cls = animClass('首页', 'enter-home');
+  }
+  const delay = cls && S.motion === 'enter'
+    ? `style="animation-delay:${mode === 'list' ? Math.min(i,6)*140 : Math.min(i,5)*70}ms"`
+    : '';
+  return `<article class="venue-card ${cls}" data-id="${v.id}" ${delay} onclick="openVenue(${v.id})">
     <img src="${v.image}" alt="${esc(v.name)}" />
     <div style="min-width:0;flex:1;display:flex;flex-direction:column">
       <h3 class="truncate">${v.name}</h3>
@@ -682,11 +784,16 @@ function pageLogin(){
 function pageHome(){
   return `<div class="home-top">
     <div class="between" style="margin-bottom:12px">
-      <button class="pill active" style="background:#fff;color:var(--text);border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)">📍 武汉市 · 洪山区文体中心</button>
-      <button class="pill" style="background:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)" onclick="toast('消息中心（演示）')">🔔</button>
+      <button class="pill active home-loc" style="background:#fff;color:var(--text);border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)">
+        <svg class="home-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6.5-5.2 6.5-11A6.5 6.5 0 0 0 5.5 10c0 5.8 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>
+        武汉市 · 洪山区文体中心
+      </button>
+      <button class="pill home-notify" style="background:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,0,0,.05)" onclick="toast('消息中心（演示）')" aria-label="消息通知">
+        <svg class="home-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 10a5.5 5.5 0 1 1 11 0c0 4 1.5 5.5 1.5 5.5H5s1.5-1.5 1.5-5.5z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+      </button>
     </div>
     <div class="search" id="searchBox">
-      <span>🔍</span>
+      <svg class="search-ic home-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
       <input id="homeSearch" placeholder="搜索运动项目、场馆名称..." onfocus="this.parentElement.classList.add('focus')" onblur="this.parentElement.classList.remove('focus')" />
       <button class="btn-sm" onclick="S.keyword=$('homeSearch').value||'';go('场地')">搜索</button>
     </div>
@@ -736,7 +843,7 @@ function pageList(){
   );
   return `
   <div class="search ${animClass('场地','enter-quiet')}" id="searchBox" style="margin-bottom:8px">
-    <span>🔍</span>
+    <svg class="search-ic home-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
     <input id="listSearch" value="${esc(S.keyword)}" placeholder="搜索场地名称、项目或地址"
       oninput="S.keyword=this.value;updateList()"
       onfocus="this.parentElement.classList.add('focus')"
@@ -745,11 +852,11 @@ function pageList(){
   </div>
   <div class="filters ${animClass('场地','enter-quiet')} d1">
     ${['全部','羽毛球','篮球','足球','网球','乒乓球','游泳'].map(t=>
-      `<button class="filter ${S.type===t?'active':''}" onclick="S.type='${t}';S.motion='micro';render()">${t}</button>`
+      `<button class="filter ${S.type===t?'active':''}" data-type="${t}" onclick="onTypeFilter('${t}')">${t}</button>`
     ).join('')}
   </div>
   <div id="venue-results">
-    ${filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>'}
+    ${filtered.length?filtered.map((v,i)=>venueCard(v,i,'list')).join(''):'<div class="empty">暂无匹配场地</div>'}
   </div>`;
 }
 
@@ -759,7 +866,168 @@ function updateList(){
     (S.type==='全部'||v.type===S.type) &&
     (`${v.name}${v.type}${v.address}${v.facilities.join('')}`).toLowerCase().includes(S.keyword.toLowerCase())
   );
-  $('venue-results').innerHTML = filtered.length?filtered.map(venueCard).join(''):'<div class="empty">暂无匹配场地</div>';
+  $('venue-results').innerHTML = filtered.length?filtered.map((v,i)=>venueCard(v,i,'list')).join(''):'<div class="empty">暂无匹配场地</div>';
+}
+
+function syncFilterTabs(){
+  document.querySelectorAll('.filters .filter').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-type') === S.type);
+  });
+}
+
+/**
+ * 类型筛选动效
+ * - 全部 → 某类型：非匹配卡淡出，保留卡 FLIP 平滑挪到前面
+ * - 某类型 → 全部：保留卡 FLIP 回原位，其余卡淡入
+ * - 类型 ↔ 类型：整列交叉淡入淡出
+ */
+function onTypeFilter(nextType){
+  if (nextType === S.type) return;
+  const prev = S.type;
+  const container = $('venue-results');
+  if (!container) {
+    S.type = nextType;
+    S.motion = 'micro';
+    render();
+    return;
+  }
+
+  clearPageSwap();
+  const matchIds = new Set(venues.filter((v) => nextType === '全部' || v.type === nextType).map((v) => String(v.id)));
+
+  // 模式 A：全部 → 具体类型（保留项 FLIP 上移，其余淡出）
+  if (prev === '全部' && nextType !== '全部') {
+    const cards = Array.from(container.querySelectorAll('.venue-card'));
+    const firstRects = new Map();
+    cards.forEach((c) => {
+      firstRects.set(c.getAttribute('data-id'), c.getBoundingClientRect());
+    });
+
+    const outs = cards.filter((c) => !matchIds.has(c.getAttribute('data-id')));
+
+    // 关键：先卸掉入场 animation（fill:both 会压住 opacity 过渡，淡出会被“吞掉”）
+    cards.forEach((c) => {
+      c.classList.remove('card-drop', 'enter-home', 'fade-in-item', 'flip-card');
+      c.style.animation = 'none';
+      c.style.opacity = '';
+      c.style.transform = '';
+      c.style.transition = '';
+    });
+    void container.offsetWidth; // reflow，确保 animation 停掉
+
+    // 再播淡出（用 inline style 保证 transition 一定生效）
+    outs.forEach((c) => {
+      c.style.transition =
+        'opacity 720ms cubic-bezier(0.4, 0, 0.2, 1), transform 720ms cubic-bezier(0.4, 0, 0.2, 1)';
+      c.style.opacity = '1';
+      c.style.transform = 'translateY(0) scale(1)';
+      c.style.pointerEvents = 'none';
+      void c.offsetWidth;
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(14px) scale(0.97)';
+    });
+
+    // 等淡出基本结束再换列表并 FLIP
+    setTimeout(() => {
+      S.type = nextType;
+      S.motion = 'none';
+      S._pageSwap = '';
+      render();
+      syncFilterTabs();
+
+      const root = $('venue-results');
+      if (!root) return;
+      const newCards = Array.from(root.querySelectorAll('.venue-card'));
+      newCards.forEach((c) => {
+        const id = c.getAttribute('data-id');
+        const prevRect = firstRects.get(id);
+        const now = c.getBoundingClientRect();
+        if (!prevRect) {
+          c.classList.add('fade-in-item');
+          return;
+        }
+        const dx = prevRect.left - now.left;
+        const dy = prevRect.top - now.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+        c.classList.add('flip-card');
+        c.style.transition = 'none';
+        c.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => {
+          c.style.transition = 'transform 780ms cubic-bezier(0.22, 1, 0.36, 1)';
+          c.style.transform = 'translate(0, 0)';
+          setTimeout(() => {
+            c.style.transition = '';
+            c.style.transform = '';
+            c.classList.remove('flip-card');
+          }, 800);
+        });
+      });
+    }, 720);
+    return;
+  }
+
+  // 模式 C：具体类型 → 全部（保留卡 FLIP 回原位，其余淡入）
+  if (prev !== '全部' && nextType === '全部') {
+    const cards = Array.from(container.querySelectorAll('.venue-card'));
+    const firstRects = new Map();
+    cards.forEach((c) => {
+      firstRects.set(c.getAttribute('data-id'), c.getBoundingClientRect());
+    });
+    const wasVisible = new Set(cards.map((c) => c.getAttribute('data-id')));
+
+    setTimeout(() => {
+      S.type = nextType;
+      S.motion = 'none';
+      S._pageSwap = '';
+      render();
+      syncFilterTabs();
+
+      const root = $('venue-results');
+      if (!root) return;
+      const newCards = Array.from(root.querySelectorAll('.venue-card'));
+      newCards.forEach((c) => {
+        const id = c.getAttribute('data-id');
+        const prevRect = firstRects.get(id);
+        const now = c.getBoundingClientRect();
+        if (!prevRect) {
+          // 之前被滤掉的卡：慢速淡入
+          c.classList.add('fade-in-item');
+          return;
+        }
+        const dx = prevRect.left - now.left;
+        const dy = prevRect.top - now.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+        c.classList.add('flip-card');
+        c.style.transition = 'none';
+        c.style.transform = `translate(${dx}px, ${dy}px)`;
+        requestAnimationFrame(() => {
+          c.style.transition = 'transform 520ms cubic-bezier(0.22, 1, 0.36, 1)';
+          c.style.transform = 'translate(0, 0)';
+          setTimeout(() => {
+            c.style.transition = '';
+            c.style.transform = '';
+            c.classList.remove('flip-card');
+          }, 540);
+        });
+      });
+    }, 180);
+    return;
+  }
+
+  // 模式 B：类型 ↔ 类型：整列交叉淡入淡出（更慢）
+  container.classList.add('list-fade-out');
+  setTimeout(() => {
+    S.type = nextType;
+    S.motion = 'none';
+    S._pageSwap = '';
+    render();
+    syncFilterTabs();
+    const root = $('venue-results');
+    if (!root) return;
+    root.classList.remove('list-fade-out');
+    root.classList.add('list-fade-in');
+    setTimeout(() => root.classList.remove('list-fade-in'), 720);
+  }, 460);
 }
 
 function pageDetail(){
@@ -943,7 +1211,7 @@ function pageBooking(){
       }).join('')}
     </div>
   </div>
-  ${S.slot?`<div class="card ${summaryAnimClass()}">
+  ${S.slot?`<div class="card ${summaryAnimClass()}" id="summary-card">
     <div class="section-title" style="margin-top:0;color:var(--primary)">已选时段</div>
     <div class="fact"><span>场馆</span><span>${S.venue.name}</span></div>
     <div class="fact"><span>日期</span><span>${esc(S.selectedDateLabel || date)}</span></div>
@@ -1108,10 +1376,29 @@ function pageProfile(){
 const rootTabs=['首页','场地','订单','我的'];
 function go(page){
   const back = arguments[1] === 'back';
-  S.page=page;
-  S.motion='enter';
-  S._pageSwap = back ? 'page-swap-back' : 'page-swap-in';
-  $('scroll').scrollTop=0;
+  S.page = page;
+  S.motion = 'enter';
+  // 每次切到场地 Tab 都重播「自上而下」列表加载，避免只在第一次可见
+  if (page === '场地') {
+    delete S.entered['场地'];
+  }
+  // Tab / 页面差异化切入：首页上浮、场地下落、订单极轻、我的轻缩放
+  if (back) {
+    S._pageSwap = 'page-swap-back';
+  } else if (page === '首页') {
+    S._pageSwap = 'swap-home';
+  } else if (page === '场地') {
+    S._pageSwap = 'swap-list';
+  } else if (page === '订单') {
+    S._pageSwap = 'swap-orders';
+  } else if (page === '我的') {
+    S._pageSwap = 'swap-profile';
+  } else {
+    S._pageSwap = 'page-swap-in';
+  }
+  // 动画时长更久，窗口拉长避免中途被重绘掐掉
+  S._pageSwapAt = Date.now();
+  $('scroll').scrollTop = 0;
   render();
 }
 function goBack(){
@@ -1125,16 +1412,25 @@ function openVenue(id){
 function startBooking(id){
   S.venue=venues.find(v=>v.id===id)||venues[0];
   S.slot=''; S.court=0; S.selectedDate=''; S.selectedDateLabel='';
-  // 每次开始预约都重播选日/选时切入，避免生硬
+  // 每次开始预约都重播选日切入
   delete S.entered['选择日期'];
   delete S.entered['选择时间'];
-  go('选择日期');
-  loadDaySummaries();
+  S.daysLoading = true;
+  S.daysError = false;
+  S.daySummaries = [];
+  go('选择日期'); // 带 page-swap 的首帧先绘制
+  // 下一帧再灌数据，保证切入动画先播出来
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { loadDaySummaries(true); });
+  });
 }
 
-async function loadDaySummaries(){
-  S.daysLoading = true; S.daysError = false; S.motion = S.entered['选择日期'] ? 'none' : 'enter';
-  render();
+async function loadDaySummaries(skipRender){
+  if (!skipRender) {
+    S.daysLoading = true; S.daysError = false;
+    S.motion = S.entered['选择日期'] ? 'none' : 'enter';
+    render();
+  }
   try {
     if (USE_API) {
       S.daySummaries = await fetchDaySummaries(S.venue.id);
@@ -1173,6 +1469,7 @@ function mockDaySummaries(){
 }
 
 async function selectDate(date, label){
+  clearPageSwap();
   S.selectedDate = date;
   S.selectedDateLabel = label || date;
   S.slot = '';
@@ -1322,36 +1619,99 @@ function summaryAnimClass(){
   return '';
 }
 
+function clearPageSwap(){
+  S._pageSwap = '';
+  S._pageSwapAt = 0;
+}
+
 function selectSlot(t){
+  clearPageSwap();
   const firstSummary = !S.slot && !!t;
   const prev = S.slot;
-  S.slot=t;
-  // 格子 CSS selection-pop；摘要卡仅首次出现；时间段用数字滚轮
+  S.slot = t;
   S.motion = 'none';
   S._summaryFirst = firstSummary;
-  render();
 
+  // 只改点中的格子，避免整页重绘造成整卡震动
+  const cells = document.querySelectorAll('.cell[data-act="select-slot"]');
+  cells.forEach((btn) => {
+    const on = btn.getAttribute('data-t') === t;
+    if (!on) btn.classList.remove('selected');
+    // 禁用格不加 selected
+    if (on && btn.getAttribute('data-disabled') !== '1') {
+      // 强制重置 CSS 动画，只让本次选中播 pop+ring
+      btn.classList.remove('selected');
+      void btn.offsetWidth;
+      btn.classList.add('selected');
+    }
+  });
+
+  // 更新/插入「已选时段」摘要（只动这一块）
+  const date = S.selectedDate || fmtDate(new Date());
+  const exist = document.querySelector('#summary-card');
+  const html = `
+    <div class="section-title" style="margin-top:0;color:var(--primary)">已选时段</div>
+    <div class="fact"><span>场馆</span><span>${S.venue.name}</span></div>
+    <div class="fact"><span>日期</span><span>${esc(S.selectedDateLabel || date)}</span></div>
+    <div class="fact"><span>时间段</span><span class="slot-val" id="slotVal">${timeText(S.slot)}</span></div>
+    <div class="fact"><span>单价</span><span style="color:var(--warning)">¥${S.venue.price}</span></div>
+  `;
+  if (exist) {
+    exist.innerHTML = html;
+    exist.style.display = '';
+  } else {
+    const wrap = document.createElement('div');
+    wrap.id = 'summary-card';
+    wrap.className = 'card summary-first';
+    wrap.innerHTML = html;
+    const nextBtn = document.querySelector('[data-act="go"][data-page="选场地"]');
+    if (nextBtn && nextBtn.parentElement) {
+      nextBtn.parentElement.insertBefore(wrap, nextBtn);
+    }
+  }
+
+  // 下一步按钮可用状态
+  const next = document.querySelector('[data-act="go"][data-page="选场地"]');
+  if (next) {
+    next.classList.remove('disabled');
+    next.removeAttribute('disabled');
+  }
+
+  // 时间段数字：仅首次出现轻入场；换时间只滚数字
   const val = document.getElementById('slotVal');
   if (!val) return;
-
   if (firstSummary || !prev) {
-    mountOdometer(val, timeText(t));
+    mountOdometer(val, timeText(S.slot));
     return;
   }
-  if (prev === t) return;
-
-  // 时间前进还是回退：比 start HH
-  const advancing = Number(t.slice(0,2)) >= Number(prev.slice(0,2));
-  // render() 已用新文案重绘，需要先恢复旧文案再滚到新文案
+  if (prev === S.slot) return;
+  const advancing = Number(S.slot.slice(0,2)) >= Number(prev.slice(0,2));
   mountOdometer(val, timeText(prev));
   requestAnimationFrame(() => {
-    rollOdometer(val, timeText(prev), timeText(t), advancing);
+    rollOdometer(val, timeText(prev), timeText(S.slot), advancing);
   });
 }
+
 function selectCourt(n){
-  S.court=n;
-  S.motion='micro';
-  render();
+  clearPageSwap();
+  S.court = n;
+  S.motion = 'none';
+  // 只更新场地格子
+  const cells = document.querySelectorAll('.cell[data-act="select-court"]');
+  cells.forEach((btn) => {
+    const on = Number(btn.getAttribute('data-no')) === n;
+    if (!on) btn.classList.remove('selected');
+    if (on) {
+      btn.classList.remove('selected');
+      void btn.offsetWidth;
+      btn.classList.add('selected');
+    }
+  });
+  const next = document.querySelector('[data-act="go"][data-page="填写信息"]');
+  if (next && n) {
+    next.classList.remove('disabled');
+    next.removeAttribute('disabled');
+  }
 }
 function refreshSlots(){
   const btn=document.querySelector('[data-act="refresh-slots"]');
@@ -1466,9 +1826,21 @@ function render(){
     '选择日期':pageSelectDate,'选择时间':pageBooking,'选场地':pageCourt,'填写信息':pageFill,
     '预约成功':pageSuccess,'订单':pageOrders,'我的':pageProfile
   };
-  const swap = S._pageSwap ? ` ${S._pageSwap}` : '';
+  // 切页动画类：在动画窗口内跨多次 render 保留，避免 loading 重绘打断
+  let swap = '';
+  if (S._pageSwap) {
+    const alive = Date.now() - (S._pageSwapAt || 0) < 800;
+    swap = alive ? ` ${S._pageSwap}` : '';
+    if (!alive) { S._pageSwap = ''; S._pageSwapAt = 0; }
+  }
   $('content').innerHTML=`<div class="page-body${swap}">${(views[page]||pageHome)()}</div>`;
-  S._pageSwap = '';
+  // 强制重启动画（同帧二次 render 时也要能播）
+  const body = $('content').querySelector('.page-body');
+  if (body && swap) {
+    body.style.animation = 'none';
+    void body.offsetWidth;
+    body.style.animation = '';
+  }
   $('tabbar').innerHTML=['首页','场地','订单','我的'].map((t)=>{
     const show=!( !S.loggedIn && page==='登录');
     return show?`<button class="${page===t?'active':''}" onclick="go('${t}')">
