@@ -1,0 +1,8 @@
+<view class="number" aria-label="{{value}}">
+  <view class="digit" wx:for="{{digits}}" wx:key="key">
+    <view class="strip {{item.rolling ? (item.backwards ? 'roll-down' : 'roll-up') : ''}}">
+      <block wx:if="{{item.rolling}}"><text class="digit-value">{{item.backwards ? item.character : item.old}}</text><text class="digit-value">{{item.backwards ? item.old : item.character}}</text></block>
+      <text wx:else class="digit-value">{{item.character}}</text>
+    </view>
+  </view>
+</view>

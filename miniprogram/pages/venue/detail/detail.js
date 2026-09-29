@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const venue_service_1 = require("../../../services/venue.service");
 const format_1 = require("../../../utils/format");
+const venue_image_1 = require("../../../utils/venue-image");
 /**
  * ============================================================================
  * P1 场地概况页 (VenueDetailPage)
@@ -19,17 +20,18 @@ Page({
     data: {
         // 顶部切换选项卡配置（羽毛球馆 / 网球馆）
         tabs: [],
-        activeTab: 'BADMINTON', // 当前选中的选项卡类型
+        activeTab: "BADMINTON", // 当前选中的选项卡类型
         venues: [], // GET /venues 返回的全部场馆
         venue: {}, // 当前展示的场馆
         // 馆内平面示意图：根据场馆容量生成场地格（1号场、2号场...）
         courtBlocks: [],
         loading: true,
         loadError: false, // 加载失败标记（错误占位 + 重试）
-        presetId: '',
+        presetId: "",
+        coverImage: "",
     },
     onLoad(options) {
-        this.setData({ presetId: options?.id || '' });
+        this.setData({ presetId: options?.id || "" });
         // 兼容外部 ?id= 直达：携带 id 时优先展示该场馆
         if (options && options.id) {
             this.loadVenues(options.id);
@@ -48,7 +50,7 @@ Page({
             this.setData({ loading: true, loadError: false });
             // 调用已有接口 GET /venues 获取场馆基础信息
             const venues = await venue_service_1.VenueService.getVenues();
-            const activeList = venues.filter((v) => v.status !== 'INACTIVE');
+            const activeList = venues.filter((v) => v.status !== "INACTIVE");
             const tabs = activeList.reduce((items, item) => {
                 if (!items.some((tab) => tab.key === item.type)) {
                     items.push({ key: item.type, label: (0, format_1.getVenueTypeName)(item.type) });
@@ -71,15 +73,23 @@ Page({
             if (venue) {
                 this.applyVenue(venue, activeTab);
             }
-            this.setData({ venues: activeList, tabs, activeTab: venue?.type || activeTab, venue: venue || {} });
+            this.setData({
+                venues: activeList,
+                tabs,
+                activeTab: venue?.type || activeTab,
+                venue: venue || {},
+            });
         }
         catch (err) {
-            console.error('加载场馆列表失败:', err);
+            console.error("加载场馆列表失败:", err);
             this.setData({ loadError: true, venue: {}, courtBlocks: [] });
         }
         finally {
             this.setData({ loading: false });
         }
+    },
+    onImageError() {
+        this.setData({ coverImage: "/assets/ui/venue.svg" });
     },
     onRetry() {
         this.loadVenues(this.data.venue.id || this.data.presetId || undefined);
@@ -98,7 +108,13 @@ Page({
         for (let i = 1; i <= capacity; i++) {
             courtBlocks.push({ no: i });
         }
-        this.setData({ venue, courtBlocks, activeTab, presetId: venue.id });
+        this.setData({
+            venue,
+            coverImage: (0, venue_image_1.venueImage)(venue.coverImage),
+            courtBlocks,
+            activeTab,
+            presetId: venue.id,
+        });
         // 同步导航栏标题为馆名
         wx.setNavigationBarTitle({ title: venue.name });
     },
@@ -116,7 +132,7 @@ Page({
             this.applyVenue(venue, key);
         }
         else {
-            wx.showToast({ title: '暂无该类型场馆', icon: 'none' });
+            wx.showToast({ title: "暂无该类型场馆", icon: "none" });
         }
     },
     /**
@@ -124,11 +140,11 @@ Page({
      */
     goToBooking() {
         if (!this.data.venue.id) {
-            wx.showToast({ title: '场馆信息加载中，请稍候', icon: 'none' });
+            wx.showToast({ title: "场馆信息加载中，请稍候", icon: "none" });
             return;
         }
         wx.navigateTo({
-            url: `/pages/venue/booking/booking?id=${this.data.venue.id}`,
+            url: `/pages/venue/date/date?id=${encodeURIComponent(this.data.venue.id)}`,
         });
     },
 });

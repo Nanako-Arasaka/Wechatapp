@@ -1,222 +1,106 @@
-/**
- * ============================================================================
- * P1 场地概况页样式
- * ----------------------------------------------------------------------------
- * 布局：顶部类型切换选项卡 -> 场馆基础信息 -> 馆内平面示意图 -> 场馆位置说明 -> 底部【开始预约】
- * 一期以简洁可用为主，配色沿用全局设计规范（科技蓝 #1677FF）。
- * ============================================================================
- */
-
-/* 页面容器：为底部固定操作栏预留空间 */
 .venue-detail-page {
-  padding-bottom: 180rpx;
+  padding: 30rpx 0 calc(180rpx + env(safe-area-inset-bottom));
 }
-
-/* ===== 顶部选项卡 ===== */
-.tab-bar {
-  display: inline-flex;
-  flex-direction: row;
-  padding: 12rpx;
-  background: var(--bg-white);
+.detail-hero {
+  display: block;
+  width: calc(100% - 64rpx);
+  height: 370rpx;
+  margin: 0 32rpx;
+  border-radius: 32rpx;
+  background: #e5e6eb;
 }
-
-.tab-scroll {
-  white-space: nowrap;
+.detail-intro {
+  margin: 26rpx 32rpx;
 }
-
-.tab-item {
-  flex: none;
-  min-width: 126rpx;
-  text-align: center;
-  font-size: 30rpx;
-  color: var(--text-regular);
-  padding: 18rpx 16rpx;
-  border-radius: var(--radius-pill);
-  transition: all 0.2s ease;
-}
-
-/* 选中态：主色渐变底 + 白字 */
-.tab-item.active {
-  background: var(--primary-gradient);
-  color: #FFFFFF;
-  font-weight: 600;
-  box-shadow: var(--shadow-float);
-}
-
-/* ===== 场馆基础信息卡片 ===== */
-.venue-name-row {
-  margin-bottom: 16rpx;
-}
-
-.venue-name {
-  font-size: 36rpx;
+.detail-name {
+  font-size: 40rpx;
   font-weight: 700;
-  color: var(--text-main);
+  line-height: 1.4;
+  margin-bottom: 12rpx;
 }
-
-.open-time-row {
-  margin-top: 8rpx;
+.detail-muted {
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: #86909c;
 }
-
-.clock-pin {
-  font-size: 28rpx;
-  margin-right: 10rpx;
+.card {
+  margin: 24rpx 32rpx;
+  border-radius: 28rpx;
 }
-
-.open-time-text {
-  font-size: 26rpx;
-  color: var(--text-regular);
-}
-
-/* ===== 通用卡片小标题 ===== */
 .card-section-title {
   font-size: 30rpx;
-  font-weight: 600;
-  color: var(--text-main);
+  font-weight: 700;
   margin-bottom: 20rpx;
 }
-
-/* ===== 馆内平面示意图 ===== */
-.map-outer {
-  border: 3rpx dashed var(--primary-color);
-  border-radius: var(--radius-md);
-  padding: 24rpx;
-  background: #FAFCFF;
-}
-
-/* 入口标识 */
-.map-entrance {
-  text-align: center;
-  font-size: 24rpx;
-  color: var(--primary-color);
-  background: var(--primary-light);
-  border-radius: var(--radius-xs);
-  padding: 10rpx 0;
-  margin-bottom: 20rpx;
-}
-
-/* 场地格矩阵：一行三列 */
-.map-grid {
+.detail-facilities {
   display: flex;
   flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 20rpx;
 }
-
-.map-court {
-  width: calc((100% - 24rpx) / 3);
-  margin-right: 12rpx;
-  margin-bottom: 12rpx;
-  height: 88rpx;
+.detail-facilities text {
+  font-size: 22rpx;
+  padding: 7rpx 14rpx;
+  border-radius: 10rpx;
+  color: #4e5969;
+  background: #f4f6f9;
+}
+.detail-fact {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--success-light);
-  border: 1rpx solid rgba(0, 185, 107, 0.35);
-  border-radius: var(--radius-sm);
-  box-sizing: border-box;
-}
-
-/* 每行第 3 个去掉右间距 */
-.map-court:nth-child(3n) {
-  margin-right: 0;
-}
-
-.map-court-no {
-  font-size: 26rpx;
-  color: var(--success-color);
-  font-weight: 600;
-}
-
-/* 底部辅助区域 */
-.map-side {
-  margin-top: 16rpx;
   justify-content: space-between;
-}
-
-.map-side-item {
-  flex: 1;
-  text-align: center;
-  font-size: 22rpx;
-  color: var(--text-secondary);
-  background: var(--border-light);
-  border-radius: var(--radius-xs);
-  padding: 10rpx 0;
-  margin-right: 12rpx;
-}
-
-.map-side-item:last-child {
-  margin-right: 0;
-}
-
-.map-legend {
-  margin-top: 16rpx;
-}
-
-.legend-text {
-  font-size: 22rpx;
-  color: var(--text-placeholder);
-}
-
-/* ===== 场馆位置说明 ===== */
-.location-row {
-  margin-bottom: 16rpx;
-}
-
-.loc-pin {
-  font-size: 28rpx;
-  margin-right: 10rpx;
-}
-
-.location-text {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.guide-text {
+  gap: 20rpx;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f1f3;
   font-size: 26rpx;
-  color: var(--text-regular);
-  line-height: 1.7;
-  background: var(--bg-page);
-  border-radius: var(--radius-sm);
-  padding: 20rpx;
+  color: #4e5969;
 }
-
-/* ===== 底部固定【开始预约】操作栏 ===== */
+.detail-fact:last-child {
+  border: 0;
+}
+.map-entrance {
+  padding: 18rpx;
+  text-align: center;
+  font-size: 23rpx;
+  color: #86909c;
+}
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16rpx;
+  margin: 12rpx 0 22rpx;
+}
+.map-court {
+  padding: 28rpx 0;
+  border: 2rpx solid #b7e6d0;
+  background: #e6fffb;
+  border-radius: 12rpx;
+  text-align: center;
+  color: #087b58;
+  font-size: 24rpx;
+}
 .bottom-action-bar {
   position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: var(--bg-white);
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
-  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.04);
 }
-
-.btn-start-book {
-  background: var(--primary-gradient);
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
-  padding: 22rpx 0;
-  text-align: center;
-  border: none;
-  box-shadow: var(--shadow-float);
+.detail-price {
+  color: #ff4d4f;
+  font-size: 38rpx;
+  font-weight: 800;
 }
-
-.btn-start-book:active {
-  opacity: 0.9;
-  transform: scale(0.98);
+.detail-price text {
+  color: #86909c;
+  font-size: 21rpx;
+  font-weight: 400;
 }
-
-/* ===== 加载中 / 空数据提示 ===== */
-.loading-box {
-  padding: 120rpx 0;
-  text-align: center;
-}
-
-.loading-text {
-  font-size: 26rpx;
-  color: var(--text-secondary);
+.bottom-action-bar button {
+  flex: 1;
+  margin: 0;
 }

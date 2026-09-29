@@ -44,7 +44,7 @@
   <!-- 订单列表 -->
   <view wx:else class="orders-wrap">
     <view
-      class="order-card card"
+      class="order-card card motion-orders"
       wx:for="{{orderList}}"
       wx:key="id"
       bindtap="goToDetail"
@@ -59,7 +59,7 @@
         <image class="venue-thumb" src="{{item.venueImage}}" mode="aspectFill" />
         <view class="order-main-info flex-1">
           <view class="venue-name">{{item.venueName}}</view>
-          <view class="time-range-text">📅 {{item.bookingDate}} {{item.timeRange}}</view>
+          <view class="time-range-text">{{item.bookingDate}} {{item.timeRange}}</view>
           <view class="count-text">数量：{{item.quantity}} 个场地名额</view>
         </view>
       </view>
@@ -83,11 +83,11 @@
           <!-- 待使用 -->
           <block wx:elif="{{item.bookingStatus === 'CONFIRMED'}}">
             <view class="btn-action-cancel" catchtap="onCancelBooking" data-booking-id="{{item.bookingId}}">取消退订</view>
-            <view class="btn-action-primary" catchtap="goToQRCode" data-id="{{item.id}}" data-code="{{item.bookingCode}}">核销码</view>
+            <view class="btn-action-primary" catchtap="goToQRCode" data-id="{{item.id}}" data-code="{{item.bookingCode}}">出示核销码</view>
           </block>
 
           <!-- 已入场 / 已完成 -->
-          <block wx:elif="{{item.bookingStatus === 'CHECKED_IN' || item.bookingStatus === 'COMPLETED'}}">
+          <block wx:elif="{{item.bookingStatus === 'CHECKED_IN' || item.bookingStatus === 'COMPLETED' || item.bookingStatus === 'CANCELLED' || item.bookingStatus === 'REFUNDED' || item.bookingStatus === 'EXPIRED'}}">
             <view class="btn-action-primary" catchtap="onRebook" data-venue-id="{{item.venueId}}">再次预约</view>
           </block>
         </view>

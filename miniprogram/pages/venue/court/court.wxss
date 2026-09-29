@@ -1,280 +1,117 @@
-/**
- * ============================================================================
- * P3 可选场地页样式
- * ----------------------------------------------------------------------------
- * 布局：顶部已选时段摘要 + 底部弹窗弹层（场地色块网格 + 【下一步】）。
- * 色块规则：绿色 = 可预约；灰色 = 不可预约；主色描边 + ✓ 角标 = 已选中。
- * ============================================================================
- */
-
-/* 页面容器 */
 .court-page {
-  min-height: 100vh;
-  padding-bottom: 40rpx;
-  box-sizing: border-box;
+  padding-top: 12rpx;
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
-
-/* ===== 顶部已选时段摘要 ===== */
-.summary-area {
-  padding-top: 20rpx;
+.card {
+  margin: 24rpx 32rpx;
+  border-radius: 30rpx;
 }
-
 .summary-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 16rpx;
+  margin-bottom: 20rpx;
 }
-
 .summary-row {
-  margin-bottom: 12rpx;
-}
-
-.summary-row:last-child {
-  margin-bottom: 0;
-}
-
-.summary-label {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-}
-
-.summary-value {
-  font-size: 26rpx;
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.summary-price {
-  color: var(--warning-color);
-}
-
-/* 已选场地高亮 */
-.summary-court {
-  color: var(--success-color);
-}
-
-/* ===== 底部弹窗弹层 ===== */
-/* 弹层背后半透明遮罩 */
-.sheet-mask {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  transition: opacity var(--dur-ui) ease;
-  pointer-events: none;
-  z-index: 20;
-}
-
-.sheet-mask.show {
-  opacity: 1;
-}
-
-/* 弹层主体：固定于页面底部，入场时自下而上滑出 */
-.court-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--bg-white);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  padding: 20rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
-  transform: translateY(100%);
-  transition: transform var(--dur-panel) var(--ease-move);
-  z-index: 21;
-  box-shadow: 0 -12rpx 40rpx rgba(0, 0, 0, 0.12);
-}
-
-.court-sheet.show {
-  transform: translateY(0);
-}
-
-/* 顶部把手装饰条 */
-.sheet-handle {
-  width: 72rpx;
-  height: 8rpx;
-  background: var(--border-color);
-  border-radius: var(--radius-pill);
-  margin: 0 auto 20rpx;
-}
-
-.sheet-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-/* ===== 色块图例 ===== */
-.legend-bar {
-  margin: 20rpx 0;
-}
-
-.legend-item {
-  margin-right: 40rpx;
-  font-size: 24rpx;
-  color: var(--text-regular);
-}
-
-.legend-box {
-  width: 28rpx;
-  height: 28rpx;
-  border-radius: 6rpx;
-  margin-right: 10rpx;
-}
-
-.legend-green {
-  background: var(--success-light);
-  border: 2rpx solid rgba(0, 185, 107, 0.45);
-}
-
-.legend-gray {
-  background: #F0F1F3;
-  border: 2rpx solid var(--border-color);
-}
-
-/* ===== 场地色块网格 ===== */
-.court-grid-scroll {
-  max-height: 46vh;
-}
-
-.court-grid {
   display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  font-size: 25rpx;
+  color: #86909c;
+  padding: 17rpx 0;
+  border-bottom: 1rpx solid #f0f1f3;
+}
+.summary-row:last-child {
+  border: 0;
+}
+.summary-row text:last-child {
+  color: #1d2129;
+  text-align: right;
+  max-width: 75%;
+  overflow-wrap: break-word;
+}
+.summary-row .summary-price {
+  color: #fa8c16;
+}
+.court-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   flex-wrap: wrap;
+  gap: 8rpx;
 }
-
-/* 单块场地：一行三列 */
+.legend {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+.legend text {
+  background: #f4f6f9;
+  color: #86909c;
+  font-size: 20rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 10rpx;
+}
+.legend .available-label {
+  background: #e6fffb;
+  color: #00b96b;
+}
+.court-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18rpx;
+}
 .court-cell {
-  position: relative;
-  width: calc((100% - 32rpx) / 3);
-  margin-right: 16rpx;
-  margin-bottom: 16rpx;
-  padding: 24rpx 0;
-  text-align: center;
-  border-radius: var(--radius-md);
+  width: 100%;
+  padding: 28rpx 8rpx;
+  margin: 0;
+  line-height: 1.4;
+  background: #e6fffb;
+  color: #087b58;
+  border: 2rpx solid rgba(0, 185, 107, 0.35);
+  border-radius: 26rpx;
   box-sizing: border-box;
-  transition: transform var(--dur-press) var(--ease-press),
-              background-color var(--dur-ui) var(--ease-enter),
-              border-color var(--dur-ui) var(--ease-enter),
-              box-shadow var(--dur-ui) var(--ease-enter);
+  transition:
+    transform 120ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease;
 }
-
-.court-cell.available:active {
-  transform: scale(0.95);
-}
-
-/* 每行第 3 个去掉右间距 */
-.court-cell:nth-child(3n) {
-  margin-right: 0;
-}
-
-/* 绿色 = 可预约 */
-.court-cell.available {
-  background: var(--success-light);
-  border: 2rpx solid rgba(0, 185, 107, 0.45);
-}
-
-/* 灰色 = 不可预约 */
 .court-cell.unavailable {
-  background: #F0F1F3;
-  border: 2rpx solid var(--border-color);
+  background: #f0f1f3;
+  border-color: #e5e6eb;
+  color: #86909c;
 }
-
-/* 选中态：主色描边 + 轻微上浮 + 光环 */
 .court-cell.selected {
-  background: var(--primary-light);
-  border-color: var(--primary-color);
-  box-shadow: 0 10rpx 28rpx rgba(22, 119, 255, 0.22);
-  animation: selection-pop 280ms var(--ease-enter) both, selection-ring 520ms var(--ease-enter) both;
-  transform: scale(1.03);
+  background: #e6f4ff;
+  border-color: #1677ff;
+  color: #1677ff;
+  animation:
+    selection-pop 420ms var(--ease-enter) both,
+    selection-ring 720ms var(--ease-enter) both;
 }
-
-.court-check {
-  animation: check-draw 360ms var(--ease-enter) both;
-}
-
 .court-no {
-  font-size: 30rpx;
+  font-size: 29rpx;
   font-weight: 700;
-  color: var(--text-main);
 }
-
-.court-cell.unavailable .court-no {
-  color: var(--text-placeholder);
-}
-
-.court-cell.selected .court-no {
-  color: var(--primary-color);
-}
-
 .court-status {
-  font-size: 22rpx;
-  color: var(--success-color);
+  font-size: 21rpx;
   margin-top: 8rpx;
 }
-
-.court-cell.unavailable .court-status {
-  color: var(--text-placeholder);
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+}
+.bottom-action-bar .btn-primary {
+  width: 100%;
+  margin: 0;
 }
 
-.court-cell.selected .court-status {
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-/* 选中标记：右上角 ✓ 角标 */
-.court-check {
-  position: absolute;
-  top: -12rpx;
-  right: -8rpx;
-  width: 40rpx;
-  height: 40rpx;
-  line-height: 40rpx;
-  text-align: center;
-  background: var(--primary-color);
-  color: #FFFFFF;
-  font-size: 24rpx;
-  border-radius: 50%;
-  box-shadow: var(--shadow-float);
-}
-
-/* ===== 弹层底部操作区 ===== */
-.sheet-footer {
-  margin-top: 24rpx;
-}
-
-.btn-next {
-  background: var(--primary-gradient);
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: 600;
-  border-radius: var(--radius-pill);
-  padding: 22rpx 0;
-  text-align: center;
-  border: none;
-  box-shadow: var(--shadow-float);
-}
-
-/* 未选场地时的置灰态 */
-.btn-next.disabled {
-  background: #C9CDD4;
-  box-shadow: none;
-}
-
-.btn-next:active {
-  opacity: 0.9;
-  transform: scale(0.98);
-}
-
-/* ===== 加载 / 空数据提示 ===== */
-.loading-box {
-  padding: 80rpx 0;
-  text-align: center;
-}
-
-.loading-text {
-  font-size: 26rpx;
-  color: var(--text-secondary);
+@media (prefers-reduced-motion: reduce) {
+  .court-cell {
+    animation: none !important;
+    transition: none;
+  }
 }

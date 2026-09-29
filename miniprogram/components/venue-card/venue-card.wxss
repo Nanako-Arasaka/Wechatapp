@@ -1,0 +1,110 @@
+:host {
+  display: block;
+}
+.venue-card {
+  display: flex;
+  gap: 22rpx;
+  padding: 26rpx;
+  margin-bottom: 22rpx;
+  background: #fff;
+  border-radius: 30rpx;
+  box-shadow: 0 6rpx 24rpx rgba(0, 0, 0, 0.04);
+  transition: transform 120ms ease;
+  box-sizing: border-box;
+}
+.pressed {
+  transform: scale(0.985);
+}
+.cover {
+  width: 174rpx;
+  height: 182rpx;
+  flex: none;
+  border-radius: 22rpx;
+  background: #e5e6eb;
+}
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.name {
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.address {
+  color: #86909c;
+  font-size: 22rpx;
+  line-height: 1.5;
+  margin-top: 5rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.facilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin: 12rpx 0;
+}
+.facility {
+  padding: 5rpx 12rpx;
+  background: #f4f6f9;
+  color: #4e5969;
+  font-size: 20rpx;
+  border-radius: 10rpx;
+}
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.price {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #ff4d4f;
+  white-space: nowrap;
+}
+.unit {
+  font-size: 20rpx;
+  font-weight: 400;
+  color: #86909c;
+}
+.book {
+  margin: 0;
+  padding: 0 22rpx;
+  line-height: 60rpx;
+  min-height: 60rpx;
+  font-size: 22rpx;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 999rpx;
+  background: #1677ff;
+  transition: transform 120ms ease;
+}
+.book::after {
+  border: 0;
+}
+.button-pressed {
+  transform: scale(0.95);
+}
+@media (max-width: 350px) {
+  .cover {
+    width: 140rpx;
+  }
+  .venue-card {
+    gap: 16rpx;
+    padding: 22rpx;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .venue-card,
+  .book {
+    transition: none;
+    transform: none;
+  }
+}

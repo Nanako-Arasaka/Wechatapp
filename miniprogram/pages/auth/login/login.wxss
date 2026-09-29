@@ -1,182 +1,92 @@
 .login-page {
   min-height: 100vh;
-  background: #F4F6F9;
-  display: flex;
-  flex-direction: column;
+  background: #f6f8fb;
 }
-
 .login-header {
-  background: linear-gradient(135deg, #1677FF 0%, #0958D9 100%);
-  padding: 60rpx 40rpx 80rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #FFFFFF;
+  padding: 90rpx 46rpx 68rpx;
+  border-radius: 0 0 54rpx 54rpx;
+  color: #fff;
+  background: linear-gradient(160deg, #1677ff 0%, #3b82f6 55%, #60a5fa 100%);
 }
-
-.logo-box {
-  width: 120rpx;
-  height: 120rpx;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 30rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.15);
-}
-
-.logo-emoji {
-  font-size: 60rpx;
-}
-
-.app-title {
-  font-size: 40rpx;
-  font-weight: 700;
-  letter-spacing: 2rpx;
-  margin-bottom: 8rpx;
-}
-
-.app-slogan {
-  font-size: 26rpx;
-  opacity: 0.9;
-  margin-bottom: 16rpx;
-}
-
 .badge-tag {
-  background: rgba(255, 255, 255, 0.25);
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 12rpx;
   font-size: 22rpx;
-  padding: 6rpx 20rpx;
-  border-radius: 30rpx;
-  font-weight: 500;
 }
-
-.login-card {
-  margin-top: -40rpx;
-  border-radius: 32rpx;
-  padding: 36rpx;
-  background: #FFFFFF;
-  box-shadow: 0 12rpx 36rpx rgba(0, 0, 0, 0.06);
-}
-
-.card-title {
-  font-size: 32rpx;
+.app-title {
+  font-size: 50rpx;
   font-weight: 700;
-  color: #1F2329;
-  margin-bottom: 8rpx;
+  margin: 24rpx 0 16rpx;
 }
-
-.card-subtitle {
+.app-slogan {
   font-size: 24rpx;
-  color: #86909C;
-  margin-bottom: 30rpx;
+  line-height: 1.7;
+  opacity: 0.92;
 }
-
+.login-card {
+  margin: 32rpx;
+  padding: 32rpx;
+  border-radius: 30rpx;
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-bottom: 26rpx;
+}
 .form-item {
   margin-bottom: 24rpx;
 }
-
-.f-label {
-  display: block;
-  font-size: 26rpx;
-  color: #4E5969;
-  margin-bottom: 10rpx;
-}
-
 .f-input {
-  height: 84rpx;
-  background: #F8F9FB;
-  border: 2rpx solid #EDEFF2;
-  border-radius: 16rpx;
-  padding: 0 24rpx;
-  font-size: 28rpx;
-  color: #1F2329;
+  width: 100%;
+  box-sizing: border-box;
+  height: 94rpx;
+  border-radius: 22rpx;
+  background: #f4f6f9;
+  padding: 0 30rpx;
+  font-size: 26rpx;
 }
-
-.btn-login {
-  background: #1677FF;
-  color: #FFFFFF;
-  font-size: 30rpx;
-  font-weight: 600;
-  border-radius: 40rpx;
-  padding: 24rpx 0;
-  margin-top: 16rpx;
-  border: none;
-  box-shadow: 0 6rpx 20rpx rgba(22, 119, 255, 0.25);
-}
-
-.btn-login:active {
-  opacity: 0.9;
-}
-
-.demo-hint {
-  display: flex;
-  flex-direction: column;
-  margin-top: 20rpx;
-  padding: 16rpx;
-  background: #F2F3F5;
-  border-radius: 12rpx;
-}
-
-.demo-hint text {
-  font-size: 22rpx;
-  color: #86909C;
-  line-height: 1.6;
-}
-
-.divider-row {
-  display: flex;
-  align-items: center;
-  margin: 32rpx 0 24rpx;
-}
-
-.divider-line {
-  flex: 1;
-  height: 2rpx;
-  background: #E5E6EB;
-}
-
-.divider-text {
-  font-size: 22rpx;
-  color: #86909C;
-  padding: 0 20rpx;
-}
-
+.btn-login,
 .btn-wechat {
-  background: #07C160;
-  color: #FFFFFF;
+  display: block;
+  width: 100%;
   font-size: 28rpx;
   font-weight: 600;
-  border-radius: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  padding: 20rpx 0;
-  border: none;
-  box-shadow: 0 6rpx 20rpx rgba(7, 193, 96, 0.25);
+  border-radius: 999rpx;
+  line-height: 1.4;
+  padding: 25rpx 20rpx;
+  transition: transform 120ms ease;
 }
-
+.btn-login {
+  display: block;
+  width: 100%;
+  background: #1677ff;
+  color: #fff;
+}
+.btn-wechat {
+  margin-top: 20rpx;
+  background: #fff;
+  color: #1677ff;
+  border: 2rpx solid #1677ff;
+}
+.btn-login[disabled],
+.btn-wechat[disabled] {
+  opacity: 0.5;
+}
+.btn-login:active,
 .btn-wechat:active {
-  opacity: 0.9;
+  transform: scale(0.97);
 }
-
-.wechat-hint-text {
-  text-align: center;
-  font-size: 22rpx;
-  color: #86909C;
-  margin-top: 16rpx;
+.login-hint {
+  font-size: 23rpx;
+  color: #86909c;
+  line-height: 1.6;
+  margin-top: 28rpx;
 }
-
-.wx-icon {
-  font-size: 32rpx;
-}
-
 .login-footer {
   text-align: center;
-  padding: 40rpx 20rpx;
   font-size: 22rpx;
-  color: #86909C;
-  margin-top: auto;
+  color: #86909c;
+  padding: 36rpx 0;
 }

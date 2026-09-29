@@ -1,3 +1,5 @@
+@import "./styles/preview-motion.wxss";
+
 /**
  * ============================================================================
  * 全局视觉与样式设计规范 (Design Tokens & Global Styles)
@@ -10,29 +12,29 @@
  * ============================================================================
  */
 page {
-  --primary-color: #1677FF;
-  --primary-gradient: linear-gradient(135deg, #1677FF 0%, #3B82F6 100%);
-  --primary-light: #E6F4FF;
+  --primary-color: #1677ff;
+  --primary-gradient: linear-gradient(135deg, #1677ff 0%, #3b82f6 100%);
+  --primary-light: #e6f4ff;
   --primary-glow: rgba(22, 119, 255, 0.28);
 
-  --success-color: #00B96B;
-  --success-light: #E6FFFB;
-  --warning-color: #FA8C16;
-  --warning-light: #FFF7E6;
-  --danger-color: #FF4D4F;
-  --danger-light: #FFF1F0;
-  
-  --text-main: #1D2129;
-  --text-regular: #4E5969;
-  --text-secondary: #86909C;
-  --text-placeholder: #C9CDD4;
-  
-  --bg-page: #F6F8FB;
-  --bg-white: #FFFFFF;
-  --bg-card: #FFFFFF;
-  --border-color: #E5E6EB;
-  --border-light: #F2F3F5;
-  
+  --success-color: #00b96b;
+  --success-light: #e6fffb;
+  --warning-color: #fa8c16;
+  --warning-light: #fff7e6;
+  --danger-color: #ff4d4f;
+  --danger-light: #fff1f0;
+
+  --text-main: #1d2129;
+  --text-regular: #4e5969;
+  --text-secondary: #86909c;
+  --text-placeholder: #c9cdd4;
+
+  --bg-page: #f6f8fb;
+  --bg-white: #ffffff;
+  --bg-card: #ffffff;
+  --border-color: #e5e6eb;
+  --border-light: #f2f3f5;
+
   --radius-xs: 8rpx;
   --radius-sm: 12rpx;
   --radius-md: 18rpx;
@@ -50,16 +52,19 @@ page {
   --dur-ui: 220ms;
   --dur-panel: 280ms;
   --dur-enter: 360ms;
-  
+
   --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 6rpx 24rpx rgba(0, 0, 0, 0.04), 0 1rpx 4rpx rgba(0, 0, 0, 0.02);
+  --shadow-card:
+    0 6rpx 24rpx rgba(0, 0, 0, 0.04), 0 1rpx 4rpx rgba(0, 0, 0, 0.02);
   --shadow-float: 0 12rpx 36rpx rgba(22, 119, 255, 0.2);
   --shadow-danger: 0 10rpx 30rpx rgba(255, 77, 79, 0.22);
   --shadow-success: 0 10rpx 30rpx rgba(0, 185, 107, 0.22);
 
   background-color: var(--bg-page);
   color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
   font-size: 28rpx;
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
@@ -93,6 +98,7 @@ page {
 
 .flex-1 {
   flex: 1;
+  min-width: 0;
 }
 
 /* 卡片基类 */
@@ -104,7 +110,9 @@ page {
   box-shadow: var(--shadow-card);
   box-sizing: border-box;
   border: 1rpx solid rgba(0, 0, 0, 0.02);
-  transition: transform var(--dur-press) var(--ease-press), box-shadow var(--dur-ui) var(--ease-enter);
+  transition:
+    transform var(--dur-press) var(--ease-press),
+    box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .card.pressed,
@@ -116,7 +124,7 @@ page {
 /* 按钮通用体系 */
 .btn-primary {
   background: var(--primary-gradient);
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 30rpx;
   font-weight: 600;
   border-radius: var(--radius-pill);
@@ -124,7 +132,10 @@ page {
   text-align: center;
   box-shadow: var(--shadow-float);
   border: none;
-  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease, box-shadow var(--dur-ui) var(--ease-enter);
+  transition:
+    transform var(--dur-press) var(--ease-press),
+    opacity var(--dur-hover) ease,
+    box-shadow var(--dur-ui) var(--ease-enter);
 }
 
 .btn-primary:active,
@@ -135,8 +146,8 @@ page {
 }
 
 .btn-primary.disabled {
-  background: #C9CDD4;
-  color: #FFFFFF;
+  background: #c9cdd4;
+  color: #ffffff;
   box-shadow: none;
   cursor: not-allowed;
   transform: none;
@@ -152,7 +163,11 @@ page {
   border-radius: var(--radius-pill);
   padding: 18rpx 32rpx;
   text-align: center;
-  transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease, transform var(--dur-press) var(--ease-press), border-color var(--dur-hover) ease;
+  transition:
+    background-color var(--dur-hover) ease,
+    color var(--dur-hover) ease,
+    transform var(--dur-press) var(--ease-press),
+    border-color var(--dur-hover) ease;
 }
 
 .btn-outline:active,
@@ -202,7 +217,7 @@ page {
 }
 
 .tag-gray {
-  background: #F2F3F5;
+  background: #f2f3f5;
   color: var(--text-secondary);
 }
 
@@ -210,13 +225,13 @@ page {
 .price-symbol {
   font-size: 24rpx;
   font-weight: 700;
-  color: #FF4D4F;
+  color: #ff4d4f;
 }
 
 .price-num {
   font-size: 40rpx;
   font-weight: 800;
-  color: #FF4D4F;
+  color: #ff4d4f;
   letter-spacing: -0.5rpx;
 }
 
@@ -228,12 +243,16 @@ page {
 
 /* 骨架屏动画 */
 @keyframes skeleton-shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 .skeleton-box {
-  background: linear-gradient(90deg, #F0F2F5 25%, #E6E8EB 37%, #F0F2F5 63%);
+  background: linear-gradient(90deg, #f0f2f5 25%, #e6e8eb 37%, #f0f2f5 63%);
   background-size: 400% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;
   border-radius: 12rpx;
@@ -277,67 +296,137 @@ page {
 }
 
 @keyframes content-rise {
-  from { opacity: 0; transform: translateY(18rpx); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes selection-pop {
-  0% { transform: scale(0.94); }
-  55% { transform: scale(1.045); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.94);
+  }
+  55% {
+    transform: scale(1.045);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes selection-ring {
-  0% { box-shadow: 0 0 0 0 rgba(22, 119, 255, 0.45); }
-  70% { box-shadow: 0 0 0 12rpx rgba(22, 119, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(22, 119, 255, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 12rpx rgba(22, 119, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(48rpx); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(48rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(28rpx); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(28rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes mask-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes sheet-rise {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes check-draw {
-  0% { transform: scale(0.4); opacity: 0; }
-  50% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes check-stroke {
-  0% { stroke-dashoffset: 48; opacity: 0; }
-  40% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 1; }
+  0% {
+    stroke-dashoffset: 48;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-soft {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.06); opacity: 0.86; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.86;
+  }
 }
 
 @keyframes shimmer-sweep {
-  0% { transform: translateX(-120%) skewX(-18deg); }
-  100% { transform: translateX(220%) skewX(-18deg); }
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-18deg);
+  }
 }
 
 .content-enter {
@@ -360,10 +449,18 @@ page {
   animation: selection-ring 480ms var(--ease-enter) both;
 }
 
-.delay-short { animation-delay: 70ms; }
-.delay-medium { animation-delay: 140ms; }
-.delay-long { animation-delay: 210ms; }
-.delay-xlong { animation-delay: 280ms; }
+.delay-short {
+  animation-delay: 70ms;
+}
+.delay-medium {
+  animation-delay: 140ms;
+}
+.delay-long {
+  animation-delay: 210ms;
+}
+.delay-xlong {
+  animation-delay: 280ms;
+}
 
 /* 按压反馈：配合 hover-class="hover-press" */
 .hover-press {
@@ -421,7 +518,9 @@ page {
   .btn-primary,
   .btn-outline,
   .card {
-    transition: opacity 100ms linear, background-color 100ms linear;
+    transition:
+      opacity 100ms linear,
+      background-color 100ms linear;
   }
 }
 
@@ -442,13 +541,13 @@ page {
 .empty-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1F2329;
+  color: #1f2329;
   margin-bottom: 12rpx;
 }
 
 .empty-desc {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
   text-align: center;
   line-height: 1.6;
 }
@@ -458,12 +557,14 @@ page {
   padding: 18rpx 64rpx;
   min-height: 44rpx;
   line-height: 44rpx;
-  background: #1677FF;
-  color: #FFFFFF;
+  background: #1677ff;
+  color: #ffffff;
   font-size: 28rpx;
   font-weight: 600;
   border-radius: 999rpx;
-  transition: transform var(--dur-press) var(--ease-press), opacity var(--dur-hover) ease;
+  transition:
+    transform var(--dur-press) var(--ease-press),
+    opacity var(--dur-hover) ease;
 }
 
 .btn-retry:active,
@@ -477,7 +578,7 @@ page {
   width: 14rpx;
   height: 14rpx;
   border-radius: 50%;
-  background: #FF4D4F;
+  background: #ff4d4f;
   margin-left: 10rpx;
 }
 
@@ -492,4 +593,17 @@ page {
   margin-top: 24rpx;
   max-width: 400rpx;
   font-size: 28rpx;
+}
+
+button::after {
+  border: 0;
+}
+.btn-primary,
+.btn-outline {
+  line-height: 1.4;
+}
+.btn-primary[disabled] {
+  background: #c9cdd4;
+  color: #fff;
+  box-shadow: none;
 }

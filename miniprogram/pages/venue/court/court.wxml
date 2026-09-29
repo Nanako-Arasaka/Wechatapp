@@ -1,94 +1,21 @@
-<view class="court-page">
-  <!-- 顶部：已选时段摘要（P2 透传信息） -->
-  <view class="summary-area">
-    <view class="summary-card card content-enter">
-      <view class="summary-title">已选时段</view>
-      <view class="summary-row flex-between">
-        <text class="summary-label">场馆</text>
-        <text class="summary-value">{{venueName}}</text>
-      </view>
-      <view class="summary-row flex-between">
-        <text class="summary-label">日期</text>
-        <text class="summary-value">{{date}}</text>
-      </view>
-      <view class="summary-row flex-between">
-        <text class="summary-label">时间段</text>
-        <text class="summary-value">{{timeRange}}</text>
-      </view>
-      <view class="summary-row flex-between">
-        <text class="summary-label">单价</text>
-        <text class="summary-value summary-price">{{priceText}}</text>
-      </view>
-      <view class="summary-row flex-between" wx:if="{{selectedCourtNo}}">
-        <text class="summary-label">已选场地</text>
-        <text class="summary-value summary-court">{{selectedCourtNo}}号场</text>
-      </view>
+<view class="court-page container">
+  <view class="summary-card card motion-panel">
+    <view class="summary-title">已选时段</view>
+    <view class="summary-row"><text>场馆</text><text>{{venueName}}</text></view>
+    <view class="summary-row"><text>日期</text><text>{{date}}</text></view>
+    <view class="summary-row"><text>时间段</text><text>{{timeRange}}</text></view>
+    <view class="summary-row"><text>单价</text><text class="summary-price">{{priceText}}</text></view>
+  </view>
+  <view wx:if="{{loading}}" class="card skeleton-card"><view class="skeleton-box skeleton-line" style="width:48%"></view><view class="skeleton-grid"><view class="skeleton-box skeleton-tile" wx:for="{{6}}" wx:key="*this"></view></view></view>
+  <view wx:elif="{{loadError}}" class="empty-state"><view class="empty-title">场地状态加载失败</view><button class="btn-retry" bindtap="onRetry">点击重试</button></view>
+  <view wx:elif="{{!courts.length}}" class="empty-state"><view class="empty-title">暂无可选场地</view><view class="empty-desc">{{unavailableReason || '请刷新后再试'}}</view><button class="btn-retry" bindtap="onRetry">重新加载</button></view>
+  <view wx:else class="card motion-panel delay-short">
+    <view class="court-heading"><view class="summary-title">请选择场地</view><view class="legend"><text class="available-label">✓ 可预约</text><text>满 / 占用</text></view></view>
+    <view class="court-grid">
+      <button class="court-cell {{item.available ? 'available' : 'unavailable'}} {{item.selected ? 'selected' : ''}}" wx:for="{{courts}}" wx:key="no" bindtap="onSelectCourt" data-no="{{item.no}}" aria-label="{{item.no}}号场 {{item.available ? '可预约' : '已占用'}}">
+        <view class="court-no">{{item.no}}号场</view><view class="court-status">{{item.selected ? '✓ 已选' : item.available ? '✓ 可预约' : '× 已占用'}}</view>
+      </button>
     </view>
   </view>
-
-  <!-- 加载骨架屏 -->
-  <view wx:if="{{loading}}" class="card skeleton-card">
-    <view class="skeleton-box skeleton-line" style="width: 48%;"></view>
-    <view class="skeleton-box skeleton-line" style="width: 78%;"></view>
-    <view class="skeleton-grid"><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view></view>
-  </view>
-
-  <!-- 加载失败：错误占位 + 重试 -->
-  <view wx:if="{{!loading && loadError}}" class="empty-state">
-    <text class="empty-icon">📡</text>
-    <text class="empty-title">场地状态加载失败</text>
-    <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
-    <view class="btn-retry" bindtap="onRetry">点击重试</view>
-  </view>
-
-  <view wx:if="{{!loading && !loadError && courts.length === 0}}" class="empty-state">
-    <text class="empty-title">暂无可选场地</text>
-    <text class="empty-desc">{{unavailableReason || '场地状态可能已变化，请刷新后再试'}}</text>
-    <view class="btn-retry" bindtap="onRetry">重新加载</view>
-  </view>
-
-  <!-- 底部弹窗弹层：展示场地列表 -->
-  <view class="sheet-mask {{sheetVisible && !loadError && courts.length > 0 ? 'show' : ''}}"></view>
-  <view class="court-sheet {{sheetVisible && !loadError && courts.length > 0 ? 'show' : ''}}">
-    <!-- 弹层顶部把手 -->
-    <view class="sheet-handle"></view>
-    <view class="sheet-header flex-between">
-      <text class="sheet-title">请选择场地（{{timeRange}}）</text>
-    </view>
-
-    <!-- 色块图例说明：绿色=可预约，灰色=不可预约 -->
-    <view class="legend-bar flex-row">
-      <view class="legend-item flex-row">
-        <view class="legend-box legend-green"></view>
-        <text>可预约</text>
-      </view>
-      <view class="legend-item flex-row">
-        <view class="legend-box legend-gray"></view>
-        <text>不可预约</text>
-      </view>
-    </view>
-
-    <!-- 场地色块网格 -->
-    <scroll-view class="court-grid-scroll" scroll-y>
-      <view class="court-grid" wx:if="{{courts.length > 0}}">
-        <view
-          class="court-cell {{item.available ? 'available' : 'unavailable'}} {{item.selected ? 'selected' : ''}}"
-          wx:for="{{courts}}"
-          wx:key="no"
-          bindtap="onSelectCourt"
-          data-no="{{item.no}}"
-        >
-          <!-- 选中标记角标 -->
-          <view class="court-check" wx:if="{{item.selected}}">✓</view>
-          <view class="court-no">{{item.no}}号场</view>
-          <view class="court-status">{{item.available ? '✓ 可预约' : '× 已占用'}}</view>
-        </view>
-      </view>
-    </scroll-view>
-
-    <!-- 弹层底部操作区：【下一步】跳转 P4 -->
-    <view class="sheet-footer">
-      <button class="btn-next {{selectedCourtNo ? '' : 'disabled'}}" disabled="{{navigating || !selectedCourtNo}}" bindtap="goToFillInfo">{{navigating ? '跳转中...' : '下一步'}}</button>
-    </view>
-  </view>
+  <view class="bottom-action-bar"><button class="btn-primary" disabled="{{navigating || loading || loadError || !selectedCourtNo}}" bindtap="goToFillInfo">下一步 · 填写信息</button></view>
 </view>

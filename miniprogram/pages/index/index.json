@@ -1,5 +1,5 @@
 {
   "navigationBarTitleText": "智场通 SmartVenue",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": { "venue-card": "/components/venue-card/venue-card" }
 }

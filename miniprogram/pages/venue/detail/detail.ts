@@ -1,6 +1,7 @@
-import { VenueService } from '../../../services/venue.service';
-import { Venue } from '../../../types';
-import { getVenueTypeName } from '../../../utils/format';
+import { VenueService } from "../../../services/venue.service";
+import { Venue } from "../../../types";
+import { getVenueTypeName } from "../../../utils/format";
+import { venueImage } from "../../../utils/venue-image";
 
 /**
  * ============================================================================
@@ -19,18 +20,19 @@ Page({
   data: {
     // 顶部切换选项卡配置（羽毛球馆 / 网球馆）
     tabs: [] as Array<{ key: string; label: string }>,
-    activeTab: 'BADMINTON', // 当前选中的选项卡类型
+    activeTab: "BADMINTON", // 当前选中的选项卡类型
     venues: [] as Venue[], // GET /venues 返回的全部场馆
     venue: {} as Venue, // 当前展示的场馆
     // 馆内平面示意图：根据场馆容量生成场地格（1号场、2号场...）
     courtBlocks: [] as Array<{ no: number }>,
     loading: true,
     loadError: false, // 加载失败标记（错误占位 + 重试）
-    presetId: '',
+    presetId: "",
+    coverImage: "",
   },
 
   onLoad(options: any) {
-    this.setData({ presetId: options?.id || '' });
+    this.setData({ presetId: options?.id || "" });
     // 兼容外部 ?id= 直达：携带 id 时优先展示该场馆
     if (options && options.id) {
       this.loadVenues(options.id);
@@ -49,13 +51,16 @@ Page({
       this.setData({ loading: true, loadError: false });
       // 调用已有接口 GET /venues 获取场馆基础信息
       const venues = await VenueService.getVenues();
-      const activeList = venues.filter((v) => v.status !== 'INACTIVE');
-      const tabs = activeList.reduce((items: Array<{ key: string; label: string }>, item) => {
-        if (!items.some((tab) => tab.key === item.type)) {
-          items.push({ key: item.type, label: getVenueTypeName(item.type) });
-        }
-        return items;
-      }, []);
+      const activeList = venues.filter((v) => v.status !== "INACTIVE");
+      const tabs = activeList.reduce(
+        (items: Array<{ key: string; label: string }>, item) => {
+          if (!items.some((tab) => tab.key === item.type)) {
+            items.push({ key: item.type, label: getVenueTypeName(item.type) });
+          }
+          return items;
+        },
+        [],
+      );
 
       let venue: Venue | undefined;
       let activeTab = this.data.activeTab;
@@ -77,13 +82,22 @@ Page({
         this.applyVenue(venue, activeTab);
       }
 
-      this.setData({ venues: activeList, tabs, activeTab: venue?.type || activeTab, venue: venue || {} as Venue });
+      this.setData({
+        venues: activeList,
+        tabs,
+        activeTab: venue?.type || activeTab,
+        venue: venue || ({} as Venue),
+      });
     } catch (err) {
-      console.error('加载场馆列表失败:', err);
+      console.error("加载场馆列表失败:", err);
       this.setData({ loadError: true, venue: {} as Venue, courtBlocks: [] });
     } finally {
       this.setData({ loading: false });
     }
+  },
+
+  onImageError() {
+    this.setData({ coverImage: "/assets/ui/venue.svg" });
   },
 
   onRetry() {
@@ -91,7 +105,9 @@ Page({
   },
 
   onPullDownRefresh() {
-    this.loadVenues(this.data.venue.id || this.data.presetId || undefined).finally(() => {
+    this.loadVenues(
+      this.data.venue.id || this.data.presetId || undefined,
+    ).finally(() => {
       wx.stopPullDownRefresh();
     });
   },
@@ -106,7 +122,13 @@ Page({
       courtBlocks.push({ no: i });
     }
 
-    this.setData({ venue, courtBlocks, activeTab, presetId: venue.id });
+    this.setData({
+      venue,
+      coverImage: venueImage(venue.coverImage),
+      courtBlocks,
+      activeTab,
+      presetId: venue.id,
+    });
 
     // 同步导航栏标题为馆名
     wx.setNavigationBarTitle({ title: venue.name });
@@ -126,7 +148,7 @@ Page({
     if (venue) {
       this.applyVenue(venue, key);
     } else {
-      wx.showToast({ title: '暂无该类型场馆', icon: 'none' });
+      wx.showToast({ title: "暂无该类型场馆", icon: "none" });
     }
   },
 
@@ -135,11 +157,11 @@ Page({
    */
   goToBooking() {
     if (!this.data.venue.id) {
-      wx.showToast({ title: '场馆信息加载中，请稍候', icon: 'none' });
+      wx.showToast({ title: "场馆信息加载中，请稍候", icon: "none" });
       return;
     }
     wx.navigateTo({
-      url: `/pages/venue/booking/booking?id=${this.data.venue.id}`,
+      url: `/pages/venue/date/date?id=${encodeURIComponent(this.data.venue.id)}`,
     });
   },
 });

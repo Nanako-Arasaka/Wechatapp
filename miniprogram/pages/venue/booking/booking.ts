@@ -1,14 +1,16 @@
-import { VenueService } from '../../../services/venue.service';
-import { Venue, VenueSlot } from '../../../types';
-import { formatDate, getWeekdayName, formatMoney } from '../../../utils/format';
+import { VenueService } from "../../../services/venue.service";
+import { Venue, VenueSlot } from "../../../types";
+import { formatDate, getWeekdayName, formatMoney } from "../../../utils/format";
+import { isBookingDate, bookingDates } from "../../../utils/booking-calendar";
+import { venueImage } from "../../../utils/venue-image";
 
 /**
  * ============================================================================
  * P2 选择时间页 (BookingPage)
  * ----------------------------------------------------------------------------
- * 用户目标：选择 1 小时预约时段，仅支持当天预约。
+ * 用户目标：选择指定日期的预约时段。
  * 核心交互逻辑：
- * 1. 仅当天：进入页面自动加载今日（GET /venues/:id/availability?date=今天）时段。
+ * 1. 接收日历选中的日期；首页快速预约默认使用当天。
  * 2. 小时格子时间选择组件：
  *    灰色色块 = 不可预约时段（已过时段/闭馆/已满），可选时段支持点击选中。
  * 3. 选中时段后展示摘要信息（场馆、日期、时间段、单价）。
@@ -17,28 +19,36 @@ import { formatDate, getWeekdayName, formatMoney } from '../../../utils/format';
  */
 Page({
   data: {
-    id: '', // 场馆 ID
+    id: "", // 场馆 ID
     venue: {} as Venue, // 场馆信息
-    today: '', // 今日日期 YYYY-MM-DD
-    todayText: '', // 今日展示文本，如「2026-09-24 周四」
-    slots: [] as VenueSlot[], // 今日全部小时时段
-    selectedSlotId: '', // 当前选中的时段 ID
+    coverImage: "",
+    today: "", // 当前预约日期 YYYY-MM-DD，沿用已有传参字段
+    todayText: "",
+    slots: [] as VenueSlot[],
+    selectedSlotId: "", // 当前选中的时段 ID
     selectedSlot: null as VenueSlot | null, // 当前选中的时段对象
-    selectedPriceText: '', // 选中时段单价展示文本
+    selectedPriceText: "", // 选中时段单价展示文本
     summaryEnter: false, // 已选时段摘要：仅首次出现播放入场
-    summaryTimeFlip: false, // 换时间时仅时间段数值微动
     isClosed: false, // 场馆今日是否闭馆
-    closedReason: '', // 闭馆原因
+    closedReason: "", // 闭馆原因
     loading: true,
     loadError: false, // 加载失败标记（展示错误占位与重试）
     navigating: false, // 下一步跳转防连点
   },
+  _loadId: 0,
+  _unloaded: false,
+  _summaryTimer: null as ReturnType<typeof setTimeout> | null,
 
   onLoad(options: any) {
     if (options && options.id) {
       this.setData({ id: options.id });
-      // 初始化今日日期展示
-      const today = formatDate(new Date(), 'YYYY-MM-DD');
+      const today = options.date || formatDate(new Date(), "YYYY-MM-DD");
+      this.setData({ today });
+      if (!isBookingDate(today)) {
+        this.setData({ loading: false, loadError: true });
+        wx.showToast({ title: "请选择今天或未来 7 天的日期", icon: "none" });
+        return;
+      }
       this.setData({
         today,
         todayText: `${today} ${getWeekdayName(today)}`,
@@ -49,55 +59,90 @@ Page({
     }
   },
 
+  onUnload() {
+    this._unloaded = true;
+    this._loadId++;
+    if (this._summaryTimer) clearTimeout(this._summaryTimer);
+  },
+
+  changeDate() {
+    const previous = getCurrentPages().slice(-2)[0];
+    if (previous?.route === "pages/venue/date/date") wx.navigateBack();
+    else
+      wx.redirectTo({
+        url: `/pages/venue/date/date?id=${encodeURIComponent(this.data.id)}`,
+      });
+  },
+
+  onImageError() {
+    this.setData({ coverImage: "/assets/ui/venue.svg" });
+  },
+
   /**
-   * 加载场馆详情 + 今日时段余量
+   * 加载场馆详情 + 所选日期时段余量
    * @param venueId 场馆 ID
    * @param preselectSlotId 外部携带的预选时段 ID（可选，首页快速预约直达场景）
    */
   async loadVenueAndTodaySlots(venueId: string, preselectSlotId?: string) {
+    const loadId = ++this._loadId;
     try {
-      const today = formatDate(new Date(), 'YYYY-MM-DD');
-      this.setData({ loading: true, loadError: false, selectedSlotId: '', selectedSlot: null, selectedPriceText: '' });
-      // 并行请求：场馆详情 + 今日时段可用状态（GET /venues/:id/availability）
+      const today = this.data.today || formatDate(new Date(), "YYYY-MM-DD");
+      if (!isBookingDate(today)) throw new Error("预约日期已过期");
+      this.setData({
+        loading: true,
+        loadError: false,
+        selectedSlotId: "",
+        selectedSlot: null,
+        selectedPriceText: "",
+      });
+      // 并行请求场馆详情与所选日期的余量。
       const [venue, avail] = await Promise.all([
         VenueService.getVenueDetail(venueId),
         VenueService.getAvailability(venueId, today),
       ]);
 
-      // 已过时段：与约满同样置灰、不可点
-      const nowH = new Date().getHours();
-      const slots = (avail.slots || []).map((s: any) => {
-        const hour = Number(String(s.startTime || s.timeRange || '').slice(0, 2));
-        if (!Number.isNaN(hour) && hour < nowH && s.isSelectable !== false) {
-          return { ...s, isSelectable: false, status: 'PAST', statusText: '已过', statusColor: 'gray' };
-        }
-        return s;
-      });
+      if (loadId !== this._loadId || this._unloaded) return;
+      if (!bookingDates(new Date(), venue.advanceDays).includes(today)) {
+        throw new Error("超出该场馆可提前预约的日期范围");
+      }
+      // 可选状态以服务端为准，未来日期不能按今天的钟点置灰。
+      const slots = avail.slots || [];
 
       this.setData({
         venue,
+        coverImage: venueImage(venue.coverImage),
         today,
         todayText: `${today} ${getWeekdayName(today)}`,
         slots,
         isClosed: avail.isClosed,
-        closedReason: avail.closedReason || '',
-        selectedSlotId: '',
+        closedReason: avail.closedReason || "",
+        selectedSlotId: "",
         selectedSlot: null,
-        selectedPriceText: '',
+        selectedPriceText: "",
       });
 
       // 支持外部携带 preselectSlotId 直达选中（该时段须仍可选）
       if (preselectSlotId && !avail.isClosed) {
-        const found = slots.find((s) => s.id === preselectSlotId && s.isSelectable);
+        const found = slots.find(
+          (s) => s.id === preselectSlotId && s.isSelectable,
+        );
         if (found) {
           this.applySelectedSlot(found);
         }
       }
     } catch (err) {
-      console.error('加载场馆与今日时段失败:', err);
-      this.setData({ loadError: true, slots: [], selectedSlotId: '', selectedSlot: null, selectedPriceText: '' });
+      if (loadId !== this._loadId || this._unloaded) return;
+      console.error("加载场馆与预约时段失败:", err);
+      this.setData({
+        loadError: true,
+        slots: [],
+        selectedSlotId: "",
+        selectedSlot: null,
+        selectedPriceText: "",
+      });
     } finally {
-      this.setData({ loading: false });
+      if (loadId === this._loadId && !this._unloaded)
+        this.setData({ loading: false });
     }
   },
 
@@ -106,7 +151,10 @@ Page({
       wx.stopPullDownRefresh();
       return;
     }
-    this.loadVenueAndTodaySlots(this.data.id, this.data.selectedSlotId || undefined).finally(() => {
+    this.loadVenueAndTodaySlots(
+      this.data.id,
+      this.data.selectedSlotId || undefined,
+    ).finally(() => {
       wx.stopPullDownRefresh();
     });
   },
@@ -126,7 +174,10 @@ Page({
     if (this.data.loading || this.data.loadError || !slot) return;
     if (!slot.isSelectable) {
       // 灰色不可预约时段：轻提示拦截
-      wx.showToast({ title: `该时段不可预约（${slot.statusText}）`, icon: 'none' });
+      wx.showToast({
+        title: `该时段不可预约（${slot.statusText}）`,
+        icon: "none",
+      });
       return;
     }
     this.applySelectedSlot(slot);
@@ -138,22 +189,16 @@ Page({
    * 换时间只让时间段数值微动，避免整卡跳跃。
    */
   applySelectedSlot(slot: VenueSlot) {
+    if (this._summaryTimer) clearTimeout(this._summaryTimer);
     const hadSlot = !!this.data.selectedSlot;
-    const changed = this.data.selectedSlotId !== slot.id;
     this.setData({
       selectedSlotId: slot.id,
       selectedSlot: slot,
       selectedPriceText: formatMoney(slot.price),
       summaryEnter: !hadSlot,
-      summaryTimeFlip: hadSlot && changed,
     });
-    if (hadSlot && changed) {
-      // 关闭 val-flip，便于下次换时间重新触发
-      setTimeout(() => {
-        this.setData({ summaryTimeFlip: false, summaryEnter: false });
-      }, 240);
-    } else if (!hadSlot) {
-      setTimeout(() => {
+    if (!hadSlot) {
+      this._summaryTimer = setTimeout(() => {
         this.setData({ summaryEnter: false });
       }, 240);
     }
@@ -163,9 +208,10 @@ Page({
    * 点击【下一步】：携带预约基础信息跳转 P3 可选场地页
    */
   goToCourtSelect() {
-    if (this.data.navigating || this.data.loading || this.data.loadError) return;
+    if (this.data.navigating || this.data.loading || this.data.loadError)
+      return;
     if (!this.data.selectedSlot) {
-      wx.showToast({ title: '请先选择预约时段', icon: 'none' });
+      wx.showToast({ title: "请先选择预约时段", icon: "none" });
       return;
     }
 
@@ -173,13 +219,13 @@ Page({
     const { id, venue, today, selectedSlot } = this.data;
     const params = [
       `venueId=${encodeURIComponent(id)}`,
-      `venueName=${encodeURIComponent(venue.name || '')}`,
-      `venueAddress=${encodeURIComponent(venue.address || '')}`,
+      `venueName=${encodeURIComponent(venue.name || "")}`,
+      `venueAddress=${encodeURIComponent(venue.address || "")}`,
       `slotId=${encodeURIComponent(selectedSlot.id)}`,
       `date=${encodeURIComponent(today)}`,
       `timeRange=${encodeURIComponent(selectedSlot.timeRange)}`,
       `price=${selectedSlot.price}`,
-    ].join('&');
+    ].join("&");
 
     wx.navigateTo({
       url: `/pages/venue/court/court?${params}`,

@@ -1,5 +1,5 @@
 .success-page {
-  background: #F4F6F9;
+  background: #f6f8fb;
   padding: 40rpx 24rpx;
 }
 
@@ -14,7 +14,7 @@
 .success-icon-box {
   width: 120rpx;
   height: 120rpx;
-  background: #00B96B;
+  background: #00b96b;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -26,7 +26,7 @@
 }
 
 .success-icon-box::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -12rpx;
   border-radius: 50%;
@@ -35,7 +35,7 @@
 }
 
 .success-check {
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 64rpx;
   font-weight: 900;
   animation: check-stroke 480ms var(--ease-enter) 120ms both;
@@ -44,19 +44,21 @@
 .success-title {
   font-size: 38rpx;
   font-weight: 700;
-  color: #1F2329;
+  color: #1f2329;
   margin-bottom: 8rpx;
   animation: content-rise 420ms var(--ease-enter) 80ms both;
 }
 
 .success-sub {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
   animation: content-rise 420ms var(--ease-enter) 140ms both;
 }
 
 /* 票券卡片 */
 .ticket-card {
+  margin-left: 8rpx;
+  margin-right: 8rpx;
   padding: 32rpx;
   border-radius: 28rpx;
   position: relative;
@@ -66,7 +68,7 @@
 .ticket-type {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1F2329;
+  color: #1f2329;
 }
 
 .qrcode-wrapper {
@@ -76,7 +78,7 @@
 .qrcode-canvas {
   width: 320rpx;
   height: 320rpx;
-  background: #FFFFFF;
+  background: #ffffff;
 }
 
 .code-number-box {
@@ -86,13 +88,13 @@
 
 .code-label {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
 }
 
 .code-val {
   font-size: 32rpx;
   font-weight: 700;
-  color: #1677FF;
+  color: #1677ff;
   letter-spacing: 0;
 }
 
@@ -106,7 +108,7 @@
 .half-circle {
   width: 24rpx;
   height: 48rpx;
-  background: #F4F6F9;
+  background: #f4f6f9;
 }
 
 .half-circle.left {
@@ -120,7 +122,7 @@
 .dash-line {
   flex: 1;
   height: 2rpx;
-  border-bottom: 2rpx dashed #E5E6EB;
+  border-bottom: 2rpx dashed #e5e6eb;
 }
 
 .ticket-details {
@@ -133,12 +135,12 @@
 }
 
 .d-label {
-  color: #86909C;
+  color: #86909c;
   flex-shrink: 0;
 }
 
 .d-val {
-  color: #1F2329;
+  color: #1f2329;
   font-weight: 500;
   max-width: 70%;
   text-align: right;
@@ -146,7 +148,7 @@
 }
 
 .text-price {
-  color: #FF4D4F;
+  color: #ff4d4f;
   font-weight: 700;
   font-size: 30rpx;
 }
@@ -159,9 +161,9 @@
 }
 
 .btn-outline-home {
-  background: #FFFFFF;
-  color: #4E5969;
-  border: 2rpx solid #E5E6EB;
+  background: #ffffff;
+  color: #4e5969;
+  border: 2rpx solid #e5e6eb;
   font-size: 28rpx;
   font-weight: 600;
   border-radius: 16rpx;
@@ -172,6 +174,8 @@
 
 /* 联系信息卡（入场核验） */
 .contact-card {
+  margin-left: 8rpx;
+  margin-right: 8rpx;
   padding: 28rpx 30rpx;
   margin-top: 24rpx;
 }
@@ -179,14 +183,14 @@
 .contact-title {
   font-size: 28rpx;
   font-weight: 700;
-  color: #1F2329;
+  color: #1f2329;
   margin-bottom: 16rpx;
 }
 
 .contact-card .info-row {
   font-size: 26rpx;
   padding: 14rpx 0;
-  border-bottom: 1rpx solid #F2F3F5;
+  border-bottom: 1rpx solid #f2f3f5;
 }
 
 .contact-card .info-row-last {
@@ -194,12 +198,12 @@
 }
 
 .contact-card .info-label {
-  color: #86909C;
+  color: #86909c;
   flex-shrink: 0;
 }
 
 .contact-card .info-value {
-  color: #1F2329;
+  color: #1f2329;
   font-weight: 500;
   text-align: right;
   max-width: 480rpx;

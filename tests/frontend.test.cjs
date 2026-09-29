@@ -23,12 +23,14 @@ function load(relative, stubs = {}, wxOverrides = {}, globals = {}) {
   const nativeRequire = createRequire(filename);
   const module = { exports: {} };
   let page;
+  let component;
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), {
     module,
     exports: module.exports,
     require: (name) => name in stubs ? stubs[name] : nativeRequire(name),
     wx,
     Page: (options) => { page = options; },
+    Component: (options) => { component = options; },
     getApp: () => ({ globalData: {} }),
     console: quiet,
     setTimeout,
@@ -49,7 +51,7 @@ function load(relative, stubs = {}, wxOverrides = {}, globals = {}) {
       callback?.();
     };
   }
-  return { page, exports: module.exports, calls };
+  return { page, component, exports: module.exports, calls };
 }
 
 const orderStubs = (service) => ({ '../../../services/order.service': { OrderService: service } });
@@ -416,4 +418,229 @@ test('二维码绘制可还原实际核销码', { skip: !process.env.QR_DECODER 
   }) }).exports;
   QRCodeGenerator.draw('canvas', 'SV202609280123', width, width);
   assert.equal(decode(pixels, width, width).data, 'SV202609280123');
+});
+
+const calendar = require('../miniprogram/utils/booking-calendar');
+const venueStubs = (service) => ({ '../../../services/venue.service': { VenueService: service } });
+const sampleVenue = { id: 'venue-1', name: '体育馆', address: '北区', basePrice: 3500, facilities: [], capacity: 4 };
+function availability(date, overrides = {}) {
+  return { date, isClosed: false, slots: [{
+    id: `slot-${date}`, venueId: 'venue-1', date, startTime: '09:00', endTime: '10:00',
+    timeRange: '09:00-10:00', price: 3500, isSelectable: true, remaining: 3,
+    totalCapacity: 4, bookedCapacity: 1, statusText: '余量充足', statusColor: 'green',
+  }], ...overrides };
+}
+const tapData = (dataset) => ({ currentTarget: { dataset }, detail: {} });
+const routeOptions = (url) => Object.fromEntries(new URL(url, 'https://test.local').searchParams);
+
+test('日历跨月跨年覆盖今天和未来七天，完整对齐周一到周日', () => {
+  for (const now of [new Date(2026, 11, 27, 18), new Date(2026, 8, 29, 18)]) {
+    const dates = calendar.bookingDates(now);
+    assert.equal(dates.length, 8);
+    const cells = calendar.calendarCells(dates.map((date) => calendar.summarizeDay(date, availability(date), now)), now);
+    assert.equal(cells.length, 14);
+    assert.equal(new Date(`${cells[0].date}T12:00:00`).getDay(), 1);
+    assert.deepEqual(cells.filter((cell) => !cell.empty).map((cell) => cell.date), dates);
+  }
+  assert.equal(calendar.bookingDates(new Date(2026, 11, 27)).at(-1), '2027-01-03');
+  assert.equal(calendar.isBookingDate('2026-02-30'), false);
+});
+
+test('日历仅汇总可预约余量，闭馆、零余量、请求失败不可选择', () => {
+  const date = calendar.bookingDates()[0];
+  const full = availability(date, { slots: [{ isSelectable: false, remaining: 20 }, { isSelectable: true, remaining: 0 }] });
+  assert.equal(calendar.summarizeDay(date, full).totalRemaining, 0);
+  assert.equal(calendar.summarizeDay(date, full).disabled, true);
+  assert.equal(calendar.summarizeDay(date, availability(date, { isClosed: true })).disabled, true);
+  const failed = calendar.summarizeDay(date);
+  assert.equal(failed.error, true);
+  assert.equal(failed.isClosed, false);
+  assert.equal(failed.disabled, true);
+});
+
+test('部分日期请求失败保留其他可选日，刷新约满后清除旧选择', async () => {
+  const dates = calendar.bookingDates();
+  let full = false;
+  const { page } = load('pages/venue/date/date.js', venueStubs({
+    getVenueDetail: async () => sampleVenue,
+    getAvailability: async (_id, date) => {
+      if (date === dates[2]) throw Error('offline');
+      return availability(date, full ? { slots: [] } : {});
+    },
+  }));
+  page.setData({ id: sampleVenue.id });
+  await page.loadDays();
+  assert.equal(page.data.loadError, false);
+  assert.equal(page.data.hasDayErrors, true);
+  page.onSelectDate(tapData({ date: dates[2] }));
+  assert.equal(page.data.selectedDate, '');
+  page.onSelectDate(tapData({ date: dates[1] }));
+  assert.equal(page.data.selectedDate, dates[1]);
+  full = true;
+  await page.loadDays();
+  assert.equal(page.data.selectedDate, '');
+  assert.equal(page.data.cells.filter((cell) => !cell.empty).every((cell) => cell.disabled), true);
+});
+
+test('离开日期页后旧请求不能再更新页面', async () => {
+  let resolveVenue;
+  const { page } = load('pages/venue/date/date.js', venueStubs({
+    getVenueDetail: () => new Promise((resolve) => { resolveVenue = resolve; }),
+    getAvailability: async (_id, date) => availability(date),
+  }));
+  page.setData({ id: sampleVenue.id });
+  const pending = page.loadDays();
+  page.onUnload();
+  const snapshot = JSON.stringify(page.data);
+  resolveVenue(sampleVenue);
+  await pending;
+  assert.equal(JSON.stringify(page.data), snapshot);
+});
+
+test('未来日期从日历一路传到选场、联系方式和确认下单，保留真实 slotId', async () => {
+  const date = calendar.bookingDates()[1];
+  const service = {
+    getVenueDetail: async () => sampleVenue,
+    getAvailability: async (_id, requestedDate) => availability(requestedDate),
+    getSlotCourts: async () => ({ totalCapacity: 4, occupied: [2] }),
+  };
+  const day = load('pages/venue/date/date.js', venueStubs(service));
+  day.page.setData({ id: sampleVenue.id });
+  await day.page.loadDays();
+  day.page.onSelectDate(tapData({ date }));
+  day.page.goToTime();
+  const timeOptions = routeOptions(day.calls.find(([key]) => key === 'navigateTo')[1].url);
+  assert.equal(timeOptions.date, date);
+
+  const time = load('pages/venue/booking/booking.js', venueStubs(service));
+  time.page.onLoad(timeOptions);
+  await new Promise(setImmediate);
+  assert.equal(time.page.data.today, date);
+  assert.equal(time.page.data.slots[0].isSelectable, true);
+  time.page.onSelectSlot(tapData({ slot: time.page.data.slots[0] }));
+  time.page.goToCourtSelect();
+  const courtOptions = routeOptions(time.calls.find(([key]) => key === 'navigateTo')[1].url);
+  assert.equal(courtOptions.date, date);
+  const court = load('pages/venue/court/court.js', venueStubs(service));
+  court.page.onLoad(courtOptions);
+  await new Promise(setImmediate);
+  court.page.onSelectCourt(tapData({ no: 2 }));
+  assert.equal(court.page.data.selectedCourtNo, 0);
+  court.page.onSelectCourt(tapData({ no: 3 }));
+  court.page.goToFillInfo();
+  const fillOptions = routeOptions(court.calls.find(([key]) => key === 'navigateTo')[1].url);
+  assert.equal(fillOptions.date, date);
+  const fill = load('pages/order/fill-info/fill-info.js', { '../../../store/auth': { AuthStore: { getUser: () => null } } });
+  fill.page.onLoad(fillOptions);
+  fill.page.setData({ studentNo: '20260001', contactName: '张三', contactPhone: '13800138000' });
+  fill.page.onClickNext();
+  const confirmOptions = routeOptions(fill.calls.find(([key]) => key === 'navigateTo')[1].url);
+  assert.equal(confirmOptions.date, date);
+  let submitted;
+  const confirm = load('pages/order/confirm/confirm.js', { '../../../services/booking.service': { BookingService: {
+    createBooking: async (params) => { submitted = params; return { orderId: 'order-1' }; },
+  } } });
+  confirm.page.onLoad(confirmOptions);
+  await confirm.page.onConfirmSheet();
+  assert.equal(submitted.slotId, `slot-${date}`);
+  assert.equal(submitted.courtNo, 3);
+  assert.equal(submitted.contactName, '张三');
+  assert.equal(confirm.calls.some(([key, options]) => key === 'redirectTo' && options.url.includes('orderId=order-1')), true);
+  time.page.onUnload();
+});
+
+test('时段刷新和旧响应不会覆盖较新的数据，已满时段撤销选择', async () => {
+  const date = calendar.bookingDates()[1];
+  const pending = [];
+  const { page } = load('pages/venue/booking/booking.js', venueStubs({
+    getVenueDetail: async () => sampleVenue,
+    getAvailability: () => new Promise((resolve) => pending.push(resolve)),
+  }));
+  page.setData({ id: sampleVenue.id, today: date });
+  const first = page.loadVenueAndTodaySlots(sampleVenue.id, `slot-${date}`);
+  const second = page.loadVenueAndTodaySlots(sampleVenue.id);
+  pending[1](availability(date, { isClosed: true, slots: [] }));
+  await second;
+  pending[0](availability(date));
+  await first;
+  assert.equal(page.data.isClosed, true);
+  assert.equal(page.data.selectedSlot, null);
+  assert.equal(page.data.slots.length, 0);
+});
+
+test('筛选动画在切页或新的搜索后停止，不覆盖新列表', () => {
+  const callbacks = [];
+  const { page } = load('pages/venue/list/list.js', {}, {}, {
+    setTimeout: (callback) => { callbacks.push(callback); return callbacks.length; },
+    clearTimeout() {},
+  });
+  page.data.rawVenues = [{ ...sampleVenue, type: 'BADMINTON' }, { ...sampleVenue, id: 'venue-2', name: '篮球馆', type: 'BASKETBALL' }];
+  page.filterAndSort();
+  page.createSelectorQuery = () => {
+    const query = { selectAll: () => query, boundingClientRect: (callback) => { callback([]); return query; }, exec() {} };
+    return query;
+  };
+  page.onSelectType(tapData({ key: 'BASKETBALL' }));
+  page.onHide();
+  const snapshot = JSON.stringify(page.data);
+  callbacks[0]();
+  assert.equal(JSON.stringify(page.data), snapshot);
+  page.onSelectType(tapData({ key: 'BADMINTON' }));
+  page.onKeywordInput({ detail: { value: '不存在' } });
+  callbacks.at(-1)();
+  assert.equal(page.data.venueList.length, 0);
+  assert.equal(page.data.filterLeaving, false);
+});
+
+test('共享场馆卡片的详情与预约事件使用对应场馆 ID', () => {
+  const { component } = load('components/venue-card/venue-card.js');
+  const events = [];
+  const instance = { data: { venue: sampleVenue }, triggerEvent: (name, detail) => events.push([name, detail.id]) };
+  component.methods.open.call(instance);
+  component.methods.book.call(instance);
+  assert.deepEqual(events, [['open', sampleVenue.id], ['book', sampleVenue.id]]);
+});
+
+test('滚动数字首次不翻动，换值只滚动变化数字', () => {
+  const { component } = load('components/rolling-number/rolling-number.js');
+  const instance = { data: { digits: [] }, setData(values) { Object.assign(this.data, values); } };
+  component.observers.value.call(instance, '09:00-10:00');
+  assert.equal(instance.data.digits.some((digit) => digit.rolling), false);
+  component.observers.value.call(instance, '10:00-11:00');
+  assert.equal(instance.data.digits.filter((digit) => digit.rolling).length, 3);
+  assert.equal(instance.data.digits.filter((digit) => digit.character === ':').every((digit) => !digit.rolling), true);
+});
+
+test('所有注册的自定义组件资源和事件处理器存在', () => {
+  const queue = JSON.parse(fs.readFileSync(path.join(root, 'app.json'))).pages;
+  const checked = new Set();
+  while (queue.length) {
+    const route = queue.shift();
+    if (checked.has(route)) continue;
+    checked.add(route);
+    const config = JSON.parse(fs.readFileSync(path.join(root, `${route}.json`)));
+    for (const relative of Object.values(config.usingComponents || {})) {
+      const target = relative.startsWith('/') ? relative.slice(1) : path.posix.normalize(path.posix.join(path.posix.dirname(route), relative));
+      for (const extension of ['.js', '.json', '.wxml', '.wxss']) assert.ok(fs.existsSync(path.join(root, target + extension)), target + extension);
+      queue.push(target);
+    }
+    if (config.component) {
+      const { component } = load(`${route}.js`);
+      const wxml = fs.readFileSync(path.join(root, `${route}.wxml`), 'utf8');
+      for (const match of wxml.matchAll(/\b(?:bind|catch):?[\w-]+="([^"{}]+)"/g)) assert.equal(typeof component.methods[match[1]], 'function', `${route}: ${match[1]}`);
+    }
+  }
+});
+
+test('场馆提前预约上限小于七天时，日历遵循接口中的限制', async () => {
+  const requested = [];
+  const { page } = load('pages/venue/date/date.js', venueStubs({
+    getVenueDetail: async () => ({ ...sampleVenue, advanceDays: 2 }),
+    getAvailability: async (_id, date) => { requested.push(date); return availability(date); },
+  }));
+  page.setData({ id: sampleVenue.id });
+  await page.loadDays();
+  assert.equal(requested.length, 3);
+  assert.equal(page.data.advanceDays, 2);
+  assert.equal(page.data.cells.filter((cell) => !cell.empty).length, 3);
 });

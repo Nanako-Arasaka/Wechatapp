@@ -1,30 +1,39 @@
 .profile-page {
-  background: #F6F8FB;
+  background: #f6f8fb;
   padding-bottom: 60rpx;
 }
 
 .user-header {
-  background: linear-gradient(135deg, #1677FF 0%, #0958D9 60%, #003EB3 100%);
+  background: linear-gradient(135deg, #1677ff, #20a6b4);
   padding: 44rpx 32rpx 40rpx;
-  color: #FFFFFF;
-  border-bottom-left-radius: 36rpx;
-  border-bottom-right-radius: 36rpx;
-  box-shadow: 0 10rpx 30rpx rgba(22, 119, 255, 0.2);
+  color: #ffffff;
 }
 
 .user-info-row {
   align-items: center;
   margin-bottom: 36rpx;
+  gap: 20rpx;
+  flex-wrap: wrap;
+}
+
+.user-left,
+.user-text-info {
+  min-width: 0;
+}
+.user-left {
+  flex: 1;
+}
+.nickname {
+  overflow-wrap: anywhere;
 }
 
 .avatar {
-  width: 124rpx;
-  height: 124rpx;
+  width: 108rpx;
+  height: 108rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.9);
+  border: 0;
   margin-right: 22rpx;
-  background: #E5E6EB;
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
 }
 
@@ -32,12 +41,13 @@
   align-items: center;
   gap: 12rpx;
   margin-bottom: 8rpx;
+  flex-wrap: wrap;
 }
 
 .nickname {
   font-size: 34rpx;
   font-weight: 800;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .member-badge {
@@ -50,18 +60,18 @@
 
 .badge-user {
   background: rgba(255, 255, 255, 0.25);
-  color: #FFFFFF;
+  color: #ffffff;
   border: 1rpx solid rgba(255, 255, 255, 0.4);
 }
 
 .badge-admin {
   background: rgba(250, 140, 22, 0.9);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .badge-super {
   background: rgba(245, 158, 11, 0.95);
-  color: #FFFFFF;
+  color: #ffffff;
   border: 1rpx solid rgba(255, 215, 0, 0.8);
 }
 
@@ -74,7 +84,7 @@
   display: flex;
   align-items: center;
   font-size: 22rpx;
-  color: #FFFFFF;
+  color: #ffffff;
   background: rgba(255, 255, 255, 0.2);
   padding: 10rpx 20rpx;
   border-radius: 30rpx;
@@ -90,11 +100,7 @@
 
 /* 运动数据卡 */
 .stats-card {
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(12px);
-  border-radius: 24rpx;
-  padding: 26rpx 0;
-  border: 1rpx solid rgba(255, 255, 255, 0.25);
+  padding: 12rpx 0 0;
 }
 
 .stat-item {
@@ -133,12 +139,12 @@
 .c-title {
   font-size: 30rpx;
   font-weight: 800;
-  color: #1D2129;
+  color: #1d2129;
 }
 
 .c-more {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
 }
 
 .arrow {
@@ -162,34 +168,35 @@
   width: 84rpx;
   height: 84rpx;
   border-radius: 22rpx;
-  background: #F8FAFC;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 10rpx;
-  border: 1rpx solid #F1F5F9;
+  border: 1rpx solid #f1f5f9;
 }
 
 .ot-icon {
-  font-size: 40rpx;
+  width: 42rpx;
+  height: 42rpx;
 }
 
 .ot-badge {
   position: absolute;
   top: -8rpx;
   right: -8rpx;
-  background: #FF4D4F;
-  color: #FFFFFF;
+  background: #ff4d4f;
+  color: #ffffff;
   font-size: 18rpx;
   font-weight: 700;
   padding: 2rpx 10rpx;
   border-radius: 20rpx;
-  border: 2rpx solid #FFFFFF;
+  border: 2rpx solid #ffffff;
 }
 
 .ot-label {
   font-size: 22rpx;
-  color: #4E5969;
+  color: #4e5969;
   font-weight: 600;
 }
 
@@ -203,12 +210,14 @@
 
 .admin-title-row {
   margin-bottom: 24rpx;
+  flex-wrap: wrap;
+  gap: 12rpx;
 }
 
 .admin-title {
   font-size: 30rpx;
   font-weight: 800;
-  color: #1D2129;
+  color: #1d2129;
 }
 
 .admin-badge-icon {
@@ -245,21 +254,29 @@
   margin-bottom: 10rpx;
 }
 
-.bg-blue { background: #E6F4FF; }
-.bg-green { background: #E6FFFB; }
-.bg-orange { background: #FFF7E6; }
-.bg-purple { background: #F9F0FF; }
+.bg-blue {
+  background: #e6f4ff;
+}
+.bg-green {
+  background: #e6fffb;
+}
+.bg-orange {
+  background: #fff7e6;
+}
+.bg-purple {
+  background: #f9f0ff;
+}
 
 .a-name {
   font-size: 22rpx;
   font-weight: 700;
-  color: #1D2129;
+  color: #1d2129;
   margin-bottom: 2rpx;
 }
 
 .a-desc {
   font-size: 18rpx;
-  color: #86909C;
+  color: #86909c;
 }
 
 /* 常用功能列表 */
@@ -286,13 +303,13 @@
 .menu-title {
   font-size: 28rpx;
   font-weight: 600;
-  color: #1D2129;
+  color: #1d2129;
 }
 
 .author-tag {
   font-size: 22rpx;
-  color: #1677FF;
-  background: #E6F4FF;
+  color: #1677ff;
+  background: #e6f4ff;
   padding: 4rpx 14rpx;
   border-radius: 12rpx;
   font-weight: 600;
@@ -301,7 +318,7 @@
 
 .menu-divider {
   height: 1rpx;
-  background: #F4F6F9;
+  background: #f4f6f9;
 }
 
 .logout-wrap {
@@ -309,8 +326,8 @@
 }
 
 .btn-primary-action {
-  background: linear-gradient(135deg, #1677FF 0%, #0958D9 100%);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%);
+  color: #ffffff;
   font-size: 30rpx;
   font-weight: 700;
   border-radius: 40rpx;
@@ -324,11 +341,11 @@
 }
 
 .btn-logout {
-  background: #FFFFFF;
-  color: #86909C;
+  background: #ffffff;
+  color: #86909c;
   font-size: 28rpx;
   font-weight: 600;
   border-radius: 40rpx;
   padding: 20rpx 0;
-  border: 1rpx solid #E5E6EB;
+  border: 1rpx solid #e5e6eb;
 }

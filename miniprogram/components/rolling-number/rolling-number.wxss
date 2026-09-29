@@ -1,0 +1,54 @@
+:host {
+  display: inline-block;
+}
+.number {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.digit {
+  height: 1.35em;
+  line-height: 1.35em;
+  overflow: hidden;
+}
+.strip {
+  display: flex;
+  flex-direction: column;
+}
+.digit-value {
+  display: block;
+  height: 1.35em;
+  line-height: 1.35em;
+}
+.roll-up {
+  animation: roll-up 480ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+.roll-down {
+  animation: roll-down 480ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes roll-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes roll-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .roll-up {
+    animation: none;
+    transform: translateY(-50%);
+  }
+  .roll-down {
+    animation: none;
+    transform: translateY(0);
+  }
+}

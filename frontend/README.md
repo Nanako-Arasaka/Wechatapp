@@ -58,6 +58,12 @@ frontend/
 实际微信小程序继续放在 `miniprogram/`，保留微信原生目录与编译方式。
 后端在 `server/`，本次结构化不修改后端。
 
+浏览器的主要布局和动效已同步到小程序：新增 `pages/venue/date/` 日历，
+复用 `components/venue-card/` 场馆卡片与 `components/rolling-number/` 数字滚动，
+动效在 `styles/preview-motion.wxss`。小程序仍使用真实接口；日期余量查询失败
+会显示失败状态，不使用浏览器的模拟余量。微信原生导航栏、支付和核销流程
+继续由小程序自身实现。
+
 ```sh
 npm run build:miniprogram  # 编译微信小程序 TS
 npm run build             # 编译两种前端

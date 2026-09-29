@@ -1,0 +1,40 @@
+<view class="date-page container">
+  <view class="card date-heading motion-panel">
+    <view class="flex-between">
+      <view class="date-heading-copy">
+        <view class="date-title">选择预约日期</view>
+        <view class="date-subtitle">今天及未来 {{advanceDays}} 天 · {{venue.name || '加载场馆中'}}</view>
+      </view>
+      <button class="refresh-button" loading="{{refreshing}}" disabled="{{refreshing}}" bindtap="onRetry">刷新</button>
+    </view>
+  </view>
+  <view class="card" wx:if="{{loading}}">
+    <view class="skeleton-box skeleton-line" style="width:40%"></view>
+    <view class="calendar-grid"><view class="calendar-cell skeleton-box" wx:for="{{14}}" wx:key="*this"></view></view>
+  </view>
+  <view class="empty-state" wx:elif="{{loadError}}">
+    <view class="empty-title">日期余量加载失败</view>
+    <view class="empty-desc">请检查网络后重试</view>
+    <button class="btn-retry" bindtap="onRetry">重新加载</button>
+  </view>
+  <view class="card calendar-card motion-panel" wx:else>
+    <view class="flex-between calendar-heading"><text>{{monthLabel}}</text><text class="calendar-hint">点选日期 · 数字为剩余名额</text></view>
+    <view class="calendar-grid calendar-weekdays"><text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text></view>
+    <view class="calendar-grid">
+      <block wx:for="{{cells}}" wx:key="date">
+        <view wx:if="{{item.empty}}" class="calendar-cell calendar-empty"></view>
+        <button wx:else class="calendar-cell {{item.isToday ? 'today' : ''}} {{item.disabled ? 'unavailable' : ''}} {{selectedDate === item.date ? 'selected' : ''}}" style="animation-delay:{{index * 28}}ms" bindtap="onSelectDate" data-date="{{item.date}}" aria-label="{{item.date}} {{item.error ? '余量未知' : item.isClosed ? '闭馆' : '剩余' + item.totalRemaining + '名额'}}">
+          <view class="calendar-day">{{item.day}}</view>
+          <view class="calendar-tag">{{item.isToday ? '今天' : item.isClosed ? '休' : ''}}</view>
+          <view class="calendar-label">{{item.error ? '未加载' : item.isClosed ? '闭馆' : '剩余'}}</view>
+          <rolling-number value="{{item.error || item.isClosed ? '—' : item.totalRemaining + ''}}" />
+        </button>
+      </block>
+    </view>
+    <view class="calendar-note">蓝色为已选或今天 · 灰色为闭馆、约满或未加载</view>
+    <view class="calendar-note" wx:if="{{hasDayErrors}}">部分日期加载失败，可刷新重试。</view>
+  </view>
+  <view class="bottom-action-bar">
+    <button class="btn-primary" bindtap="goToTime" disabled="{{!selectedDate || refreshing || loadError || navigating}}">下一步 · 选择时段</button>
+  </view>
+</view>

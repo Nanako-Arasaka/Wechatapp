@@ -1,6 +1,6 @@
 <view class="fill-page container">
   
-  <view class="summary-card card">
+  <view class="summary-card card motion-panel">
     <view class="summary-title">订单摘要</view>
     <view class="summary-row flex-between">
       <text class="summary-label">场馆</text>
@@ -30,7 +30,7 @@
   </view>
 
   
-  <view class="form-card card">
+  <view class="form-card card motion-panel delay-short">
     <view class="form-title">联系方式（入场核验用）</view>
     <view class="form-row flex-between">
       <text class="form-label">学号</text>

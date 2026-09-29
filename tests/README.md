@@ -12,6 +12,12 @@ The tests mock the WeChat page lifecycle and HTTP client. They do not start or
 modify the backend. They cover failed requests, order cancellation IDs, payment
 deadlines, duplicate submissions, check-in states and page event bindings.
 
+The mini program checks also cover the new calendar's month/year boundaries,
+partial availability failures, selection invalidation after refresh, late
+responses, cancellation of filter animations and the full date → slot → court →
+contact → booking request chain. Service calls are mocked, so this validates
+frontend behavior without creating backend orders.
+
 For an independent scan of the rendered QR pixels, install jsQR outside the repo
 and point `QR_DECODER` to its CommonJS module:
 

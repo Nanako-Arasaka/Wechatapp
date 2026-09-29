@@ -1,50 +1,17 @@
 <view class="login-page">
-  <!-- 顶部科技感背景与品牌标识 -->
-  <view class="login-header">
-    <view class="logo-box">
-      <text class="logo-emoji">🏸</text>
-    </view>
-    <view class="app-title">智场通 SmartVenue</view>
-    <view class="app-slogan">智能场馆预约与实时余量查询系统</view>
-    <view class="badge-tag">智慧体育场馆运营系统</view>
+  <view class="login-header motion-login">
+    <text class="badge-tag">智场通 SmartVenue</text>
+    <view class="app-title">校园场馆预约</view>
+    <view class="app-slogan">查看实时余量 · 在线预约 · 扫码入场</view>
+    <view class="app-slogan">登录后即可预约羽毛球、篮球、游泳等场地</view>
   </view>
-
-  <view class="login-card card">
+  <view class="login-card card motion-login delay-short">
     <view class="card-title">学工号登录</view>
-    <view class="card-subtitle">使用场馆管理中心开通的账号登录</view>
-
-    <view class="form-item">
-      <text class="f-label">学工号</text>
-      <input class="f-input" placeholder="请输入学工号" value="{{username}}" bindinput="onUsernameInput" />
-    </view>
-
-    <view class="form-item">
-      <text class="f-label">密码</text>
-      <input class="f-input" password placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
-    </view>
-
-    <button class="btn-login" bindtap="handleLogin" disabled="{{submitting}}">{{submitting ? '登录中...' : '登录'}}</button>
-
-    <view class="demo-hint">
-      <text>暂无账号？请联系体育场馆管理中心开通预约权限。</text>
-      <text>管理员账号由后台统一分配，不在此页面注册。</text>
-    </view>
-
-    <view class="divider-row">
-      <view class="divider-line"></view>
-      <text class="divider-text">或者</text>
-      <view class="divider-line"></view>
-    </view>
-
-    <!-- 微信快捷一键登录 -->
-    <button class="btn-wechat" bindtap="handleWechatLogin" disabled="{{submitting}}">
-      <text class="wx-icon">💬</text>
-      <text>微信登录（演示）</text>
-    </button>
-    <view class="wechat-hint-text">微信账号识别为模拟模式，正式预约请使用学工号登录</view>
+    <view class="form-item"><input class="f-input" placeholder="请输入学工号 / 账号" value="{{username}}" bindinput="onUsernameInput" aria-label="学工号或账号" /></view>
+    <view class="form-item"><input class="f-input" password placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" bindconfirm="handleLogin" confirm-type="done" aria-label="密码" /></view>
+    <button class="btn-login" bindtap="handleLogin" loading="{{submitting}}" disabled="{{submitting}}">登录</button>
+    <button class="btn-wechat" bindtap="handleWechatLogin" disabled="{{submitting}}">微信登录（演示）</button>
+    <view class="login-hint">暂无账号？请联系体育场馆管理中心。正式预约请使用学工号登录。</view>
   </view>
-
-  <view class="login-footer">
-    <text>© 2026 SmartVenue 智场通 · 开发者: 茉黎</text>
-  </view>
+  <view class="login-footer">© 2026 SmartVenue 智场通</view>
 </view>

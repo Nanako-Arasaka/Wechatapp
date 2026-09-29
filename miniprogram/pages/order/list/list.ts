@@ -1,6 +1,7 @@
-import { OrderService } from '../../../services/order.service';
-import { OrderItem } from '../../../types';
-import { AuthStore } from '../../../store/auth';
+import { OrderService } from "../../../services/order.service";
+import { OrderItem } from "../../../types";
+import { AuthStore } from "../../../store/auth";
+import { venueImage } from "../../../utils/venue-image";
 
 Page({
   data: {
@@ -8,14 +9,14 @@ Page({
     loadError: false,
     cancelling: false,
     isLoggedIn: false,
-    currentStatus: 'ALL',
+    currentStatus: "ALL",
     orderList: [] as OrderItem[],
     statusTabs: [
-      { key: 'ALL', name: '全部' },
-      { key: 'PENDING_PAYMENT', name: '待支付' },
-      { key: 'CONFIRMED', name: '待使用' },
-      { key: 'COMPLETED', name: '已完成' },
-      { key: 'REFUNDED', name: '退款/取消' },
+      { key: "ALL", name: "全部" },
+      { key: "PENDING_PAYMENT", name: "待支付" },
+      { key: "CONFIRMED", name: "待使用" },
+      { key: "COMPLETED", name: "已完成" },
+      { key: "REFUNDED", name: "退款/取消" },
     ],
   },
   _loadId: 0,
@@ -32,7 +33,8 @@ Page({
     if (app && app.globalData && app.globalData.targetOrderStatus) {
       const target = app.globalData.targetOrderStatus;
       app.globalData.targetOrderStatus = null;
-      const mapped = (target === 'CANCELLED' || target === 'REFUNDED') ? 'REFUNDED' : target;
+      const mapped =
+        target === "CANCELLED" || target === "REFUNDED" ? "REFUNDED" : target;
       this.setData({ currentStatus: mapped });
     }
     this.loadOrders();
@@ -51,13 +53,19 @@ Page({
     this.setData({ loading: true, loadError: false });
     try {
       const list = await OrderService.getOrders(
-        status !== 'ALL' ? status : undefined,
+        status !== "ALL" ? status : undefined,
       );
       if (loadId !== this._loadId) return;
-      this.setData({ orderList: list || [], loading: false });
+      this.setData({
+        orderList: (list || []).map((order) => ({
+          ...order,
+          venueImage: venueImage(order.venueImage),
+        })),
+        loading: false,
+      });
     } catch (err) {
       if (loadId !== this._loadId) return;
-      console.warn('订单列表加载失败:', err);
+      console.warn("订单列表加载失败:", err);
       this.setData({ loading: false, loadError: true, orderList: [] });
     }
   },
@@ -94,28 +102,41 @@ Page({
    */
   async onCancelBooking(e: any) {
     if (this.data.cancelling) return;
-    const bookingId = e.currentTarget.dataset.bookingId || e.currentTarget.dataset.id;
-    const order = this.data.orderList.find((o) => o.bookingId === bookingId || o.id === bookingId);
-    const refundText = order ? ` ¥${((order.amount || 0) / 100).toFixed(2)}` : '';
+    const bookingId =
+      e.currentTarget.dataset.bookingId || e.currentTarget.dataset.id;
+    const order = this.data.orderList.find(
+      (o) => o.bookingId === bookingId || o.id === bookingId,
+    );
+    const refundText = order
+      ? ` ¥${((order.amount || 0) / 100).toFixed(2)}`
+      : "";
     wx.showModal({
-      title: '确认取消退订',
+      title: "确认取消退订",
       content: `退订将全额原路退款${refundText}并立即释放场地名额，是否确认取消？`,
-      confirmColor: '#FF4D4F',
-      confirmText: '确认退订',
-      cancelText: '再想想',
+      confirmColor: "#FF4D4F",
+      confirmText: "确认退订",
+      cancelText: "再想想",
       success: async (res) => {
         if (!res.confirm || this.data.cancelling) return;
         this.setData({ cancelling: true });
-        wx.showLoading({ title: '正在退订...', mask: true });
+        wx.showLoading({ title: "正在退订...", mask: true });
         try {
           await OrderService.cancelOrder(bookingId);
           wx.hideLoading();
-          wx.showToast({ title: '退订成功，已全额退款', icon: 'success', duration: 2000 });
+          wx.showToast({
+            title: "退订成功，已全额退款",
+            icon: "success",
+            duration: 2000,
+          });
           // 以服务端结果为准，重新拉取列表
           await this.loadOrders();
         } catch (err: any) {
           wx.hideLoading();
-          wx.showToast({ title: err?.message || '退订失败，请稍后重试', icon: 'none', duration: 2500 });
+          wx.showToast({
+            title: err?.message || "退订失败，请稍后重试",
+            icon: "none",
+            duration: 2500,
+          });
         } finally {
           this.setData({ cancelling: false });
         }
@@ -132,21 +153,25 @@ Page({
     const order = this.data.orderList.find((o) => o.id === id);
     if (!order) return;
     wx.showModal({
-      title: '确认取消订单',
-      content: '是否确认取消该待支付订单？',
-      confirmColor: '#FF4D4F',
+      title: "确认取消订单",
+      content: "是否确认取消该待支付订单？",
+      confirmColor: "#FF4D4F",
       success: async (res) => {
         if (!res.confirm || this.data.cancelling) return;
         this.setData({ cancelling: true });
-        wx.showLoading({ title: '正在取消...', mask: true });
+        wx.showLoading({ title: "正在取消...", mask: true });
         try {
           await OrderService.cancelOrder(order.bookingId);
           wx.hideLoading();
-          wx.showToast({ title: '订单已取消', icon: 'success' });
+          wx.showToast({ title: "订单已取消", icon: "success" });
           await this.loadOrders();
         } catch (err: any) {
           wx.hideLoading();
-          wx.showToast({ title: err?.message || '取消失败，请稍后重试', icon: 'none', duration: 2500 });
+          wx.showToast({
+            title: err?.message || "取消失败，请稍后重试",
+            icon: "none",
+            duration: 2500,
+          });
         } finally {
           this.setData({ cancelling: false });
         }
@@ -160,15 +185,17 @@ Page({
   onRebook(e: any) {
     const venueId = e.currentTarget.dataset.venueId;
     if (!venueId) return;
-    wx.navigateTo({ url: `/pages/venue/booking/booking?id=${venueId}` });
+    wx.navigateTo({
+      url: `/pages/venue/date/date?id=${encodeURIComponent(venueId)}`,
+    });
   },
 
   goToVenues() {
-    wx.switchTab({ url: '/pages/venue/list/list' });
+    wx.switchTab({ url: "/pages/venue/list/list" });
   },
 
   goToLogin() {
-    wx.navigateTo({ url: '/pages/auth/login/login' });
+    wx.navigateTo({ url: "/pages/auth/login/login" });
   },
 
   noBubble() {},

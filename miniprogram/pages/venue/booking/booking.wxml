@@ -1,20 +1,20 @@
 <view class="booking-page container">
   <!-- 场馆信息概览：馆名 + 地址 -->
   <view class="venue-brief card flex-row content-enter" wx:if="{{!loading && !loadError}}">
-    <image class="v-brief-img" src="{{venue.coverImage}}" mode="aspectFill" />
+    <image class="v-brief-img" src="{{coverImage}}" mode="aspectFill" binderror="onImageError" />
     <view class="v-brief-info flex-1">
       <view class="v-brief-name">{{venue.name}}</view>
       <view class="v-brief-addr">{{venue.address}}</view>
     </view>
   </view>
 
-  <!-- 日期标题：仅支持当天预约 -->
+  <!-- 日期来自日历选择 -->
   <view class="date-title card flex-between content-enter delay-short" wx:if="{{!loading && !loadError}}">
     <view>
       <view class="dst-main">选择预约时段</view>
-      <view class="dst-sub">今日 {{todayText}}</view>
+      <view class="dst-sub">{{todayText}}</view>
     </view>
-    <view class="tag tag-blue">仅支持当天</view>
+    <button class="change-date" bindtap="changeDate">更改日期</button>
   </view>
 
   <!-- 加载骨架屏 -->
@@ -36,11 +36,12 @@
     <text class="empty-title">时段加载失败</text>
     <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
     <view class="btn-retry" bindtap="onRetry">点击重试</view>
+    <button class="change-date" bindtap="changeDate">重新选择日期</button>
   </view>
 
   <!-- 闭馆提示 -->
   <view class="closed-box card" wx:if="{{!loading && !loadError && isClosed}}">
-    <text class="closed-text">今日场馆闭馆：{{closedReason || '暂不开放预约'}}</text>
+    <text class="closed-text">该日场馆闭馆：{{closedReason || '暂不开放预约'}}</text>
   </view>
 
   <!-- 小时格子时间选择组件 -->
@@ -56,13 +57,13 @@
       <view class="slot-time">{{item.startTime}}</view>
       <view class="slot-range">{{item.startTime}}-{{item.endTime}}</view>
       <!-- 状态文字：可预约显示余量，不可预约显示原因（颜色之外补充图标语义） -->
-      <view class="slot-status">{{item.isSelectable ? '✓ ' + item.statusText : item.statusText === '已过时段' ? '— 已过' : item.statusText === '已满' ? '满' : '× ' + item.statusText}}</view>
+      <view class="slot-status">{{item.isSelectable ? '✓ 余 ' + item.remaining : item.statusText === '已过时段' ? '— 已过' : item.statusText === '已满' ? '满' : '× ' + item.statusText}}</view>
     </view>
   </view>
 
   <!-- 今日无时段兜底 -->
   <view class="loading-box" wx:if="{{!loading && !loadError && !isClosed && slots.length === 0}}">
-    <text class="loading-text">今日暂无可预约时段</text>
+    <text class="loading-text">该日暂无可预约时段</text>
   </view>
 
   <!-- 选中时段摘要信息 -->
@@ -79,7 +80,7 @@
     </view>
     <view class="summary-row flex-between">
       <text class="summary-label">时间段</text>
-      <text class="summary-value summary-time {{summaryTimeFlip ? 'val-flip' : ''}}">{{selectedSlot.timeRange}}（1小时）</text>
+      <view class="summary-value summary-time"><rolling-number value="{{selectedSlot.timeRange}}" /></view>
     </view>
     <view class="summary-row flex-between">
       <text class="summary-label">单价</text>
@@ -89,6 +90,6 @@
 
   <!-- 底部固定操作栏：【下一步】跳转 P3 可选场地页 -->
   <view class="bottom-action-bar">
-    <button class="btn-next {{selectedSlot && !loading && !loadError ? '' : 'disabled'}}" bindtap="goToCourtSelect" disabled="{{navigating || loading || loadError || !selectedSlot}}">{{navigating ? '跳转中...' : '下一步'}}</button>
+    <button class="btn-next {{selectedSlot && !loading && !loadError ? '' : 'disabled'}}" bindtap="goToCourtSelect" disabled="{{navigating || loading || loadError || !selectedSlot}}">{{navigating ? '跳转中...' : '下一步 · 选场地'}}</button>
   </view>
 </view>

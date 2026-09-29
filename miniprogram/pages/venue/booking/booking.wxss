@@ -8,6 +8,17 @@
  */
 
 /* 页面容器：为底部固定操作栏预留空间 */
+.change-date {
+  margin: 0 0 0 12rpx;
+  padding: 0 20rpx;
+  line-height: 60rpx;
+  font-size: 24rpx;
+  color: #1677ff;
+  background: #e6f4ff;
+  border-radius: 999rpx;
+  flex: none;
+}
+
 .booking-page {
   padding-bottom: 180rpx;
 }
@@ -63,11 +74,12 @@
   border: 2rpx solid rgba(0, 185, 107, 0.35);
   border-radius: var(--radius-md);
   box-sizing: border-box;
-  transition: transform var(--dur-press) var(--ease-press),
-              background-color var(--dur-ui) var(--ease-enter),
-              border-color var(--dur-ui) var(--ease-enter),
-              box-shadow var(--dur-ui) var(--ease-enter),
-              color var(--dur-hover) ease;
+  transition:
+    transform var(--dur-press) var(--ease-press),
+    background-color var(--dur-ui) var(--ease-enter),
+    border-color var(--dur-ui) var(--ease-enter),
+    box-shadow var(--dur-ui) var(--ease-enter),
+    color var(--dur-hover) ease;
 }
 
 .slot-cell:not(.disabled):active {
@@ -81,7 +93,7 @@
 
 /* 灰色色块：不可预约时段 */
 .slot-cell.disabled {
-  background: #F0F1F3;
+  background: #f0f1f3;
   border-color: var(--border-color);
 }
 
@@ -90,7 +102,9 @@
   background: var(--primary-light);
   border-color: var(--primary-color);
   box-shadow: 0 10rpx 28rpx rgba(22, 119, 255, 0.22);
-  animation: selection-pop 280ms var(--ease-enter) both, selection-ring 520ms var(--ease-enter) both;
+  animation:
+    selection-pop 280ms var(--ease-enter) both,
+    selection-ring 520ms var(--ease-enter) both;
   transform: scale(1.02);
 }
 
@@ -131,7 +145,7 @@
 
 /* ===== 选中时段摘要信息 ===== */
 .summary-card {
-  border: 2rpx solid var(--primary-color);
+  border: 0;
 }
 
 /* 已选时段：仅首次出现轻入场 */
@@ -146,13 +160,25 @@
 }
 
 @keyframes summary-in {
-  from { opacity: 0; transform: translateY(16rpx); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes val-pulse {
-  0% { opacity: 0.55; transform: translateY(6rpx); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0.55;
+    transform: translateY(6rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .summary-title {
@@ -179,6 +205,8 @@
   font-size: 26rpx;
   color: var(--text-main);
   font-weight: 600;
+  max-width: 74%;
+  text-align: right;
 }
 
 .summary-time {
@@ -225,7 +253,7 @@
 
 .btn-next {
   background: var(--primary-gradient);
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 32rpx;
   font-weight: 600;
   border-radius: var(--radius-pill);
@@ -237,11 +265,31 @@
 
 /* 未选时段时的置灰态 */
 .btn-next.disabled {
-  background: #C9CDD4;
+  background: #c9cdd4;
   box-shadow: none;
 }
 
 .btn-next:active {
   opacity: 0.9;
   transform: scale(0.98);
+}
+
+.booking-page .card {
+  margin-left: 32rpx;
+  margin-right: 32rpx;
+  border-radius: 30rpx;
+}
+.slot-cell {
+  border-radius: 26rpx;
+}
+.slot-cell.selected {
+  animation:
+    selection-pop 420ms var(--ease-enter) both,
+    selection-ring 720ms var(--ease-enter) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slot-cell.selected,
+  .summary-first {
+    animation: none !important;
+  }
 }

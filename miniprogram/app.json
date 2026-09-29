@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/venue/list/list",
     "pages/venue/detail/detail",
+    "pages/venue/date/date",
     "pages/venue/booking/booking",
     "pages/venue/court/court",
     "pages/order/list/list",

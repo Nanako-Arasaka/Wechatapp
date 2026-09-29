@@ -1,5 +1,5 @@
-import { VenueService } from '../../../services/venue.service';
-import { formatMoney, safeDecode } from '../../../utils/format';
+import { VenueService } from "../../../services/venue.service";
+import { formatMoney, safeDecode } from "../../../utils/format";
 
 /**
  * ============================================================================
@@ -10,21 +10,21 @@ import { formatMoney, safeDecode } from '../../../utils/format';
  * 1. 接收 P2 传来的预约基础信息（场馆/日期/时段/单价）。
  * 2. 再次调用 GET /venues/:id/availability 获取目标时段的场地可用状态，
  *    按时段总容量生成场地列表：绿色 = 可预约，灰色 = 不可预约（已被占用）。
- * 3. 场地以底部弹窗弹层形式展示，点击绿色场地块完成选中标记。
- * 4. 点击【下一步】跳转 P4 填写预约信息页（order/fill-info，P4 不做任何修改）。
+ * 3. 场地以卡片网格展示，点击可预约场地完成选中标记。
+ * 4. 点击【下一步】跳转填写预约信息页（order/fill-info）。
  * ============================================================================
  */
 Page({
   data: {
     // ===== P2 透传的预约基础信息 =====
-    venueId: '',
-    venueName: '',
-    venueAddress: '',
-    slotId: '',
-    date: '',
-    timeRange: '',
+    venueId: "",
+    venueName: "",
+    venueAddress: "",
+    slotId: "",
+    date: "",
+    timeRange: "",
     price: 0, // 单价（分）
-    priceText: '', // 单价展示文本
+    priceText: "", // 单价展示文本
 
     // ===== 页面状态 =====
     courts: [] as Array<{ no: number; available: boolean; selected: boolean }>, // 场地列表
@@ -32,19 +32,18 @@ Page({
     navigating: false, // 下一步跳转防连点
     loading: true,
     loadError: false, // 加载失败标记（错误占位 + 重试）
-    unavailableReason: '',
-    sheetVisible: false, // 底部弹窗弹层是否已弹起（用于入场动画）
+    unavailableReason: "",
   },
 
   onLoad(options: any) {
     // 解析 P2 透传参数
     this.setData({
-      venueId: options.venueId || '',
-      venueName: safeDecode(options.venueName || ''),
-      venueAddress: safeDecode(options.venueAddress || ''),
-      slotId: options.slotId || '',
-      date: options.date || '',
-      timeRange: safeDecode(options.timeRange || ''),
+      venueId: options.venueId || "",
+      venueName: safeDecode(options.venueName || ""),
+      venueAddress: safeDecode(options.venueAddress || ""),
+      slotId: options.slotId || "",
+      date: options.date || "",
+      timeRange: safeDecode(options.timeRange || ""),
       price: Number(options.price || 0),
       priceText: formatMoney(Number(options.price || 0)),
     });
@@ -59,37 +58,57 @@ Page({
    */
   async loadCourts() {
     try {
-      this.setData({ loading: true, loadError: false, unavailableReason: '', sheetVisible: false, courts: [], selectedCourtNo: 0 });
-      if (!this.data.venueId || !this.data.slotId) throw new Error('缺少预约时段');
+      this.setData({
+        loading: true,
+        loadError: false,
+        unavailableReason: "",
+        courts: [],
+        selectedCourtNo: 0,
+      });
+      if (!this.data.venueId || !this.data.slotId)
+        throw new Error("缺少预约时段");
 
       const [courtData, availability] = await Promise.all([
         VenueService.getSlotCourts(this.data.venueId, this.data.slotId),
         VenueService.getAvailability(this.data.venueId, this.data.date),
       ]);
-      const slot = availability.slots.find((item) => item.id === this.data.slotId);
+      const slot = availability.slots.find(
+        (item) => item.id === this.data.slotId,
+      );
       if (availability.isClosed || !slot || !slot.isSelectable) {
-        this.setData({ unavailableReason: slot?.statusText || availability.closedReason || '该时段暂不可预约' });
+        this.setData({
+          unavailableReason:
+            slot?.statusText || availability.closedReason || "该时段暂不可预约",
+        });
         return;
       }
       const totalCapacity = courtData.totalCapacity;
       const occupied = courtData.occupied;
-      if (!Number.isInteger(totalCapacity) || totalCapacity < 0 || !Array.isArray(occupied) || occupied.some((no) => !Number.isInteger(no) || no < 1 || no > totalCapacity)) {
-        throw new Error('场地状态数据异常');
+      if (
+        !Number.isInteger(totalCapacity) ||
+        totalCapacity < 0 ||
+        !Array.isArray(occupied) ||
+        occupied.some(
+          (no) => !Number.isInteger(no) || no < 1 || no > totalCapacity,
+        )
+      ) {
+        throw new Error("场地状态数据异常");
       }
 
       if (totalCapacity > 0) {
         const courts = [];
         for (let i = 1; i <= totalCapacity; i++) {
-          courts.push({ no: i, available: !occupied.includes(i), selected: false });
+          courts.push({
+            no: i,
+            available: !occupied.includes(i),
+            selected: false,
+          });
         }
         this.setData({ courts });
       }
-
-      // 数据准备好后再展示选场层，避免失败时出现空弹层。
-      if (totalCapacity > 0) this.setData({ sheetVisible: true });
     } catch (err) {
-      console.error('加载场地可用状态失败:', err);
-      this.setData({ loadError: true, sheetVisible: false });
+      console.error("加载场地可用状态失败:", err);
+      this.setData({ loadError: true });
     } finally {
       this.setData({ loading: false });
     }
@@ -113,7 +132,7 @@ Page({
 
     if (!court || !court.available) {
       // 灰色不可预约场地：轻提示拦截
-      wx.showToast({ title: '该场地不可预约', icon: 'none' });
+      wx.showToast({ title: "该场地不可预约", icon: "none" });
       return;
     }
 
@@ -132,9 +151,15 @@ Page({
    * venueId / venueName / venueAddress / slotId / date / timeRange / unitPrice / quantity
    */
   goToFillInfo() {
-    if (this.data.navigating || this.data.loading || this.data.loadError || this.data.unavailableReason) return;
+    if (
+      this.data.navigating ||
+      this.data.loading ||
+      this.data.loadError ||
+      this.data.unavailableReason
+    )
+      return;
     if (!this.data.selectedCourtNo) {
-      wx.showToast({ title: '请先选择场地', icon: 'none' });
+      wx.showToast({ title: "请先选择场地", icon: "none" });
       return;
     }
 
@@ -149,7 +174,7 @@ Page({
       `unitPrice=${this.data.price}`,
       `quantity=1`,
       `courtNo=${this.data.selectedCourtNo}`,
-    ].join('&');
+    ].join("&");
 
     wx.navigateTo({
       url: `/pages/order/fill-info/fill-info?${params}`,

@@ -1,19 +1,20 @@
-import { VenueService } from '../../services/venue.service';
-import { AuthStore } from '../../store/auth';
-import { NotificationService } from '../../services/notification.service';
-import { Venue, VenueSlot } from '../../types';
+import { VenueService } from "../../services/venue.service";
+import { AuthStore } from "../../store/auth";
+import { NotificationService } from "../../services/notification.service";
+import { Venue, VenueSlot } from "../../types";
 
 Page({
   data: {
-    currentLocation: wx.getStorageSync('CURRENT_LOCATION') || '选择位置',
-    keyword: '',
+    currentLocation: wx.getStorageSync("CURRENT_LOCATION") || "选择位置",
+    keyword: "",
     searchFocused: false,
     venues: [] as Venue[],
-    selectedVenueId: '',
+    recommendedVenues: [] as Venue[],
+    selectedVenueId: "",
     quickSlots: [] as VenueSlot[],
     isClosedToday: false,
-    closedReason: '',
-    peakAdvice: '',
+    closedReason: "",
+    peakAdvice: "",
     isAdmin: false,
     hasUnread: false,
     venuesLoading: true,
@@ -24,11 +25,11 @@ Page({
 
   onLoad() {
     // 零点击：一进入小程序即刻自动调起真实 GPS 定位并呈现真实地名
-    if (!wx.getStorageSync('CURRENT_LOCATION')) this.autoFetchRealLocation();
+    if (!wx.getStorageSync("CURRENT_LOCATION")) this.autoFetchRealLocation();
   },
 
   onShow() {
-    const cached = wx.getStorageSync('CURRENT_LOCATION');
+    const cached = wx.getStorageSync("CURRENT_LOCATION");
     if (cached) {
       this.setData({ currentLocation: cached });
     }
@@ -38,7 +39,9 @@ Page({
     });
     this.loadData();
     if (AuthStore.getToken()) {
-      NotificationService.getUnreadCount().then((count) => this.setData({ hasUnread: count > 0 })).catch(() => {});
+      NotificationService.getUnreadCount()
+        .then((count) => this.setData({ hasUnread: count > 0 }))
+        .catch(() => {});
     } else {
       this.setData({ hasUnread: false });
     }
@@ -49,15 +52,17 @@ Page({
    */
   autoFetchRealLocation() {
     wx.getLocation({
-      type: 'gcj02',
+      type: "gcj02",
       success: (res) => {
         const { latitude, longitude } = res;
         const realLocationName = this.resolveRealLocation(latitude, longitude);
         this.setData({ currentLocation: realLocationName });
-        wx.setStorageSync('CURRENT_LOCATION', realLocationName);
+        wx.setStorageSync("CURRENT_LOCATION", realLocationName);
       },
       fail: (err) => {
-        this.setData({ currentLocation: wx.getStorageSync('CURRENT_LOCATION') || '选择位置' });
+        this.setData({
+          currentLocation: wx.getStorageSync("CURRENT_LOCATION") || "选择位置",
+        });
       },
     });
   },
@@ -75,13 +80,13 @@ Page({
   handleChooseLocation() {
     wx.chooseLocation({
       success: (locRes) => {
-        const realName = locRes.name || locRes.address || '已选场馆';
+        const realName = locRes.name || locRes.address || "已选场馆";
         this.setData({ currentLocation: realName });
-        wx.setStorageSync('CURRENT_LOCATION', realName);
-        wx.showToast({ title: `已定位: ${realName}`, icon: 'success' });
+        wx.setStorageSync("CURRENT_LOCATION", realName);
+        wx.showToast({ title: `已定位: ${realName}`, icon: "success" });
       },
       fail: (err) => {
-        console.log('取消地图选点:', err);
+        console.log("取消地图选点:", err);
       },
     });
   },
@@ -112,14 +117,14 @@ Page({
    * 触发搜索：携参切换到【场地】TabBar 页面并立即过滤
    */
   onSearchConfirm() {
-    const kw = (this.data.keyword || '').trim();
+    const kw = (this.data.keyword || "").trim();
     const app = getApp<any>();
     if (app && app.globalData) {
       app.globalData.targetVenueKeyword = kw;
     }
     // 切换到场地 Tab 页面
     wx.switchTab({
-      url: '/pages/venue/list/list',
+      url: "/pages/venue/list/list",
     });
   },
 
@@ -128,19 +133,37 @@ Page({
     try {
       const venues = await VenueService.getVenues();
       if (venues && venues.length > 0) {
-        this.setData({ venues, venuesLoading: false });
+        this.setData({
+          venues,
+          recommendedVenues: venues.slice(0, 3),
+          venuesLoading: false,
+        });
         // 保持当前选中的 venueId 或默认第 1 个
-        const targetVenueId = venues.some((v) => v.id === this.data.selectedVenueId)
+        const targetVenueId = venues.some(
+          (v) => v.id === this.data.selectedVenueId,
+        )
           ? this.data.selectedVenueId
           : venues[0].id;
         this.setData({ selectedVenueId: targetVenueId });
         await this.loadAvailabilityForVenue(targetVenueId);
       } else {
-        this.setData({ venues: [], quickSlots: [], selectedVenueId: '', venuesLoading: false });
+        this.setData({
+          venues: [],
+          quickSlots: [],
+          selectedVenueId: "",
+          venuesLoading: false,
+        });
       }
     } catch (err: any) {
-      console.warn('加载首页数据失败:', err);
-      this.setData({ venues: [], quickSlots: [], selectedVenueId: '', venuesLoading: false, venuesError: true, slotsError: false });
+      console.warn("加载首页数据失败:", err);
+      this.setData({
+        venues: [],
+        quickSlots: [],
+        selectedVenueId: "",
+        venuesLoading: false,
+        venuesError: true,
+        slotsError: false,
+      });
     }
   },
 
@@ -149,7 +172,8 @@ Page({
   },
 
   onRetrySlots() {
-    if (this.data.selectedVenueId) this.loadAvailabilityForVenue(this.data.selectedVenueId);
+    if (this.data.selectedVenueId)
+      this.loadAvailabilityForVenue(this.data.selectedVenueId);
   },
 
   /**
@@ -172,15 +196,15 @@ Page({
         this.setData({
           quickSlots: (avail.slots || []).slice(0, 8),
           isClosedToday: avail.isClosed || false,
-          closedReason: avail.closedReason || '',
-          peakAdvice: avail.peakAdvice || '',
+          closedReason: avail.closedReason || "",
+          peakAdvice: avail.peakAdvice || "",
           slotsLoading: false,
         });
       } else if (this.data.selectedVenueId === venueId) {
         this.setData({ slotsLoading: false, slotsError: true });
       }
     } catch (err) {
-      console.warn('加载指定场馆余量失败:', err);
+      console.warn("加载指定场馆余量失败:", err);
       if (this.data.selectedVenueId === venueId) {
         this.setData({ slotsLoading: false, slotsError: true, quickSlots: [] });
       }
@@ -188,8 +212,15 @@ Page({
   },
 
   goToVenueDetail(e: any) {
-    const id = e.currentTarget.dataset.id;
+    const id = e.detail.id || e.currentTarget.dataset.id;
     wx.navigateTo({ url: `/pages/venue/detail/detail?id=${id}` });
+  },
+
+  goToBooking(e: any) {
+    const id = e.detail.id || e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/venue/date/date?id=${encodeURIComponent(id)}`,
+    });
   },
 
   onQuickSlotTap(e: any) {
@@ -201,24 +232,31 @@ Page({
         url: `/pages/venue/booking/booking?id=${targetVenueId}&slotId=${slot.id}`,
       });
     } else {
-      wx.showToast({ title: '该时段已约满或不可选', icon: 'none' });
+      wx.showToast({ title: "该时段已约满或不可选", icon: "none" });
     }
   },
 
   goToNotifications() {
-    wx.navigateTo({ url: AuthStore.getToken() ? '/pages/user/notifications/notifications' : '/pages/auth/login/login' });
+    wx.navigateTo({
+      url: AuthStore.getToken()
+        ? "/pages/user/notifications/notifications"
+        : "/pages/auth/login/login",
+    });
   },
 
   navTo(e: any) {
     const url = e.currentTarget.dataset.url;
     const type = e.currentTarget.dataset.type;
-    if (url.startsWith('/pages/venue/list/list')) {
+    if (url.startsWith("/pages/venue/list/list")) {
       const app = getApp<any>();
       if (app && app.globalData) {
-        app.globalData.targetVenueType = type || '';
+        app.globalData.targetVenueType = type || "";
       }
       wx.switchTab({ url });
-    } else if (url.startsWith('/pages/order/list/list') || url.startsWith('/pages/user/profile/profile')) {
+    } else if (
+      url.startsWith("/pages/order/list/list") ||
+      url.startsWith("/pages/user/profile/profile")
+    ) {
       wx.switchTab({ url });
     } else {
       wx.navigateTo({ url });

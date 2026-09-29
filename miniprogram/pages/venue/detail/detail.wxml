@@ -1,96 +1,33 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
 <view class="venue-detail-page container">
-  <scroll-view class="tab-scroll" scroll-x enable-flex show-scrollbar="{{false}}" wx:if="{{!loading && !loadError && tabs.length > 0}}">
-    <view class="tab-bar card">
-      <view
-        class="tab-item {{activeTab === item.key ? 'active' : ''}}"
-        wx:for="{{tabs}}"
-        wx:key="key"
-        bindtap="onSwitchTab"
-        data-key="{{item.key}}"
-      >
-        {{item.label}}
-      </view>
+  <view wx:if="{{loading}}" class="card skeleton-box" style="height:380rpx"></view>
+  <view wx:elif="{{loadError}}" class="empty-state"><view class="empty-title">场馆信息加载失败</view><button class="btn-retry" bindtap="onRetry">点击重试</button></view>
+  <block wx:elif="{{venue.id}}">
+    <image class="detail-hero motion-detail" src="{{coverImage}}" mode="aspectFill" binderror="onImageError" />
+    <view class="detail-intro motion-detail">
+      <view class="detail-name">{{venue.name}}</view>
+      <view class="detail-muted">{{venue.address}}</view>
+      <view class="detail-muted">营业时间 {{venue.openTime}}-{{venue.closeTime}}</view>
     </view>
-  </scroll-view>
-
-  <!-- 加载骨架屏 -->
-  <view wx:if="{{loading}}">
-    <view class="card skeleton-card"><view class="skeleton-box skeleton-line" style="width: 54%;"></view><view class="skeleton-box skeleton-line" style="width: 82%;"></view></view>
-    <view class="card skeleton-card"><view class="skeleton-box skeleton-line" style="width: 42%;"></view><view class="skeleton-grid"><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view><view class="skeleton-box skeleton-tile"></view></view></view>
-    <view class="card skeleton-card"><view class="skeleton-box skeleton-line" style="width: 40%;"></view><view class="skeleton-box skeleton-line" style="width: 90%;"></view><view class="skeleton-box skeleton-line" style="width: 74%;"></view></view>
-  </view>
-
-  <!-- 加载失败：错误占位 + 重试 -->
-  <view wx:if="{{!loading && loadError}}" class="empty-state">
-    <text class="empty-icon">📡</text>
-    <text class="empty-title">场馆信息加载失败</text>
-    <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
-    <view class="btn-retry" bindtap="onRetry">点击重试</view>
-  </view>
-
-  <block wx:if="{{!loading && !loadError && venue.id}}">
-    <!-- 场馆基础信息卡片：馆名 + 开放时间 -->
-    <view class="section-card card content-enter">
-      <view class="venue-name-row flex-between">
-        <text class="venue-name">{{venue.name}}</text>
-        <view class="tag tag-blue">{{venue.openTime}} - {{venue.closeTime}}</view>
-      </view>
-      <view class="open-time-row flex-row">
-        <text class="clock-pin">🕒</text>
-        <text class="open-time-text">开放时间：每日 {{venue.openTime}} - {{venue.closeTime}}（仅支持当天预约）</text>
-      </view>
+    <view class="card motion-detail delay-short">
+      <view class="card-section-title">场馆介绍</view><view class="detail-muted">{{venue.description || '场馆介绍暂未提供'}}</view>
+      <view class="detail-facilities"><text wx:for="{{venue.facilities}}" wx:key="*this">{{item}}</text></view>
     </view>
-
-    <!-- 馆内平面示意图（CSS 绘制） -->
-    <view class="section-card card content-enter delay-short">
+    <view class="card motion-detail delay-medium">
+      <view class="card-section-title">场馆信息</view>
+      <view class="detail-fact"><text>今日余量</text><text>{{venue.totalRemaining === undefined || venue.totalRemaining === null ? '待查询' : venue.totalRemaining + ' 个名额'}}</text></view>
+      <view class="detail-fact"><text>开放时间</text><text>{{venue.openTime}}-{{venue.closeTime}}</text></view>
+      <view class="detail-fact"><text>起订价</text><text>¥{{filters.formatMoney(venue.basePrice)}}/小时</text></view>
+      <view class="detail-fact"><text>场地类型</text><text>{{filters.venueTypeName(venue.type)}}</text></view>
+    </view>
+    <view class="card motion-detail delay-long">
       <view class="card-section-title">馆内平面示意图</view>
-      <view class="floor-map">
-        <!-- 场馆外框 -->
-        <view class="map-outer">
-          <!-- 顶部入口标识 -->
-          <view class="map-entrance">↑ 场馆入口 / 前台</view>
-          <!-- 场地格矩阵 -->
-          <view class="map-grid">
-            <view class="map-court" wx:for="{{courtBlocks}}" wx:key="no">
-              <text class="map-court-no">{{item.no}}号场</text>
-            </view>
-          </view>
-          <!-- 底部辅助区域标识 -->
-          <view class="map-side flex-row">
-            <view class="map-side-item">更衣室</view>
-            <view class="map-side-item">淋浴间</view>
-            <view class="map-side-item">器材租借处</view>
-          </view>
-        </view>
-        <view class="map-legend flex-row">
-          <text class="legend-text">* 示意图仅供参考，实际布局以场馆现场为准</text>
-        </view>
-      </view>
+      <view class="map-entrance">↑ 场馆入口 / 前台</view>
+      <view class="map-grid"><view class="map-court" wx:for="{{courtBlocks}}" wx:key="no">{{item.no}}号场</view></view>
+      <view class="detail-muted">示意图仅供参考，实际布局以场馆现场为准。</view>
     </view>
-
-    <!-- 场馆位置说明（怎么走） -->
-    <view class="section-card card content-enter delay-medium">
-      <view class="card-section-title">场馆位置</view>
-      <view class="location-row flex-row">
-        <text class="loc-pin">📍</text>
-        <text class="location-text">{{venue.address}}</text>
-      </view>
-      <view class="guide-text">
-        路线指引：进入校园后，沿主干道前往{{venue.address}}，从场馆正门进入即可到达前台，出示预约码后按馆内平面示意图前往对应场地。
-      </view>
-    </view>
-
-    <!-- 底部固定操作栏：【开始预约】跳转 P2 选择时间页 -->
-    <view class="bottom-action-bar">
-      <button class="btn-start-book" bindtap="goToBooking">开始预约</button>
-    </view>
+    <view class="card" wx:if="{{venue.rules}}"><view class="card-section-title">预约须知</view><view class="detail-muted">{{venue.rules}}</view></view>
+    <view class="bottom-action-bar"><view class="detail-price">¥{{filters.formatMoney(venue.basePrice)}}<text>/小时起</text></view><button class="btn-primary" bindtap="goToBooking">开始预约</button></view>
   </block>
-
-  <!-- 无数据兜底 -->
-  <view class="empty-state" wx:if="{{!loading && !loadError && !venue.id}}">
-    <text class="empty-icon">🏟️</text>
-    <text class="empty-title">暂无场馆信息</text>
-    <text class="empty-desc">该类型场馆暂未上架，去看看其他场馆吧</text>
-    <view class="btn-retry" bindtap="onRetry">重新加载</view>
-  </view>
+  <view wx:else class="empty-state"><view class="empty-title">暂无场馆信息</view><button class="btn-retry" bindtap="onRetry">重新加载</button></view>
 </view>

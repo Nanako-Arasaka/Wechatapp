@@ -1,0 +1,13 @@
+<wxs src="../../utils/filters.wxs" module="filters" />
+<view class="venue-card" wx:if="{{venue}}" bindtap="open" hover-class="pressed" aria-label="查看{{venue.name}}详情">
+  <image class="cover" src="{{image}}" mode="aspectFill" binderror="imageFailed" />
+  <view class="info">
+    <view class="name">{{venue.name}}</view>
+    <view class="address">{{venue.address}}</view>
+    <view class="facilities"><text class="facility" wx:for="{{venue.facilities}}" wx:key="*this" wx:if="{{index < 3}}">{{item}}</text></view>
+    <view class="footer">
+      <view class="price">¥{{filters.formatMoney(venue.basePrice)}}<text class="unit">/小时起</text></view>
+      <button class="book" catchtap="book" hover-class="button-pressed">立即预约</button>
+    </view>
+  </view>
+</view>

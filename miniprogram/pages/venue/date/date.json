@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "选择日期",
+  "enablePullDownRefresh": true,
+  "usingComponents": { "rolling-number": "/components/rolling-number/rolling-number" }
+}

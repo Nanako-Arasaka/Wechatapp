@@ -1,10 +1,10 @@
 .order-list-page {
-  background: #F6F8FB;
+  background: #f6f8fb;
   padding-bottom: 40rpx;
 }
 
 .tab-bar-wrap {
-  background: #FFFFFF;
+  background: #ffffff;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -24,13 +24,13 @@
   justify-content: center;
   padding: 24rpx 32rpx;
   font-size: 28rpx;
-  color: #86909C;
+  color: #86909c;
   position: relative;
-  transition: all 0.2s ease;
+  transition: color 200ms ease;
 }
 
 .tab-item.active {
-  color: #1677FF;
+  color: #1677ff;
   font-weight: 800;
 }
 
@@ -51,17 +51,17 @@
 .order-card {
   padding: 26rpx;
   margin-bottom: 20rpx;
-  border-radius: 24rpx;
+  border-radius: 30rpx;
 }
 
 .order-header {
   padding-bottom: 16rpx;
-  border-bottom: 1rpx solid #F4F6F9;
+  border-bottom: 1rpx solid #f4f6f9;
 }
 
 .order-no {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
   font-family: monospace;
 }
 
@@ -75,33 +75,35 @@
   height: 140rpx;
   border-radius: 16rpx;
   margin-right: 20rpx;
-  background: #E5E6EB;
+  background: #e5e6eb;
   flex-shrink: 0;
 }
 
 .venue-name {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #1D2129;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1d2129;
   margin-bottom: 8rpx;
 }
 
 .time-range-text {
   font-size: 24rpx;
-  color: #1677FF;
-  font-weight: 600;
+  color: #86909c;
+  font-weight: 400;
   margin-bottom: 6rpx;
 }
 
 .count-text {
   font-size: 22rpx;
-  color: #86909C;
+  color: #86909c;
 }
 
 .order-footer {
   padding-top: 18rpx;
-  border-top: 1rpx solid #F4F6F9;
+  border-top: 1rpx solid #f4f6f9;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 18rpx;
 }
 
 .footer-price {
@@ -111,12 +113,12 @@
 
 .price-label {
   font-size: 24rpx;
-  color: #86909C;
+  color: #86909c;
 }
 
 .refund-tip {
   font-size: 20rpx;
-  color: #00B96B;
+  color: #00b96b;
   margin-left: 8rpx;
 }
 
@@ -125,6 +127,8 @@
   flex-direction: row;
   align-items: center;
   gap: 16rpx;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .btn-action-cancel {
@@ -133,8 +137,8 @@
   justify-content: center;
   height: 56rpx;
   padding: 0 24rpx;
-  background: #F4F6F9;
-  color: #86909C;
+  background: #f4f6f9;
+  color: #86909c;
   font-size: 24rpx;
   font-weight: 600;
   border-radius: 28rpx;
@@ -153,7 +157,7 @@
   height: 56rpx;
   padding: 0 30rpx;
   background: var(--primary-gradient);
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 24rpx;
   font-weight: 600;
   border-radius: 28rpx;

@@ -1,0 +1,102 @@
+/* 与浏览器预览对应的页面动效，按场景使用，保持原生导航栏和 TabBar。 */
+.motion-home {
+  animation: preview-rise 480ms var(--ease-enter) both;
+}
+.motion-list-card {
+  animation: preview-drop 620ms var(--ease-enter) both;
+}
+.motion-panel {
+  animation: preview-rise 420ms var(--ease-enter) both;
+}
+.motion-detail {
+  animation: preview-reveal 500ms var(--ease-move) both;
+}
+.motion-orders {
+  animation: preview-fade 300ms ease both;
+}
+.motion-profile {
+  animation: preview-profile 540ms var(--ease-enter) both;
+}
+.motion-login {
+  animation: preview-rise 620ms var(--ease-enter) both;
+}
+.refresh-spin {
+  animation: preview-spin 720ms linear infinite;
+}
+.ui-icon {
+  width: 36rpx;
+  height: 36rpx;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+@keyframes preview-rise {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes preview-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes preview-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(32rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes preview-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes preview-profile {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes preview-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-home,
+  .motion-list-card,
+  .motion-panel,
+  .motion-detail,
+  .motion-orders,
+  .motion-profile,
+  .motion-login,
+  .refresh-spin {
+    animation: none !important;
+    transform: none;
+    opacity: 1;
+  }
+  .venue-card-shell {
+    transition: none !important;
+    transform: none !important;
+  }
+}

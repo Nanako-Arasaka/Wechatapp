@@ -20,6 +20,7 @@ export interface Venue {
   capacity: number;
   openTime: string;
   closeTime: string;
+  advanceDays?: number;
   status: string;
   facilities: string[];
   rules?: string;

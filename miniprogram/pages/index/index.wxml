@@ -1,201 +1,51 @@
-<wxs src="../../utils/filters.wxs" module="filters" />
 <view class="index-page container">
-  <!-- 顶部定位与全局搜索 -->
   <view class="header-section">
     <view class="location-row flex-between">
-      <view class="loc-left flex-row" bindtap="handleChooseLocation">
-        <text class="loc-name">{{currentLocation}}</text>
-        <text class="loc-arrow">▼</text>
+      <view class="loc-left flex-row" bindtap="handleChooseLocation" hover-class="hover-press">
+        <image class="ui-icon" src="/assets/ui/location.svg" /><text class="loc-name">{{currentLocation}}</text>
       </view>
-      <view class="notify-btn-box" bindtap="goToNotifications">
-        <text class="notify-bell">🔔</text>
-        <view class="badge-dot" wx:if="{{hasUnread}}"></view>
+      <view class="notify-btn-box" bindtap="goToNotifications" hover-class="hover-press" aria-label="消息通知">
+        <image class="ui-icon" src="/assets/ui/bell.svg" /><view class="badge-dot" wx:if="{{hasUnread}}"></view>
       </view>
     </view>
-
-    <!-- 真实可交互搜索栏 -->
     <view class="search-bar flex-row {{searchFocused ? 'focus' : ''}}">
-      <text class="search-icon">🔍</text>
-      <input
-        class="search-input flex-1"
-        value="{{keyword}}"
-        placeholder="搜索运动项目、场馆名称或场地设施..."
-        placeholder-class="search-placeholder"
-        confirm-type="search"
-        bindinput="onSearchInput"
-        bindconfirm="onSearchConfirm"
-        bindfocus="onSearchFocus"
-        bindblur="onSearchBlur"
-      />
-      <view class="search-btn" bindtap="onSearchConfirm">搜索</view>
+      <image class="ui-icon" src="/assets/ui/search.svg" />
+      <input class="search-input flex-1" value="{{keyword}}" placeholder="搜索运动项目、场馆名称…" confirm-type="search" bindinput="onSearchInput" bindconfirm="onSearchConfirm" bindfocus="onSearchFocus" bindblur="onSearchBlur" />
+      <button class="search-btn" bindtap="onSearchConfirm">搜索</button>
     </view>
   </view>
-
-  <!-- Banner 轮播图 -->
-  <view class="banner-section">
-    <swiper class="banner-swiper" autoplay circular interval="4000" indicator-dots indicator-color="rgba(255,255,255,0.6)" indicator-active-color="#1677FF">
-      <swiper-item>
-        <view class="banner-card banner-bg-1" bindtap="navTo" data-url="/pages/venue/list/list" data-type="BADMINTON">
-          <image class="banner-photo" src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=1000" mode="aspectFill" />
-          <view class="banner-shade"></view>
-          <view class="banner-tag">热门推荐</view>
-          <view class="banner-title">星羽羽毛球馆 A馆全新升级</view>
-          <view class="banner-desc">国家级比赛标准木地板 · 恒温中央空调</view>
-        </view>
-      </swiper-item>
-      <swiper-item>
-        <view class="banner-card banner-bg-2" bindtap="navTo" data-url="/pages/venue/list/list" data-type="BASKETBALL">
-          <image class="banner-photo" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" mode="aspectFill" />
-          <view class="banner-shade"></view>
-          <view class="banner-tag tag-orange">夜场特惠</view>
-          <view class="banner-title">冠军篮球中心 室内主馆</view>
-          <view class="banner-desc">FIBA认证枫木地板 · 实时电子计分大屏</view>
-        </view>
-      </swiper-item>
-    </swiper>
-  </view>
-
-  <!-- 错峰建议 -->
-  <view class="ai-advice-card card content-enter" wx:if="{{!venuesError && !slotsError && !slotsLoading && venues.length > 0}}">
-    <view class="advice-header flex-between">
-      <view class="advice-title-box flex-row">
-        <text class="advice-title">今日错峰建议</text>
-      </view>
-      <text class="tag tag-orange">今日排期</text>
+  <view class="home-content">
+    <view class="banner-card motion-home" bindtap="navTo" data-url="/pages/venue/list/list" data-type="BADMINTON">
+      <image class="banner-photo" src="/assets/venues/badminton.jpg" mode="aspectFill" />
+      <view class="banner-shade"></view>
+      <view class="banner-copy"><text class="banner-tag">热门推荐</text><view class="banner-title">发现身边的羽毛球场馆</view><view class="banner-desc">查看开放时间，选好下一场运动</view></view>
     </view>
-    <view class="advice-body">
-      <text class="advice-text">{{peakAdvice}}</text>
+    <view class="advice-card motion-home" wx:if="{{!venuesError && !slotsError && !slotsLoading && peakAdvice}}">
+      <view class="advice-title">今日错峰建议</view><view class="advice-text">{{peakAdvice}}</view>
     </view>
-  </view>
-
-  <!-- 热门场馆推荐 -->
-  <view class="section-container">
-    <view class="section-header flex-between">
-      <view class="section-title flex-row">
-        <text class="title-bar"></text>
-        <text>热门推荐场馆</text>
-      </view>
-      <view class="more-link" bindtap="navTo" data-url="/pages/venue/list/list">查看全部 ›</view>
-    </view>
-
-    <!-- 加载骨架 -->
-    <view class="venue-list" wx:if="{{venuesLoading}}">
-      <view class="card skeleton-box" style="height: 220rpx; margin-bottom: 20rpx;"></view>
-      <view class="card skeleton-box" style="height: 220rpx; margin-bottom: 20rpx;"></view>
-      <view class="card skeleton-box" style="height: 220rpx;"></view>
-    </view>
-
-    <!-- 加载失败：错误占位 + 重试 -->
-    <view wx:elif="{{venuesError}}" class="empty-state">
-      <text class="empty-icon">📡</text>
-      <text class="empty-title">场馆数据加载失败</text>
-      <text class="empty-desc">网络似乎不太给力，请稍后重试</text>
-      <view class="btn-retry" bindtap="onRetryLoad">点击重试</view>
-    </view>
-
-    <!-- 空状态 -->
-    <view wx:elif="{{venues.length === 0}}" class="empty-state">
-      <text class="empty-icon">🏟️</text>
-      <text class="empty-title">暂无可用场馆</text>
-      <text class="empty-desc">当前区域还没有上架的场馆，敬请期待</text>
-    </view>
-
-    <!-- 场馆卡片列表 -->
-    <view class="venue-list" wx:else>
-      <view
-        class="venue-card card flex-row content-enter"
-        wx:for="{{venues}}"
-        wx:key="id"
-        bindtap="goToVenueDetail"
-        data-id="{{item.id}}"
-        style="animation-delay: {{index * 55}}ms;"
-      >
-        <view class="venue-img-wrap">
-          <image class="venue-img" src="{{item.coverImage}}" mode="aspectFill" />
-          <view class="v-img-badge {{item.totalRemaining === 0 ? 'badge-full' : (item.totalRemaining <= 2 ? 'badge-tight' : 'badge-avail')}}">
-            {{item.totalRemaining === 0 ? '已约满' : '余 ' + (item.totalRemaining || 8) + ' 位'}}
-          </view>
-        </view>
-
-        <view class="venue-info flex-1">
-          <view class="venue-title-row flex-between">
-            <text class="venue-name">{{item.name}}</text>
-            <text class="tag tag-blue">{{filters.venueTypeName(item.type)}}</text>
-          </view>
-          <view class="venue-addr">{{item.address}}</view>
-          <view class="facility-tags flex-row">
-            <text class="fac-tag" wx:for="{{item.facilities}}" wx:for-item="fac" wx:key="fac" wx:if="{{index < 3}}">{{fac}}</text>
-          </view>
-          <view class="venue-bottom flex-between">
-            <view class="price-box">
-              <text class="symbol">¥</text>
-              <text class="price-val">{{filters.formatMoney(item.basePrice)}}</text>
-              <text class="unit">/小时起</text>
-            </view>
-            <view class="btn-primary-sm" catchtap="goToVenueDetail" data-id="{{item.id}}">立即预约</view>
-          </view>
-        </view>
+    <view class="section-header flex-between"><view class="section-title">热门推荐场馆</view><text class="more-link" bindtap="navTo" data-url="/pages/venue/list/list">查看全部 ›</text></view>
+    <view wx:if="{{venuesLoading}}"><view class="skeleton-box home-skeleton"></view><view class="skeleton-box home-skeleton"></view></view>
+    <view wx:elif="{{venuesError}}" class="empty-state"><view class="empty-title">场馆数据加载失败</view><button class="btn-retry" bindtap="onRetryLoad">点击重试</button></view>
+    <view wx:elif="{{!venues.length}}" class="empty-state"><view class="empty-title">暂无可用场馆</view><view class="empty-desc">场馆上架后会在这里显示</view></view>
+    <view wx:else>
+      <view class="motion-home" wx:for="{{recommendedVenues}}" wx:key="id" style="animation-delay:{{index * 70}}ms">
+        <venue-card venue="{{item}}" bind:open="goToVenueDetail" bind:book="goToBooking" />
       </view>
     </view>
-  </view>
-
-  <!-- 今日时段实时余量 (支持用户自由切换场馆) -->
-  <view class="section-container" wx:if="{{!venuesError && venues.length > 0}}">
-    <view class="section-header flex-between">
-      <view class="section-title flex-row">
-        <text class="title-bar"></text>
-        <text>今日时段实时余量</text>
-      </view>
-      <text class="refresh-tip" wx:if="{{!slotsError && !slotsLoading}}">● 实时余量</text>
-    </view>
-
-    <!-- 场馆快速选择胶囊标签 -->
-    <view class="venue-tabs-wrap">
-      <scroll-view scroll-x enable-flex class="venue-tabs-scroll" show-scrollbar="{{false}}">
-        <view
-          class="venue-pill {{selectedVenueId === item.id ? 'active' : ''}}"
-          wx:for="{{venues}}"
-          wx:key="id"
-          bindtap="onSelectQuickVenue"
-          data-id="{{item.id}}"
-        >
-          <text class="vp-text">{{item.name}}</text>
+    <block wx:if="{{!venuesError && venues.length}}">
+      <view class="section-header flex-between"><view class="section-title">今日时段实时余量</view><button class="refresh-slots" bindtap="onRetrySlots" disabled="{{slotsLoading}}"><image class="ui-icon {{slotsLoading ? 'refresh-spin' : ''}}" src="/assets/ui/refresh.svg" />刷新</button></view>
+      <scroll-view class="horizontal-scroll" scroll-x show-scrollbar="{{false}}">
+        <view class="venue-pill {{selectedVenueId === item.id ? 'active' : ''}}" wx:for="{{venues}}" wx:key="id" bindtap="onSelectQuickVenue" data-id="{{item.id}}">{{item.name}}</view>
+      </scroll-view>
+      <view wx:if="{{slotsLoading}}" class="skeleton-box slots-skeleton"></view>
+      <view wx:elif="{{slotsError}}" class="slots-state"><text>时段余量加载失败</text><button class="btn-retry" bindtap="onRetrySlots">重试</button></view>
+      <view wx:elif="{{isClosedToday}}" class="slots-state">今日闭馆：{{closedReason || '场馆维护中'}}</view>
+      <scroll-view wx:elif="{{quickSlots.length}}" class="horizontal-scroll" scroll-x show-scrollbar="{{false}}">
+        <view class="slot-bubble {{item.isSelectable ? '' : 'disabled'}}" wx:for="{{quickSlots}}" wx:key="id" bindtap="onQuickSlotTap" data-slot="{{item}}">
+          <view class="sb-time">{{item.startTime}}</view><view class="sb-status">{{item.isSelectable ? '✓ 余 ' + item.remaining : item.statusText}}</view>
         </view>
       </scroll-view>
-    </view>
-
-    <!-- 对应选中场馆的时段气泡 -->
-    <view class="slots-scroll-wrap card">
-      <view wx:if="{{slotsLoading}}" class="empty-closed-tip">
-        <view class="skeleton-line skeleton-box" style="width: 58%; height: 28rpx; margin-bottom: 18rpx;"></view>
-        <view class="skeleton-line skeleton-box" style="width: 86%; height: 74rpx;"></view>
-      </view>
-      <view wx:elif="{{slotsError}}" class="empty-closed-tip">
-        <text class="ect-text">时段余量加载失败</text>
-        <view class="btn-retry" bindtap="onRetrySlots">点击重试</view>
-      </view>
-      <view wx:elif="{{isClosedToday}}" class="empty-closed-tip">
-        <text class="ect-icon">🔧</text>
-        <text class="ect-text">今日闭馆：{{closedReason || '场馆维护中'}}</text>
-      </view>
-      <block wx:elif="{{quickSlots.length > 0}}">
-        <scroll-view scroll-x enable-flex class="slots-scroll" show-scrollbar="{{false}}">
-          <view
-            class="slot-bubble slot-{{item.statusColor}} {{!item.isSelectable ? 'disabled' : ''}}"
-            wx:for="{{quickSlots}}"
-            wx:key="id"
-            bindtap="onQuickSlotTap"
-            data-slot="{{item}}"
-          >
-            <view class="sb-time">{{item.startTime}}</view>
-            <view class="sb-status">{{item.isSelectable ? '✓ ' + item.statusText : item.statusText === '已过时段' ? '— 已过' : item.statusText === '已满' ? '满' : '× ' + item.statusText}}</view>
-          </view>
-        </scroll-view>
-      </block>
-      <view wx:else class="empty-closed-tip">
-        <text class="ect-icon">📭</text>
-        <text class="ect-text">今日暂无可用时段</text>
-      </view>
-    </view>
+      <view wx:else class="slots-state">今日暂无可用时段</view>
+    </block>
   </view>
 </view>
