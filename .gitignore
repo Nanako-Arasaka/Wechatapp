@@ -7,6 +7,9 @@ node_modules/
 miniprogram_npm/
 
 # Build
+dist/
+test-results/
+playwright-report/
 server/dist/
 *.tsbuildinfo
 

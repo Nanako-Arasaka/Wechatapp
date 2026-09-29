@@ -1,0 +1,39 @@
+/* login */
+
+.login-hero {
+  margin: -16px -16px 18px;
+  padding: 48px 24px 36px;
+  background: linear-gradient(160deg, #1677ff 0%, #3b82f6 55%, #60a5fa 100%);
+  color: #fff;
+  border-radius: 0 0 28px 28px;
+}
+
+.login-hero h1 {
+  font-size: 26px;
+  margin: 12px 0 8px;
+}
+
+.login-hero p {
+  opacity: 0.92;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.login-card input {
+  width: 100%;
+  border: 0;
+  background: #f4f6f9;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  outline: 0;
+  transition:
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.login-card input:focus {
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.35);
+}

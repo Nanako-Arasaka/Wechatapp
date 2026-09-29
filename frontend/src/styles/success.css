@@ -1,0 +1,55 @@
+/* success */
+
+.success-icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--success);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 44px;
+  font-weight: 900;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(0, 185, 107, 0.3);
+  animation: checkIn 560ms var(--ease-enter) both;
+  position: relative;
+}
+
+.success-icon::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 185, 107, 0.35);
+  animation: pulse 1.8s ease-in-out 0.35s 2;
+}
+
+.ticket {
+  background: #fff;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  position: relative;
+  animation: rise 480ms var(--ease-enter) 180ms both;
+}
+
+.qr {
+  width: 180px;
+  height: 180px;
+  margin: 12px auto;
+  background: repeating-conic-gradient(#1d2129 0 25%, #fff 0 50%) 0 0/20px 20px;
+  border-radius: 8px;
+  border: 8px solid #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dash {
+  height: 1px;
+  margin: 16px 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #e5e6eb 0 6px,
+    transparent 6px 12px
+  );
+}

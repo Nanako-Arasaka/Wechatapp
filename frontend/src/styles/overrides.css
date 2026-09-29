@@ -1,0 +1,154 @@
+/* 我的预约快捷入口：线性 SVG（不用 emoji） */
+
+.prof-shortcut {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text2);
+  font-size: 11px;
+  font-weight: 600;
+  transition: transform 120ms var(--ease-press);
+}
+
+.prof-shortcut:active {
+  transform: scale(0.94);
+}
+
+.prof-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #f4f7fb;
+  display: grid;
+  place-items: center;
+}
+
+.prof-ic svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--primary);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 首页定位 / 通知：与 Tab 同风格线性图标 */
+
+.home-loc,
+.home-notify {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-ic {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  stroke: var(--primary);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-notify .home-ic {
+  width: 20px;
+  height: 20px;
+}
+
+.search-ic {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-right: 2px;
+}
+
+/* 日历首次入场：格子错落升起（仅未加载完的首帧） */
+
+.cal-grid .cal-cell.cal-in {
+  animation: calIn 560ms var(--ease-enter) both;
+}
+
+@keyframes calIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cal-grid .cal-cell.cal-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 骨架屏：仅首次进入页面时出现 */
+
+.sk {
+  height: 12px;
+  border-radius: 6px;
+  margin: 0 0 8px;
+  background: linear-gradient(90deg, #f0f2f5 25%, #e6e8eb 37%, #f0f2f5 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* Tab 图标：线性 SVG，对齐 Sportica 类运动预约 App */
+
+.tabbar .ic {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.tabbar svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tabbar button.active svg {
+  stroke: var(--primary);
+}
+
+.tabbar .ic-refresh {
+  display: inline-block;
+  margin-right: 2px;
+}
+
+.refresh-spin .ic-refresh,
+.refresh-spin {
+  animation: spin 700ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .btn:active,
+  .btn-outline:active,
+  .btn-sm:active,
+  .venue-card:active,
+  .cell.selected,
+  .pill.active {
+    transform: none;
+  }
+}

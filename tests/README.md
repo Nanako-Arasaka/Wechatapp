@@ -3,8 +3,9 @@
 Compile the mini program TypeScript before testing the generated JavaScript:
 
 ```sh
-npm exec --yes --package=typescript@5.3.3 -- tsc -p miniprogram/tsconfig.json
-node --test tests/frontend.test.cjs
+npm ci
+npm run build:miniprogram
+npm test
 ```
 
 The tests mock the WeChat page lifecycle and HTTP client. They do not start or
@@ -21,3 +22,17 @@ QR_DECODER=/tmp/wechatapp-frontend-check/node_modules/jsqr/dist/jsQR.js node --t
 
 Without `QR_DECODER`, only the QR decoding test is skipped. Actual WeChat canvas
 rendering, device permissions and layout still require Developer Tools or a phone.
+
+## Browser Preview
+
+```sh
+npm run test:web
+```
+
+Playwright starts Vite or reuses the server on port 5173. Tests cover search,
+filters, navigation during animations, a future-date booking, the selected order's
+check-in preview, logout, both HTML entry points and the separate motion demo.
+They run at desktop, mobile and 320px widths, report uncaught page errors and save
+screenshots to `test-results/`. These tests use demo data and do not start the backend.
+On macOS they use Google Chrome; elsewhere install Chromium with
+`npx playwright install chromium` first.

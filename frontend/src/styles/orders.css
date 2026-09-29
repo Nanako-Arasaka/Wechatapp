@@ -1,0 +1,34 @@
+/* orders */
+
+.order-tabs {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+}
+
+.order-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.order-tabs button {
+  white-space: nowrap;
+  padding: 6px 2px;
+  color: var(--text2);
+  font-size: 13px;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 180ms ease,
+    transform 120ms var(--ease-press);
+}
+
+.order-tabs button:active {
+  transform: scale(0.96);
+}
+
+.order-tabs button.active {
+  color: var(--primary);
+  border-color: var(--primary);
+  font-weight: 700;
+}

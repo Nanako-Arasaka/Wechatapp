@@ -1,530 +1,209 @@
-<!-- AI生成 -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>智场通 · 动效预览</title>
-<style>
-  :root {
-    --primary: #1677FF;
-    --primary-end: #3B82F6;
-    --primary-light: #E6F4FF;
-    --success: #00B96B;
-    --success-light: #E6FFFB;
-    --warning: #FA8C16;
-    --danger: #FF4D4F;
-    --text: #1D2129;
-    --text-2: #4E5969;
-    --text-3: #86909C;
-    --bg: #F6F8FB;
-    --card: #FFFFFF;
-    --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
-    --ease-move: cubic-bezier(0.25, 1, 0.5, 1);
-    --ease-press: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --dur-press: 120ms;
-    --dur-ui: 220ms;
-    --dur-panel: 280ms;
-    --dur-enter: 360ms;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 28px 16px 60px;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 420px; margin: 0 auto; }
-  h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.2px; }
-  .sub { color: var(--text-3); font-size: 13px; margin: 6px 0 22px; line-height: 1.5; }
-  .section {
-    background: var(--card);
-    border-radius: 18px;
-    padding: 18px 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
-  }
-  .section h2 {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .section .hint {
-    font-size: 12px;
-    color: var(--text-3);
-    margin-bottom: 14px;
-    line-height: 1.5;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>智场通 · 动效预览</title>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>智场通 · 动效预览</h1>
+      <p class="sub">
+        对照小程序全局 Motion 体系：按压反馈、选中
+        pop、卡片入场、底部抽屉、成功庆祝、骨架屏。 可直接点按体验；已适配
+        <span class="kbd">prefers-reduced-motion</span>。
+      </p>
 
-  /* Buttons */
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-end));
-    color: #fff; border: none; border-radius: 999px;
-    padding: 12px 22px; font-size: 14px; font-weight: 600;
-    box-shadow: 0 12px 36px rgba(22,119,255,0.2);
-    transition: transform var(--dur-press) var(--ease-press),
-                opacity 160ms ease,
-                box-shadow var(--dur-ui) var(--ease-enter);
-    cursor: pointer;
-  }
-  .btn-primary:active {
-    opacity: 0.92; transform: scale(0.97);
-    box-shadow: 0 6px 18px rgba(22,119,255,0.18);
-  }
-  .btn-outline {
-    background: transparent; color: var(--primary);
-    border: 1.5px solid var(--primary); border-radius: 999px;
-    padding: 11px 20px; font-size: 13px; font-weight: 600;
-    transition: background-color 160ms ease, transform var(--dur-press) var(--ease-press);
-    cursor: pointer;
-  }
-  .btn-outline:active { background: var(--primary-light); transform: scale(0.97); }
-
-  /* Cards */
-  .venue-card {
-    display: flex; gap: 12px; padding: 14px;
-    border-radius: 16px; background: var(--card);
-    border: 1px solid rgba(0,0,0,0.03);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
-    margin-bottom: 12px;
-    transition: transform var(--dur-press) var(--ease-press),
-                box-shadow var(--dur-ui) var(--ease-enter);
-  }
-  .venue-card:active {
-    transform: scale(0.985);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-  }
-  .venue-card:active .thumb { transform: scale(1.05); }
-  .thumb {
-    width: 84px; height: 84px; border-radius: 12px; flex-shrink: 0;
-    background: linear-gradient(135deg, #1677FF22, #3B82F655);
-    transition: transform 220ms var(--ease-enter);
-  }
-  .venue-name { font-size: 15px; font-weight: 700; }
-  .venue-addr { font-size: 12px; color: var(--text-3); margin: 4px 0 8px; }
-  .tag {
-    display: inline-block; font-size: 11px; font-weight: 600;
-    padding: 2px 8px; border-radius: 6px;
-    background: var(--primary-light); color: var(--primary);
-  }
-
-  /* Chips */
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .chip {
-    padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600;
-    background: #F4F6F9; color: var(--text-2); border: 1px solid transparent;
-    transition: background-color var(--dur-ui) var(--ease-enter),
-                color var(--dur-ui) var(--ease-enter),
-                transform var(--dur-press) var(--ease-press),
-                box-shadow var(--dur-ui) var(--ease-enter);
-    cursor: pointer; user-select: none;
-  }
-  .chip:active { transform: scale(0.95); }
-  .chip.active {
-    background: var(--primary); color: #fff;
-    box-shadow: 0 6px 16px rgba(22,119,255,0.28);
-    transform: scale(1.03);
-  }
-
-  /* Slots */
-  .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .slot {
-    text-align: center; padding: 12px 6px; border-radius: 12px;
-    background: var(--success-light); border: 1.5px solid rgba(0,185,107,0.35);
-    cursor: pointer;
-    transition: transform var(--dur-press) var(--ease-press),
-                background-color var(--dur-ui) var(--ease-enter),
-                border-color var(--dur-ui) var(--ease-enter),
-                box-shadow var(--dur-ui) var(--ease-enter);
-  }
-  .slot:not(.disabled):active { transform: scale(0.95); }
-  .slot.disabled {
-    background: #F0F1F3; border-color: #E5E6EB; cursor: default;
-    color: #C9CDD4;
-  }
-  .slot.selected {
-    background: var(--primary-light); border-color: var(--primary);
-    box-shadow: 0 10px 28px rgba(22,119,255,0.22);
-    animation: selection-pop 280ms var(--ease-enter) both,
-               selection-ring 520ms var(--ease-enter) both;
-    transform: scale(1.02);
-    color: var(--primary);
-  }
-  .slot .t { font-size: 16px; font-weight: 700; }
-  .slot .s { font-size: 11px; margin-top: 4px; color: var(--text-3); }
-  .slot.selected .s { color: var(--primary); font-weight: 600; }
-
-  /* Stagger enter demo */
-  .stagger > * {
-    animation: content-rise var(--dur-enter) var(--ease-enter) both;
-  }
-  .stagger > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger > *:nth-child(2) { animation-delay: 55ms; }
-  .stagger > *:nth-child(3) { animation-delay: 110ms; }
-  .stagger > *:nth-child(4) { animation-delay: 165ms; }
-
-  /* Success */
-  .success-box {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 8px 0 4px;
-  }
-  .success-icon {
-    width: 72px; height: 72px; border-radius: 50%;
-    background: var(--success); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36px; font-weight: 900;
-    box-shadow: 0 8px 24px rgba(0,185,107,0.3);
-    animation: check-draw 560ms var(--ease-enter) both;
-    position: relative;
-  }
-  .success-icon::before {
-    content: ''; position: absolute; inset: -8px; border-radius: 50%;
-    border: 3px solid rgba(0,185,107,0.35);
-    animation: pulse-soft 1.8s ease-in-out 0.35s 2;
-  }
-  .success-title {
-    margin-top: 14px; font-size: 18px; font-weight: 700;
-    animation: content-rise 420ms var(--ease-enter) 80ms both;
-  }
-  .success-sub {
-    margin-top: 6px; font-size: 12px; color: var(--text-3);
-    animation: content-rise 420ms var(--ease-enter) 140ms both;
-  }
-
-  /* Sheet */
-  .mask {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
-    opacity: 0; pointer-events: none; transition: opacity var(--dur-ui) ease;
-    z-index: 20;
-  }
-  .mask.show { opacity: 1; pointer-events: auto; }
-  .sheet {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    background: #fff; border-radius: 22px 22px 0 0;
-    padding: 14px 18px 28px;
-    transform: translateY(100%);
-    transition: transform var(--dur-panel) var(--ease-move);
-    z-index: 21;
-    box-shadow: 0 -12px 40px rgba(0,0,0,0.12);
-  }
-  .sheet.show { transform: translateY(0); }
-  .handle {
-    width: 40px; height: 4px; border-radius: 999px;
-    background: #E5E6EB; margin: 0 auto 14px;
-  }
-  .sheet h3 { font-size: 15px; margin-bottom: 12px; }
-
-  /* Skeleton */
-  .sk {
-    height: 14px; border-radius: 6px; margin-bottom: 10px;
-    background: linear-gradient(90deg, #F0F2F5 25%, #E6E8EB 37%, #F0F2F5 63%);
-    background-size: 400% 100%;
-    animation: skeleton-shimmer 1.4s ease infinite;
-  }
-  .sk.w60 { width: 60%; }
-  .sk.w80 { width: 80%; }
-  .sk.w40 { width: 40%; }
-
-  /* Search focus */
-  .search {
-    display: flex; align-items: center; gap: 8px;
-    background: #fff; border-radius: 999px; padding: 10px 12px 10px 16px;
-    border: 1px solid rgba(22,119,255,0.12);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.04);
-    transition: box-shadow var(--dur-ui) var(--ease-enter),
-                border-color var(--dur-ui) ease,
-                transform var(--dur-press) var(--ease-press);
-  }
-  .search.focus {
-    border-color: rgba(22,119,255,0.45);
-    box-shadow: 0 8px 28px rgba(22,119,255,0.16);
-    transform: translateY(-1px);
-  }
-  .search input {
-    flex: 1; border: none; outline: none; font-size: 13px;
-  }
-  .search .go {
-    background: linear-gradient(135deg, var(--primary), var(--primary-end));
-    color: #fff; border: none; border-radius: 999px;
-    padding: 8px 14px; font-size: 12px; font-weight: 600;
-    transition: transform var(--dur-press) var(--ease-press), opacity 160ms ease;
-    cursor: pointer;
-  }
-  .search .go:active { transform: scale(0.93); opacity: 0.92; }
-
-  /* Keyframes */
-  @keyframes content-rise {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes selection-pop {
-    0% { transform: scale(0.94); }
-    55% { transform: scale(1.045); }
-    100% { transform: scale(1.02); }
-  }
-  @keyframes selection-ring {
-    0% { box-shadow: 0 0 0 0 rgba(22,119,255,0.45); }
-    70% { box-shadow: 0 0 0 12px rgba(22,119,255,0); }
-    100% { box-shadow: 0 0 0 0 rgba(22,119,255,0); }
-  }
-  @keyframes check-draw {
-    0% { transform: scale(0.4); opacity: 0; }
-    50% { transform: scale(1.12); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  @keyframes pulse-soft {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.06); opacity: 0.86; }
-  }
-  @keyframes skeleton-shimmer {
-    0% { background-position: -200px 0; }
-    100% { background-position: calc(200px + 100%) 0; }
-  }
-
-  .pill-demo {
-    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
-  }
-  .vpill {
-    flex-shrink: 0; padding: 8px 14px; border-radius: 999px;
-    background: #fff; border: 1px solid #E5E6EB;
-    font-size: 12px; font-weight: 600; color: var(--text-2);
-    transition: background-color var(--dur-ui) var(--ease-enter),
-                border-color var(--dur-ui) var(--ease-enter),
-                color var(--dur-ui) var(--ease-enter),
-                transform var(--dur-press) var(--ease-press),
-                box-shadow var(--dur-ui) var(--ease-enter);
-    cursor: pointer;
-  }
-  .vpill:active { transform: scale(0.95); }
-  .vpill.active {
-    background: var(--primary); border-color: var(--primary); color: #fff;
-    box-shadow: 0 6px 18px rgba(22,119,255,0.28);
-    transform: scale(1.02);
-  }
-
-  .note {
-    font-size: 11px; color: var(--text-3); line-height: 1.6;
-    margin-top: 10px; padding-top: 10px; border-top: 1px dashed #E5E6EB;
-  }
-  .kbd {
-    display: inline-block; padding: 1px 6px; border-radius: 4px;
-    background: #F0F2F5; font-family: ui-monospace, monospace; font-size: 10px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-    .btn-primary:active, .btn-outline:active, .venue-card:active,
-    .chip:active, .slot:not(.disabled):active, .chip.active, .vpill.active {
-      transform: none;
-    }
-  }
-</style>
-</head>
-<body>
-<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
-
-  <div class="wrap">
-    <h1>智场通 · 动效预览</h1>
-    <p class="sub">
-      对照小程序全局 Motion 体系：按压反馈、选中 pop、卡片入场、底部抽屉、成功庆祝、骨架屏。
-      可直接点按体验；已适配 <span class="kbd">prefers-reduced-motion</span>。
-    </p>
-
-    <div class="section">
-      <h2>1 · 按压反馈</h2>
-      <p class="hint">transform / opacity，时长 120ms，入场曲线 cubic-bezier(0.22,1,0.36,1)</p>
-      <div class="row">
-        <button class="btn-primary">立即预约</button>
-        <button class="btn-outline">查看详情</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>2 · 搜索栏聚焦</h2>
-      <p class="hint">聚焦时描边加深、轻抬 1px（输入框 focus / blur）</p>
-      <div class="search" id="searchBox">
-        <span>🔍</span>
-        <input id="searchInput" placeholder="搜索运动项目、场馆..." />
-        <button class="go">搜索</button>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>3 · 分类胶囊切换</h2>
-      <p class="hint">选中放大 1.03 + 阴影抬升；按压缩到 0.95</p>
-      <div class="chips" id="chips">
-        <div class="chip active">🏸 羽毛球</div>
-        <div class="chip">🏀 篮球</div>
-        <div class="chip">🏊 游泳</div>
-        <div class="chip">⚽ 足球</div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>4 · 时段选择（selection-pop + ring）</h2>
-      <p class="hint">选中格子：弹性放大 + 扩散光环；已满/已过置灰</p>
-      <div class="slots" id="slots">
-        <div class="slot disabled"><div class="t">09:00</div><div class="s">— 已过</div></div>
-        <div class="slot"><div class="t">10:00</div><div class="s">✓ 余 3</div></div>
-        <div class="slot selected"><div class="t">14:00</div><div class="s">✓ 余 5</div></div>
-        <div class="slot"><div class="t">15:00</div><div class="s">✓ 余 2</div></div>
-        <div class="slot disabled"><div class="t">19:00</div><div class="s">满</div></div>
-        <div class="slot"><div class="t">20:00</div><div class="s">✓ 余 8</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>5 · 场馆卡片入场（stagger）</h2>
-      <p class="hint">依次上浮淡入，间隔 55ms，总时长控制在 300ms 内</p>
-      <div class="stagger" id="staggerList">
-        <div class="venue-card">
-          <div class="thumb"></div>
-          <div>
-            <div class="venue-name">星羽羽毛球馆</div>
-            <div class="venue-addr">洪山区文体中心 · 木地板</div>
-            <span class="tag">羽毛球</span>
-          </div>
+      <div class="section">
+        <h2>1 · 按压反馈</h2>
+        <p class="hint">
+          transform / opacity，时长 120ms，入场曲线 cubic-bezier(0.22,1,0.36,1)
+        </p>
+        <div class="row">
+          <button class="btn-primary">立即预约</button>
+          <button class="btn-outline">查看详情</button>
         </div>
-        <div class="venue-card">
-          <div class="thumb"></div>
-          <div>
-            <div class="venue-name">冠军篮球中心</div>
-            <div class="venue-addr">光谷体育馆 · 枫木地板</div>
-            <span class="tag">篮球</span>
-          </div>
+      </div>
+
+      <div class="section">
+        <h2>2 · 搜索栏聚焦</h2>
+        <p class="hint">聚焦时描边加深、轻抬 1px（输入框 focus / blur）</p>
+        <div class="search" id="searchBox">
+          <span>🔍</span>
+          <input id="searchInput" placeholder="搜索运动项目、场馆..." />
+          <button class="go">搜索</button>
         </div>
-        <div class="venue-card">
-          <div class="thumb"></div>
-          <div>
-            <div class="venue-name">蓝湾游泳馆</div>
-            <div class="venue-addr">南湖大道 · 恒温泳池</div>
-            <span class="tag">游泳</span>
+      </div>
+
+      <div class="section">
+        <h2>3 · 分类胶囊切换</h2>
+        <p class="hint">选中放大 1.03 + 阴影抬升；按压缩到 0.95</p>
+        <div class="chips" id="chips">
+          <div class="chip active">🏸 羽毛球</div>
+          <div class="chip">🏀 篮球</div>
+          <div class="chip">🏊 游泳</div>
+          <div class="chip">⚽ 足球</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>4 · 时段选择（selection-pop + ring）</h2>
+        <p class="hint">选中格子：弹性放大 + 扩散光环；已满/已过置灰</p>
+        <div class="slots" id="slots">
+          <div class="slot disabled">
+            <div class="t">09:00</div>
+            <div class="s">— 已过</div>
+          </div>
+          <div class="slot">
+            <div class="t">10:00</div>
+            <div class="s">✓ 余 3</div>
+          </div>
+          <div class="slot selected">
+            <div class="t">14:00</div>
+            <div class="s">✓ 余 5</div>
+          </div>
+          <div class="slot">
+            <div class="t">15:00</div>
+            <div class="s">✓ 余 2</div>
+          </div>
+          <div class="slot disabled">
+            <div class="t">19:00</div>
+            <div class="s">满</div>
+          </div>
+          <div class="slot">
+            <div class="t">20:00</div>
+            <div class="s">✓ 余 8</div>
           </div>
         </div>
       </div>
-      <button class="btn-outline" style="margin-top:8px" id="replayStagger">重播入场</button>
-    </div>
 
-    <div class="section">
-      <h2>6 · 场馆快捷胶囊</h2>
-      <p class="hint">首页「今日余量」切换场馆</p>
-      <div class="pill-demo" id="vpills">
-        <div class="vpill active">星羽羽毛球馆</div>
-        <div class="vpill">冠军篮球中心</div>
-        <div class="vpill">蓝湾游泳馆</div>
-        <div class="vpill">光谷网球中心</div>
+      <div class="section">
+        <h2>5 · 场馆卡片入场（stagger）</h2>
+        <p class="hint">依次上浮淡入，间隔 55ms，总时长控制在 300ms 内</p>
+        <div class="stagger" id="staggerList">
+          <div class="venue-card">
+            <div class="thumb"></div>
+            <div>
+              <div class="venue-name">星羽羽毛球馆</div>
+              <div class="venue-addr">洪山区文体中心 · 木地板</div>
+              <span class="tag">羽毛球</span>
+            </div>
+          </div>
+          <div class="venue-card">
+            <div class="thumb"></div>
+            <div>
+              <div class="venue-name">冠军篮球中心</div>
+              <div class="venue-addr">光谷体育馆 · 枫木地板</div>
+              <span class="tag">篮球</span>
+            </div>
+          </div>
+          <div class="venue-card">
+            <div class="thumb"></div>
+            <div>
+              <div class="venue-name">蓝湾游泳馆</div>
+              <div class="venue-addr">南湖大道 · 恒温泳池</div>
+              <span class="tag">游泳</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-outline" style="margin-top: 8px" id="replayStagger">
+          重播入场
+        </button>
+      </div>
+
+      <div class="section">
+        <h2>6 · 场馆快捷胶囊</h2>
+        <p class="hint">首页「今日余量」切换场馆</p>
+        <div class="pill-demo" id="vpills">
+          <div class="vpill active">星羽羽毛球馆</div>
+          <div class="vpill">冠军篮球中心</div>
+          <div class="vpill">蓝湾游泳馆</div>
+          <div class="vpill">光谷网球中心</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>7 · 底部抽屉（选场地）</h2>
+        <p class="hint">
+          遮罩淡入 + 面板自下而上，cubic-bezier(0.25,1,0.5,1) 280ms
+        </p>
+        <button class="btn-primary" id="openSheet">打开场地选择</button>
+      </div>
+
+      <div class="section">
+        <h2>8 · 预约成功庆祝</h2>
+        <p class="hint">勾选弹出 + 光环呼吸 + 文案错落入场</p>
+        <div class="success-box" id="successDemo">
+          <div class="success-icon">✓</div>
+          <div class="success-title">预约成功！</div>
+          <div class="success-sub">您的场地已锁定，请在运动时间前凭码入场</div>
+        </div>
+        <button class="btn-outline" style="margin-top: 12px" id="replaySuccess">
+          重播庆祝
+        </button>
+      </div>
+
+      <div class="section">
+        <h2>9 · 骨架屏</h2>
+        <p class="hint">弱网加载时替代大面积空白</p>
+        <div class="sk w40"></div>
+        <div class="sk w80"></div>
+        <div class="sk w60"></div>
+      </div>
+
+      <div class="section">
+        <h2>设计原则（ui-animation）</h2>
+        <div class="note">
+          只动 <b>transform / opacity</b>；禁止
+          <span class="kbd">transition: all</span>。<br />
+          常规 UI &lt; 300ms；按压 120ms；面板 280ms。<br />
+          入场曲线 <span class="kbd">cubic-bezier(0.22, 1, 0.36, 1)</span>，位移
+          <span class="kbd">cubic-bezier(0.25, 1, 0.5, 1)</span>。<br />
+          开合成对、结果就地确认、高频操作要「隐形」。
+        </div>
       </div>
     </div>
 
-    <div class="section">
-      <h2>7 · 底部抽屉（选场地）</h2>
-      <p class="hint">遮罩淡入 + 面板自下而上，cubic-bezier(0.25,1,0.5,1) 280ms</p>
-      <button class="btn-primary" id="openSheet">打开场地选择</button>
-    </div>
-
-    <div class="section">
-      <h2>8 · 预约成功庆祝</h2>
-      <p class="hint">勾选弹出 + 光环呼吸 + 文案错落入场</p>
-      <div class="success-box" id="successDemo">
-        <div class="success-icon">✓</div>
-        <div class="success-title">预约成功！</div>
-        <div class="success-sub">您的场地已锁定，请在运动时间前凭码入场</div>
+    <!-- Sheet -->
+    <div class="mask" id="mask"></div>
+    <div class="sheet" id="sheet">
+      <div class="handle"></div>
+      <h3>请选择场地（14:00-15:00）</h3>
+      <div class="slots" id="courtSlots">
+        <div class="slot">
+          <div class="t">1号场</div>
+          <div class="s">✓ 可预约</div>
+        </div>
+        <div class="slot selected">
+          <div class="t">2号场</div>
+          <div class="s">✓ 已选</div>
+        </div>
+        <div class="slot disabled">
+          <div class="t">3号场</div>
+          <div class="s">× 已占用</div>
+        </div>
+        <div class="slot">
+          <div class="t">4号场</div>
+          <div class="s">✓ 可预约</div>
+        </div>
+        <div class="slot">
+          <div class="t">5号场</div>
+          <div class="s">✓ 可预约</div>
+        </div>
+        <div class="slot disabled">
+          <div class="t">6号场</div>
+          <div class="s">× 已占用</div>
+        </div>
       </div>
-      <button class="btn-outline" style="margin-top:12px" id="replaySuccess">重播庆祝</button>
+      <button
+        class="btn-primary"
+        style="width: 100%; margin-top: 16px"
+        id="closeSheet"
+      >
+        下一步
+      </button>
     </div>
 
-    <div class="section">
-      <h2>9 · 骨架屏</h2>
-      <p class="hint">弱网加载时替代大面积空白</p>
-      <div class="sk w40"></div>
-      <div class="sk w80"></div>
-      <div class="sk w60"></div>
-    </div>
-
-    <div class="section">
-      <h2>设计原则（ui-animation）</h2>
-      <div class="note">
-        只动 <b>transform / opacity</b>；禁止 <span class="kbd">transition: all</span>。<br>
-        常规 UI &lt; 300ms；按压 120ms；面板 280ms。<br>
-        入场曲线 <span class="kbd">cubic-bezier(0.22, 1, 0.36, 1)</span>，位移
-        <span class="kbd">cubic-bezier(0.25, 1, 0.5, 1)</span>。<br>
-        开合成对、结果就地确认、高频操作要「隐形」。
-      </div>
-    </div>
-  </div>
-
-  <!-- Sheet -->
-  <div class="mask" id="mask"></div>
-  <div class="sheet" id="sheet">
-    <div class="handle"></div>
-    <h3>请选择场地（14:00-15:00）</h3>
-    <div class="slots" id="courtSlots">
-      <div class="slot"><div class="t">1号场</div><div class="s">✓ 可预约</div></div>
-      <div class="slot selected"><div class="t">2号场</div><div class="s">✓ 已选</div></div>
-      <div class="slot disabled"><div class="t">3号场</div><div class="s">× 已占用</div></div>
-      <div class="slot"><div class="t">4号场</div><div class="s">✓ 可预约</div></div>
-      <div class="slot"><div class="t">5号场</div><div class="s">✓ 可预约</div></div>
-      <div class="slot disabled"><div class="t">6号场</div><div class="s">× 已占用</div></div>
-    </div>
-    <button class="btn-primary" style="width:100%;margin-top:16px" id="closeSheet">下一步</button>
-  </div>
-
-<script>
-  // Search focus
-  const searchBox = document.getElementById('searchBox');
-  const searchInput = document.getElementById('searchInput');
-  searchInput.addEventListener('focus', () => searchBox.classList.add('focus'));
-  searchInput.addEventListener('blur', () => searchBox.classList.remove('focus'));
-
-  // Generic select groups
-  function bindSelect(id, sel) {
-    const root = document.getElementById(id);
-    root.addEventListener('click', (e) => {
-      const el = e.target.closest(sel);
-      if (!el || el.classList.contains('disabled')) return;
-      root.querySelectorAll(sel).forEach(n => n.classList.remove('selected', 'active'));
-      el.classList.add(id === 'chips' || id === 'vpills' ? 'active' : 'selected');
-    });
-  }
-  bindSelect('chips', '.chip');
-  bindSelect('vpills', '.vpill');
-  bindSelect('slots', '.slot');
-  bindSelect('courtSlots', '.slot');
-
-  // Stagger replay
-  function replay(id) {
-    const root = document.getElementById(id);
-    root.style.animation = 'none';
-    root.querySelectorAll(':scope > *').forEach((el) => {
-      el.style.animation = 'none';
-      void el.offsetWidth;
-      el.style.animation = '';
-    });
-    void root.offsetWidth;
-  }
-  document.getElementById('replayStagger').addEventListener('click', () => replay('staggerList'));
-  document.getElementById('replaySuccess').addEventListener('click', () => replay('successDemo'));
-
-  // Sheet
-  const mask = document.getElementById('mask');
-  const sheet = document.getElementById('sheet');
-  function openSheet() {
-    mask.classList.add('show');
-    sheet.classList.add('show');
-  }
-  function closeSheet() {
-    mask.classList.remove('show');
-    sheet.classList.remove('show');
-  }
-  document.getElementById('openSheet').addEventListener('click', openSheet);
-  document.getElementById('closeSheet').addEventListener('click', closeSheet);
-  mask.addEventListener('click', closeSheet);
-</script>
-</body>
+    <script type="module" src="/frontend/src/motion-demo.ts"></script>
+  </body>
 </html>

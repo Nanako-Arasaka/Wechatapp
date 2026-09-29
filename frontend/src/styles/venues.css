@@ -1,0 +1,122 @@
+/* list */
+
+.filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 8px 0 12px;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.filter {
+  flex: none;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: #f4f6f9;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 220ms var(--ease-enter),
+    color 220ms ease,
+    transform 120ms var(--ease-press),
+    box-shadow 220ms var(--ease-enter);
+}
+
+.filter:active {
+  transform: scale(0.95);
+}
+
+.filter.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(22, 119, 255, 0.28);
+  transform: scale(1.03);
+}
+
+/* 类型筛选：全部→单项：非匹配淡出 + 保留卡 FLIP；项→项：交叉淡入淡出 */
+
+.fade-out-item {
+  opacity: 0;
+  transform: scale(0.97) translateY(12px);
+  transition:
+    opacity 720ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 720ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.fade-in-item {
+  animation: fadeInSoft 720ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes fadeInSoft {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.list-fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 480ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 480ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.list-fade-in {
+  animation: fadeUp 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.flip-card {
+  will-change: transform;
+}
+
+/* detail */
+
+.hero {
+  width: calc(100% + 32px);
+  margin: -16px -16px 0;
+  height: 200px;
+  object-fit: cover;
+  background: #e5e6eb;
+  display: block;
+}
+
+.detail-title {
+  font-size: 21px;
+  font-weight: 800;
+  margin: 16px 0 8px;
+}
+
+.fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f1f3;
+  font-size: 13px;
+}
+
+.fact:last-child {
+  border-bottom: 0;
+}
+
+.fact span:first-child {
+  color: var(--text2);
+  font-weight: 500;
+}
+
+.fact span:last-child {
+  font-weight: 600;
+  text-align: right;
+  color: #111827;
+}

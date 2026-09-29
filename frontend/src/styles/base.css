@@ -1,0 +1,152 @@
+:root {
+  --primary: #1677ff;
+  --primary-end: #3b82f6;
+  --primary-light: #e6f4ff;
+  --success: #00b96b;
+  --success-light: #e6fffb;
+  --warning: #fa8c16;
+  --danger: #ff4d4f;
+  --text: #1d2129;
+  --text2: #4e5969;
+  --text3: #86909c;
+  --bg: #f6f8fb;
+  --card: #fff;
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-move: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-press: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+    sans-serif;
+  background: #e8eef5;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+}
+
+.phone {
+  width: min(430px, 100%);
+  height: min(900px, calc(100vh - 48px));
+  background: var(--bg);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(29, 35, 41, 0.18);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.status-bar {
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff;
+  z-index: 5;
+}
+
+.nav {
+  height: 48px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  position: relative;
+  z-index: 5;
+  border-bottom: 1px solid #f0f1f3;
+}
+
+.nav .back {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  width: 36px;
+  height: 36px;
+  font-size: 26px;
+  color: var(--text);
+  line-height: 1;
+  border-radius: 50%;
+  transition: transform 120ms var(--ease-press);
+}
+
+.nav .back:active {
+  transform: scale(0.92);
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pad {
+  padding: 16px 16px 28px;
+}
+
+.tabbar {
+  height: 64px;
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #fff;
+  border-top: 1px solid #eef0f2;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text3);
+  font-size: 11px;
+  transition:
+    color 180ms ease,
+    transform 120ms var(--ease-press);
+}
+
+.tabbar button:active {
+  transform: scale(0.94);
+}
+
+.tabbar button.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.tabbar .ic {
+  font-size: 18px;
+  line-height: 1;
+}

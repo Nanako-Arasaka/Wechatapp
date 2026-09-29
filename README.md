@@ -1,4 +1,24 @@
 # 🏟️ Slotify (智场通) · 智慧体育场馆预约与分时余量管理系统
+
+## 前端开发
+
+浏览器预览已从大 HTML 拆成 `frontend/src/` 下的 TypeScript 模块。
+微信小程序源码仍在 `miniprogram/`。在仓库根目录执行：
+
+```sh
+npm ci
+npm run dev                 # 浏览器预览，默认 http://127.0.0.1:5173
+npm run build               # 构建浏览器前端和微信小程序
+npm test                    # 小程序回归检查
+npm run test:web            # 浏览器回归检查
+```
+
+目录、入口、演示模式与构建说明见 [frontend/README.md](frontend/README.md)。
+`index.html` 和 `preview.html` 共用同一套页面；`animation-preview.html`
+为独立动效演示。源码 HTML 需通过 Vite 运行，生产静态文件在 `dist/`。
+
+以下为原有系统部署文档，部分云开发及账号说明可能与当前无云版本不一致。
+
 ## 📖 官方系统架构与开发部署指南 (Architecture & Deployment Guide)
 
 ---

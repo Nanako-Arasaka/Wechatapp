@@ -1,0 +1,21 @@
+{
+  "name": "wechatapp-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc -p frontend/tsconfig.json && tsc -p miniprogram/tsconfig.json --noEmit",
+    "build:web": "tsc -p frontend/tsconfig.json && vite build",
+    "build:miniprogram": "tsc -p miniprogram/tsconfig.json",
+    "build": "npm run build:web && npm run build:miniprogram",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.cjs",
+    "test:web": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "prettier": "^3.6.2",
+    "typescript": "5.3.3",
+    "vite": "^6.4.0"
+  }
+}
