@@ -21,7 +21,9 @@
   min-width: 0;
   font-size: 24rpx;
 }
-.clear-btn {
+.venue-list-page .clear-btn {
+  width: auto;
+  min-width: 0;
   flex: none;
   margin: 0;
   padding: 0 24rpx;
@@ -30,6 +32,8 @@
   color: #fff;
   background: #1677ff;
   border-radius: 999rpx;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .type-scroll {
   white-space: nowrap;
@@ -69,25 +73,28 @@
 }
 .venue-cards-list {
   padding: 0 32rpx;
-  transition:
-    opacity 240ms ease,
-    transform 240ms ease;
 }
-.filter-leaving {
-  opacity: 0.15;
-  transform: translateY(14rpx);
+.venue-results {
+  transition:
+    opacity 200ms ease,
+    transform 240ms var(--ease-enter);
+}
+.venue-results.filter-leaving {
+  opacity: 0;
+  transform: translateY(8rpx);
+  transition-duration: 140ms;
   pointer-events: none;
 }
 .venue-card-shell {
   position: relative;
 }
 @media (prefers-reduced-motion: reduce) {
-  .venue-cards-list,
+  .venue-results,
   .type-item,
   .search-input-box {
     transition: none;
   }
-  .filter-leaving {
+  .venue-results.filter-leaving {
     transform: none;
   }
 }

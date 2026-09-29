@@ -67,7 +67,9 @@
   min-width: 0;
   font-size: 24rpx;
 }
-.search-btn {
+.index-page .search-btn {
+  width: auto;
+  min-width: 0;
   margin: 0;
   padding: 0 26rpx;
   line-height: 64rpx;
@@ -76,6 +78,8 @@
   color: #fff;
   border-radius: 999rpx;
   flex: none;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .home-content {
   padding: 0 32rpx;
@@ -209,7 +213,10 @@
   font-size: 21rpx;
   margin-top: 8rpx;
 }
-.refresh-slots {
+.index-page .refresh-slots {
+  width: auto;
+  min-width: 0;
+  flex: none;
   margin: 0;
   display: flex;
   align-items: center;
@@ -219,6 +226,8 @@
   font-size: 23rpx;
   line-height: 56rpx;
   border-radius: 999rpx;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .slots-skeleton {
   height: 120rpx;

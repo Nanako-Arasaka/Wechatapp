@@ -22,13 +22,15 @@
     <view class="calendar-grid calendar-weekdays"><text wx:for="{{weekdays}}" wx:key="*this">{{item}}</text></view>
     <view class="calendar-grid">
       <block wx:for="{{cells}}" wx:key="date">
-        <view wx:if="{{item.empty}}" class="calendar-cell calendar-empty"></view>
-        <button wx:else class="calendar-cell {{item.isToday ? 'today' : ''}} {{item.disabled ? 'unavailable' : ''}} {{selectedDate === item.date ? 'selected' : ''}}" style="animation-delay:{{index * 28}}ms" bindtap="onSelectDate" data-date="{{item.date}}" aria-label="{{item.date}} {{item.error ? '余量未知' : item.isClosed ? '闭馆' : '剩余' + item.totalRemaining + '名额'}}">
-          <view class="calendar-day">{{item.day}}</view>
-          <view class="calendar-tag">{{item.isToday ? '今天' : item.isClosed ? '休' : ''}}</view>
-          <view class="calendar-label">{{item.error ? '未加载' : item.isClosed ? '闭馆' : '剩余'}}</view>
-          <rolling-number value="{{item.error || item.isClosed ? '—' : item.totalRemaining + ''}}" />
-        </button>
+        <view class="calendar-entry" style="animation-delay:{{index * 28}}ms">
+          <view wx:if="{{item.empty}}" class="calendar-cell calendar-empty"></view>
+          <button wx:else class="calendar-cell {{item.isToday ? 'today' : ''}} {{item.disabled ? 'unavailable' : ''}} {{selectedDate === item.date ? 'selected' : ''}}" bindtap="onSelectDate" data-date="{{item.date}}" aria-label="{{item.date}} {{item.error ? '余量未知' : item.isClosed ? '闭馆' : '剩余' + item.totalRemaining + '名额'}}">
+            <view class="calendar-day">{{item.day}}</view>
+            <view class="calendar-tag">{{item.isToday ? '今天' : item.isClosed ? '休' : ''}}</view>
+            <view class="calendar-label">{{item.error ? '未加载' : item.isClosed ? '闭馆' : '剩余'}}</view>
+            <rolling-number value="{{item.error || item.isClosed ? '—' : item.totalRemaining + ''}}" />
+          </button>
+        </view>
       </block>
     </view>
     <view class="calendar-note">蓝色为已选或今天 · 灰色为闭馆、约满或未加载</view>

@@ -15,7 +15,9 @@
   color: #86909c;
   margin-top: 10rpx;
 }
-.refresh-button {
+.date-page .refresh-button {
+  width: auto;
+  min-width: 0;
   flex: none;
   margin: 0 0 0 16rpx;
   padding: 0 20rpx;
@@ -24,6 +26,8 @@
   color: #4e5969;
   background: #f4f6f9;
   border-radius: 999rpx;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .calendar-card {
   padding: 24rpx 16rpx;
@@ -51,7 +55,13 @@
   color: #86909c;
   margin-bottom: 14rpx;
 }
-.calendar-cell {
+.calendar-entry {
+  min-width: 0;
+  animation: calendar-in 420ms var(--ease-enter) both;
+}
+/* 两个类的优先级高于微信 v2 的 button:not([size='mini'])。 */
+.date-page .calendar-cell {
+  display: block;
   min-width: 0;
   width: 100%;
   margin: 0;
@@ -64,9 +74,8 @@
   color: #1d2129;
   box-sizing: border-box;
   border: 2rpx solid transparent;
-  animation: calendar-in 420ms var(--ease-enter) both;
 }
-.calendar-empty {
+.date-page .calendar-empty {
   background: transparent;
   animation: none;
 }
@@ -84,14 +93,14 @@
   font-size: 18rpx;
   margin: 4rpx 0;
 }
-.calendar-cell.today {
+.date-page .calendar-cell.today {
   border-color: #91caff;
 }
-.calendar-cell.unavailable {
+.date-page .calendar-cell.unavailable {
   background: #f0f1f3;
   color: #a8adb5;
 }
-.calendar-cell.selected {
+.date-page .calendar-cell.selected {
   background: #e6f4ff;
   border-color: #1677ff;
   box-shadow: 0 8rpx 20rpx rgba(22, 119, 255, 0.15);
@@ -127,6 +136,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .calendar-entry,
   .calendar-cell {
     animation: none !important;
   }

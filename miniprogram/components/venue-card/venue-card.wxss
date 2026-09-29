@@ -74,7 +74,10 @@
   font-weight: 400;
   color: #86909c;
 }
-.book {
+.venue-card .book {
+  width: auto;
+  min-width: 0;
+  flex: none;
   margin: 0;
   padding: 0 22rpx;
   line-height: 60rpx;
@@ -85,6 +88,8 @@
   border-radius: 999rpx;
   background: #1677ff;
   transition: transform 120ms ease;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .book::after {
   border: 0;
@@ -103,7 +108,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .venue-card,
-  .book {
+  .venue-card .book {
     transition: none;
     transform: none;
   }

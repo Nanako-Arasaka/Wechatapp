@@ -37,7 +37,11 @@
   line-height: 1.5;
 }
 
-.empty-btn {
+.empty-container .empty-btn {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.5;
   background: #1677FF;
   color: #FFFFFF;
   font-size: 26rpx;

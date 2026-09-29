@@ -12,8 +12,6 @@ Page({
         autoFocus: false,
         searchFocused: false,
         filterLeaving: false,
-        listEntering: true,
-        cardStyles: {},
         rawVenues: [],
         venueList: [],
         typeList: [
@@ -38,11 +36,13 @@ Page({
         this.cancelFilter();
         this._loadId++;
     },
-    cancelFilter() {
+    cancelFilter(resetView = true) {
         this._filterId++;
-        if (this._filterTimer)
+        if (this._filterTimer !== null)
             clearTimeout(this._filterTimer);
-        this.setData({ filterLeaving: false, cardStyles: {} });
+        this._filterTimer = null;
+        if (resetView)
+            this.setData({ filterLeaving: false });
     },
     onSearchFocus() {
         this.setData({ searchFocused: true });
@@ -92,6 +92,9 @@ Page({
         this.loadVenues();
     },
     filterAndSort(sourceList) {
+        this.setData({ venueList: this.getFilteredVenues(sourceList) });
+    },
+    getFilteredVenues(sourceList) {
         let list = sourceList ? [...sourceList] : [...this.data.rawVenues];
         if (this.data.currentType) {
             list = list.filter((v) => v.type === this.data.currentType);
@@ -115,7 +118,7 @@ Page({
                     facMatch);
             });
         }
-        this.applySorting(list);
+        return this.applySorting(list);
     },
     async loadVenues() {
         this.cancelFilter();
@@ -126,7 +129,7 @@ Page({
             if (loadId !== this._loadId)
                 return;
             const venues = Array.isArray(res) ? res : res.list || [];
-            this.setData({ rawVenues: venues, listEntering: true });
+            this.setData({ rawVenues: venues });
             this.filterAndSort(venues);
         }
         catch (err) {
@@ -151,15 +154,15 @@ Page({
         else if (this.data.sortBy === "REMAIN_DESC") {
             sorted.sort((a, b) => (b.totalRemaining || 0) - (a.totalRemaining || 0));
         }
-        this.setData({ venueList: sorted });
+        return sorted;
     },
     onKeywordInput(e) {
         this.cancelFilter();
-        this.setData({ listEntering: false });
         this.setData({ keyword: e.detail.value });
         this.filterAndSort();
     },
     onSearchConfirm() {
+        this.cancelFilter();
         this.filterAndSort();
     },
     onClearKeyword() {
@@ -171,53 +174,28 @@ Page({
         const key = e.currentTarget.dataset.key;
         if (key === this.data.currentType)
             return;
-        this.cancelFilter();
+        this.cancelFilter(false);
         const filterId = this._filterId;
-        this.setData({ currentType: key });
-        // 先记录位置，再用新列表的位置差还原浏览器版筛选位移动画。
-        this.createSelectorQuery()
-            .selectAll(".venue-card-shell")
-            .boundingClientRect((rects) => {
+        if (this.data.loading || this.data.loadError) {
+            this.setData({ currentType: key, filterLeaving: false });
+            this.filterAndSort();
+            return;
+        }
+        // 只移动结果容器，避免卡片入场、列表退场和 FLIP 同时修改 transform。
+        // 从视图更新完成后开始计时；连续切换时保留当前退场状态。
+        this.setData({ currentType: key, filterLeaving: true }, () => {
             if (filterId !== this._filterId)
                 return;
-            const before = new Map((rects || []).map((rect) => [rect.dataset.id, rect.top]));
-            this.setData({ filterLeaving: true, listEntering: false });
             this._filterTimer = setTimeout(() => {
                 if (filterId !== this._filterId)
                     return;
-                this.filterAndSort();
-                this.setData({ filterLeaving: false }, () => {
-                    this.createSelectorQuery()
-                        .selectAll(".venue-card-shell")
-                        .boundingClientRect((after) => {
-                        if (filterId !== this._filterId)
-                            return;
-                        const cardStyles = {};
-                        (after || []).forEach((rect) => {
-                            const oldTop = before.get(rect.dataset.id);
-                            cardStyles[rect.dataset.id] =
-                                oldTop === undefined
-                                    ? "opacity:0;transition:none;"
-                                    : `transform:translateY(${Number(oldTop) - rect.top}px);transition:none;`;
-                        });
-                        this.setData({ cardStyles }, () => {
-                            this._filterTimer = setTimeout(() => {
-                                if (filterId !== this._filterId)
-                                    return;
-                                const settled = {};
-                                Object.keys(cardStyles).forEach((id) => {
-                                    settled[id] =
-                                        "transform:translateY(0);opacity:1;transition:transform 520ms cubic-bezier(.22,1,.36,1),opacity 420ms ease;";
-                                });
-                                this.setData({ cardStyles: settled });
-                            }, 32);
-                        });
-                    })
-                        .exec();
+                this._filterTimer = null;
+                this.setData({
+                    venueList: this.getFilteredVenues(),
+                    filterLeaving: false,
                 });
-            }, 240);
-        })
-            .exec();
+            }, 140);
+        });
     },
     onSelectSort(e) {
         this.cancelFilter();

@@ -60,7 +60,9 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18rpx;
 }
-.court-cell {
+.court-page .court-cell {
+  display: block;
+  min-width: 0;
   width: 100%;
   padding: 28rpx 8rpx;
   margin: 0;
@@ -75,12 +77,12 @@
     background-color 220ms ease,
     border-color 220ms ease;
 }
-.court-cell.unavailable {
+.court-page .court-cell.unavailable {
   background: #f0f1f3;
   border-color: #e5e6eb;
   color: #86909c;
 }
-.court-cell.selected {
+.court-page .court-cell.selected {
   background: #e6f4ff;
   border-color: #1677ff;
   color: #1677ff;
@@ -110,7 +112,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .court-cell {
+  .court-page .court-cell {
     animation: none !important;
     transition: none;
   }

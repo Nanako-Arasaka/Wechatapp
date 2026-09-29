@@ -552,7 +552,10 @@ page {
   line-height: 1.6;
 }
 
-.btn-retry {
+.container .btn-retry {
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
   margin-top: 36rpx;
   padding: 18rpx 64rpx;
   min-height: 44rpx;
