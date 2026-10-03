@@ -1,17 +1,25 @@
 <view class="date-picker-page container">
   <view class="card">
     <view class="page-title">选择预约日期</view>
+    <view class="page-hint">最多可提前预约 {{advanceDays}} 天</view>
     <view class="day-list">
       <view
-        class="day-item {{item.date === currentDate ? 'active' : ''}}"
+        class="day-item {{item.date === currentDate ? 'active' : ''}} {{item.disabled ? 'disabled' : ''}}"
         wx:for="{{days}}"
         wx:key="date"
         bindtap="onSelectDate"
         data-date="{{item.date}}"
+        data-disabled="{{item.disabled}}"
       >
         <text class="day-week">{{item.isToday ? '今天' : item.weekday}}</text>
         <text class="day-date">{{item.date}}</text>
+        <text class="day-remaining" wx:if="{{item.remainingText}}">{{item.remainingText}}</text>
       </view>
     </view>
+  </view>
+
+  <view wx:if="{{loadError}}" class="empty-state">
+    <text class="empty-title">预约日历加载失败</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
   </view>
 </view>

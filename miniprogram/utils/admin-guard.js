@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.guardAdminPage = guardAdminPage;
+exports.guardAdminPage = void 0;
 const auth_1 = require("../store/auth");
 const auth_service_1 = require("../services/auth.service");
 /**
@@ -40,6 +40,7 @@ function guardAdminPage(page) {
     verifyRoleWithServer();
     return true;
 }
+exports.guardAdminPage = guardAdminPage;
 let verifying = false;
 async function verifyRoleWithServer() {
     if (verifying)

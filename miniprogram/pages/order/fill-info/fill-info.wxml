@@ -1,5 +1,5 @@
 <view class="fill-page container">
-  
+
   <view class="summary-card card motion-panel">
     <view class="summary-title">订单摘要</view>
     <view class="summary-row flex-between">
@@ -29,19 +29,33 @@
     </view>
   </view>
 
-  
+  <!-- 预约人身份（校内 / 校外） -->
   <view class="form-card card motion-panel delay-short">
-    <view class="form-title">联系方式（入场核验用）</view>
+    <view class="form-title">预约人信息（入场核验用）</view>
+
+    <view class="form-row">
+      <text class="form-label">身份</text>
+      <radio-group class="identity-group" bindchange="onIdentityChange">
+        <label class="identity-opt">
+          <radio value="STUDENT" checked="{{identityType === 'STUDENT'}}" color="#1677FF" />
+          <text>在校生</text>
+        </label>
+        <label class="identity-opt">
+          <radio value="VISITOR" checked="{{identityType === 'VISITOR'}}" color="#1677FF" />
+          <text>校外人员</text>
+        </label>
+      </radio-group>
+    </view>
+
     <view class="form-row flex-between">
-      <text class="form-label">学号</text>
+      <text class="form-label">{{identityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
       <input
         class="form-input"
-        type="number"
-        maxlength="12"
         value="{{studentNo}}"
-        placeholder="请输入 6-12 位数字学号"
+        maxlength="18"
+        placeholder="{{identityPlaceholder}}"
         placeholder-class="form-placeholder"
-        bindinput="onInputStudentNo"
+        bindinput="onIdentityNoInput"
       />
     </view>
     <view class="form-row flex-between">
@@ -69,7 +83,67 @@
     </view>
   </view>
 
-  
+  <!-- 同行人（解决校外人员进校登记） -->
+  <view class="form-card card motion-panel delay-medium">
+    <view class="form-title flex-between">
+      <text>同行人</text>
+      <switch checked="{{companionEnabled}}" bindchange="onToggleCompanion" color="#1677FF" />
+    </view>
+    <view class="form-tip" wx:if="{{!companionEnabled}}">
+      如有校外人员陪同入场，请开启并填写同行人信息
+    </view>
+
+    <block wx:if="{{companionEnabled}}">
+      <view class="form-row">
+        <text class="form-label">身份</text>
+        <radio-group class="identity-group" bindchange="onCompanionIdentityChange">
+          <label class="identity-opt">
+            <radio value="STUDENT" checked="{{companionIdentityType === 'STUDENT'}}" color="#1677FF" />
+            <text>在校生</text>
+          </label>
+          <label class="identity-opt">
+            <radio value="VISITOR" checked="{{companionIdentityType === 'VISITOR'}}" color="#1677FF" />
+            <text>校外人员</text>
+          </label>
+        </radio-group>
+      </view>
+      <view class="form-row flex-between">
+        <text class="form-label">{{companionIdentityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
+        <input
+          class="form-input"
+          value="{{companionIdentityNo}}"
+          maxlength="18"
+          placeholder="{{companionIdentityType === 'VISITOR' ? '请输入身份证号' : '请输入学号'}}"
+          placeholder-class="form-placeholder"
+          bindinput="onCompanionIdentityNoInput"
+        />
+      </view>
+      <view class="form-row flex-between">
+        <text class="form-label">姓名</text>
+        <input
+          class="form-input"
+          maxlength="20"
+          value="{{companionName}}"
+          placeholder="同行人姓名"
+          placeholder-class="form-placeholder"
+          bindinput="onCompanionNameInput"
+        />
+      </view>
+      <view class="form-row flex-between">
+        <text class="form-label">手机号</text>
+        <input
+          class="form-input"
+          type="number"
+          maxlength="11"
+          value="{{companionPhone}}"
+          placeholder="同行人手机号"
+          placeholder-class="form-placeholder"
+          bindinput="onCompanionPhoneInput"
+        />
+      </view>
+    </block>
+  </view>
+
   <view class="bottom-bar">
     <button
       class="btn-primary btn-next {{submitting ? 'btn-disabled' : ''}}"
@@ -80,4 +154,3 @@
     </button>
   </view>
 </view>
-

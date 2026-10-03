@@ -1,6 +1,6 @@
 <view class="venue-detail-page container">
   <!-- 加载中 -->
-  <view wx:if="{{loading && !venue}}" class="loading-box">正在加载场馆信息...</view>
+  <view wx:if="{{loading && !venue}}" class="loading-box motion-orders">正在加载场馆信息...</view>
 
   <!-- 加载失败 -->
   <view wx:elif="{{loadError}}" class="empty-state">
@@ -11,7 +11,7 @@
 
   <block wx:elif="{{venue}}">
     <!-- 场馆头图 -->
-    <view class="vd-hero">
+    <view class="vd-hero motion-detail">
       <image class="vd-cover" src="{{coverImage}}" mode="aspectFill" binderror="onImageError" />
       <view class="vd-hero-mask"></view>
       <view class="vd-hero-copy">
@@ -20,13 +20,13 @@
           {{venueTypeName(venue.type)}} · 容量 {{venue.capacity}} 场
         </text>
       </view>
-      <text class="vd-status {{venue.status === 'ACTIVE' ? 'tag-green' : 'tag-gray'}}">
+      <text class="vd-status {{venue.status === 'ACTIVE' ? 'is-open' : 'is-off'}}">
         {{venue.status === 'ACTIVE' ? '开放中' : '已下架'}}
       </text>
     </view>
 
     <!-- 场馆信息 -->
-    <view class="card info-card">
+    <view class="info-card card motion-panel delay-short">
       <view class="info-row">
         <text class="info-label">营业时间</text>
         <text class="info-value">{{venue.openTime}} - {{venue.closeTime}}</text>
@@ -49,14 +49,18 @@
     <view class="section-header">
       <text class="section-title">时段与预约</text>
     </view>
-    <view class="action-grid">
+    <view class="action-grid motion-panel delay-medium">
       <view class="action-item" bindtap="goSchedule" hover-class="hover-press">
-        <view class="ac-icon bg-green">📅</view>
+        <view class="ac-icon-box is-success">
+          <image class="ac-icon" src="/assets/ui/refresh.svg" />
+        </view>
         <text class="ac-name">排期管理</text>
         <text class="ac-desc">查看时段余量</text>
       </view>
       <view class="action-item" bindtap="goBookings" hover-class="hover-press">
-        <view class="ac-icon bg-blue">📑</view>
+        <view class="ac-icon-box is-primary">
+          <image class="ac-icon" src="/assets/ui/ticket.svg" />
+        </view>
         <text class="ac-name">预约监管</text>
         <text class="ac-desc">该馆订单</text>
       </view>
@@ -66,7 +70,7 @@
     <view class="section-header">
       <text class="section-title">运营操作</text>
     </view>
-    <view class="card op-card">
+    <view class="op-card card motion-panel delay-medium">
       <view class="op-row" bindtap="goEdit" hover-class="hover-press">
         <text class="op-label">编辑场馆资料</text>
         <text class="op-arrow">›</text>

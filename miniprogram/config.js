@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CONFIG = void 0;
-exports.getApiBaseUrl = getApiBaseUrl;
+exports.getApiBaseUrl = exports.CONFIG = void 0;
 exports.CONFIG = {
     APP_NAME: 'Slotify (智场通) 场地预约',
     APP_VERSION: 'v1.0.0',
@@ -36,3 +35,4 @@ function getApiBaseUrl() {
     }
     return exports.CONFIG.LAN_API_BASE_URL;
 }
+exports.getApiBaseUrl = getApiBaseUrl;

@@ -39,6 +39,10 @@
         <text class="vr-label">预约人</text>
         <text class="vr-val font-bold">{{verifyResult.userName}} ({{verifyResult.userPhone}})</text>
       </view>
+      <view class="vr-row flex-between" wx:if="{{verifyResult.identityType}}">
+        <text class="vr-label">预约人身份</text>
+        <text class="vr-val">{{verifyResult.identityType === 'VISITOR' ? '校外人员' : '在校生'}}</text>
+      </view>
       <view class="vr-row flex-between">
         <text class="vr-label">预约场馆</text>
         <text class="vr-val font-bold">{{verifyResult.venueName}}</text>
@@ -59,6 +63,22 @@
         <text class="vr-label">实付金额</text>
         <text class="vr-val text-danger font-bold">¥{{filters.formatMoney(verifyResult.amount)}}</text>
       </view>
+
+      <!-- 同行人：校外人员进校需现场核对证件 -->
+      <block wx:if="{{verifyResult.companionName}}">
+        <view class="vr-row flex-between">
+          <text class="vr-label">同行人</text>
+          <text class="vr-val font-bold">{{verifyResult.companionName}} ({{verifyResult.companionPhone}})</text>
+        </view>
+        <view class="vr-row flex-between">
+          <text class="vr-label">同行人身份</text>
+          <text class="vr-val">{{verifyResult.companionIdentityType === 'VISITOR' ? '校外人员' : '在校生'}}</text>
+        </view>
+        <view class="vr-row flex-between">
+          <text class="vr-label">证件号</text>
+          <text class="vr-val font-bold">{{verifyResult.companionIdentityNo}}</text>
+        </view>
+      </block>
     </view>
 
     <!-- 确认核销操作按钮 -->

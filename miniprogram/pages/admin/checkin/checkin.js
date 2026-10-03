@@ -69,7 +69,8 @@ Page({
             this.setData({ verifyResult: null, inputCode: '' });
             wx.showModal({
                 title: '核销成功！',
-                content: `已为【${booking.userName}】办理【${booking.venueName}】入场核销。`,
+                content: `已为【${booking.userName}】办理【${booking.venueName}】入场核销。` +
+                    (booking.companionName ? `\n同行人【${booking.companionName}】需一同入场，请核验证件。` : ''),
                 showCancel: false,
                 success: () => {
                     this.setData({ verifyResult: null, inputCode: '' });

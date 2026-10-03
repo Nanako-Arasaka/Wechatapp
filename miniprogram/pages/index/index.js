@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const venue_service_1 = require("../../services/venue.service");
 const auth_1 = require("../../store/auth");
 const notification_service_1 = require("../../services/notification.service");
+const booking_calendar_1 = require("../../utils/booking-calendar");
 Page({
     data: {
         currentLocation: wx.getStorageSync("CURRENT_LOCATION") || "选择位置",
@@ -181,7 +182,7 @@ Page({
             if (avail && this.data.selectedVenueId === venueId) {
                 const now = new Date();
                 const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                const upcomingSlots = (avail.slots || []).filter((s) => s.startTime >= nowStr);
+                const upcomingSlots = (0, booking_calendar_1.userVisibleSlots)(avail.slots || []).filter((s) => s.startTime >= nowStr);
                 this.setData({
                     quickSlots: upcomingSlots.slice(0, 8),
                     isClosedToday: avail.isClosed || false,

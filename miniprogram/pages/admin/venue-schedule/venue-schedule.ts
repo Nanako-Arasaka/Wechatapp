@@ -14,6 +14,8 @@ Page({
     closedReason: "",
     loading: true,
     loadError: false,
+    /** 可管理的日期窗口，跟随场馆配置的可提前预约天数 */
+    advanceDays: 7,
   },
 
   onShow() {
@@ -26,16 +28,25 @@ Page({
     const rawName = options.venueName || "";
     const venueName = rawName ? decodeURIComponent(rawName) : "";
     const today = formatDate(new Date());
-    const days = bookingDates(new Date(), 7).map((date) => ({
-      date,
-      weekday: getWeekdayName(date),
-      isToday: date === today,
-    }));
-    this.setData({ venueId, venueName, currentDate: today, days });
+    this.setData({
+      venueId,
+      venueName,
+      currentDate: today,
+      days: this.buildDays(today, 7),
+    });
     if (venueName) {
       wx.setNavigationBarTitle({ title: `${venueName} 排期` });
     }
     this.loadSchedule(today);
+  },
+
+  /** 按窗口天数构建日期条；与用户端选日页共用同一套 advanceDays 口径 */
+  buildDays(today: string, advanceDays: number) {
+    return bookingDates(new Date(), advanceDays).map((date) => ({
+      date,
+      weekday: getWeekdayName(date),
+      isToday: date === today,
+    }));
   },
 
   onSelectDate(e: any) {
@@ -53,6 +64,14 @@ Page({
         VenueService.getVenueDetail(this.data.venueId),
         VenueService.getAvailability(this.data.venueId, date),
       ]);
+      // 管理端可查看的窗口同样跟随场馆配置，避免管理员看到用户约不到的日期
+      const advanceDays = Number(venue?.advanceDays) || 7;
+      if (advanceDays !== this.data.advanceDays) {
+        this.setData({
+          advanceDays,
+          days: this.buildDays(formatDate(new Date()), advanceDays),
+        });
+      }
       if (venue?.name && !this.data.venueName) {
         wx.setNavigationBarTitle({ title: `${venue.name} 排期` });
       }

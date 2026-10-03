@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const venue_service_1 = require("../../../services/venue.service");
 const format_1 = require("../../../utils/format");
 const auth_guard_1 = require("../../../utils/auth-guard");
+const booking_calendar_1 = require("../../../utils/booking-calendar");
 /**
  * ============================================================================
  * P3 可选场地页 (CourtSelectPage)
@@ -74,7 +75,8 @@ Page({
                 venue_service_1.VenueService.getSlotCourts(this.data.venueId, this.data.slotId),
                 venue_service_1.VenueService.getAvailability(this.data.venueId, this.data.date),
             ]);
-            const slot = availability.slots.find((item) => item.id === this.data.slotId);
+            // 该时段若已被管理员关闭，普通用户不应再看到可选场地。
+            const slot = (0, booking_calendar_1.userVisibleSlots)(availability.slots).find((item) => item.id === this.data.slotId);
             if (availability.isClosed || !slot || !slot.isSelectable) {
                 this.setData({
                     unavailableReason: slot?.statusText || availability.closedReason || "该时段暂不可预约",

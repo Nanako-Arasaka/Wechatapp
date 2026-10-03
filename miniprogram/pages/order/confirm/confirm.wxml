@@ -26,8 +26,12 @@
         <text class="info-value">{{timeRange}}</text>
       </view>
       <view class="info-row flex-between">
-        <text class="info-label">学号</text>
-        <text class="info-value">{{studentNo}}</text>
+        <text class="info-label">{{identityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
+        <text class="info-value">{{identityNoMasked}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">身份</text>
+        <text class="info-value">{{identityType === 'VISITOR' ? '校外人员' : '在校生'}}</text>
       </view>
       <view class="info-row flex-between">
         <text class="info-label">姓名</text>
@@ -36,6 +40,27 @@
       <view class="info-row flex-between info-row-last">
         <text class="info-label">联系方式</text>
         <text class="info-value">{{contactPhone}}</text>
+      </view>
+    </view>
+
+    <!-- 同行人（校外人员进校登记） -->
+    <view class="info-list card" wx:if="{{companionEnabled}}">
+      <view class="companion-title">同行人（1 位）</view>
+      <view class="info-row flex-between">
+        <text class="info-label">姓名</text>
+        <text class="info-value">{{companionName}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">身份</text>
+        <text class="info-value">{{companionIdentityType === 'VISITOR' ? '校外人员' : '在校生'}}</text>
+      </view>
+      <view class="info-row flex-between">
+        <text class="info-label">{{companionIdentityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
+        <text class="info-value">{{companionNoMasked}}</text>
+      </view>
+      <view class="info-row flex-between info-row-last">
+        <text class="info-label">联系方式</text>
+        <text class="info-value">{{companionPhone}}</text>
       </view>
     </view>
 

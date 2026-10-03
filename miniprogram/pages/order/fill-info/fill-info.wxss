@@ -111,3 +111,29 @@
 .btn-disabled {
   opacity: 0.5;
 }
+
+/* ===== 身份选择 ===== */
+.identity-group {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+}
+.identity-opt {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: var(--text-main);
+}
+.identity-opt radio {
+  transform: scale(0.8);
+  margin-right: 4rpx;
+  transform-origin: center;
+}
+
+/* ===== 表单提示 ===== */
+.form-tip {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-bottom: 8rpx;
+}

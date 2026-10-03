@@ -161,6 +161,14 @@ Page({
             return this.goToLogin();
         wx.navigateTo({ url: "/pages/user/notifications/notifications" });
     },
+    /** 返回管理端首页（场馆管理落地页） */
+    goAdminHome() {
+        if (!this.data.isAdmin) {
+            this.goToLogin();
+            return;
+        }
+        wx.reLaunch({ url: "/pages/admin/home/home" });
+    },
     navTo(e) {
         if (!this.data.isLoggedIn) {
             this.goToLogin();

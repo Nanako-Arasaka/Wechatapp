@@ -1,12 +1,15 @@
+/* 管理端落地页。视觉沿用全局设计令牌与动效类，不引入新的色板。 */
 .admin-home {
-  background: #F4F6F9;
+  background: var(--bg-page);
 }
 
-/* ===== 顶部身份条 ===== */
+/* ===== 顶部身份条：沿用用户端深色头部的处理方式 ===== */
 .home-header {
-  background: #1F2329;
-  padding: 28rpx 32rpx 36rpx;
-  margin-bottom: 20rpx;
+  background: linear-gradient(135deg, #1f2329 0%, #2c3138 100%);
+  padding: 32rpx 32rpx 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .header-role {
   display: flex;
@@ -14,27 +17,36 @@
   gap: 16rpx;
 }
 .role-name {
-  font-size: 36rpx;
+  font-size: 34rpx;
   font-weight: 600;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 .role-tag {
   font-size: 20rpx;
-  padding: 4rpx 14rpx;
-  border-radius: 20rpx;
-  color: #FFFFFF;
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
-.role-tag.tag-green {
-  background: #00B96B;
+.header-exit {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 20rpx;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  transition: background var(--dur-press) var(--ease-press);
 }
-.role-tag.tag-purple {
-  background: #722ED1;
+.header-exit.hover-press {
+  background: rgba(255, 255, 255, 0.24);
 }
-.header-sub {
-  display: block;
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.65);
+.header-exit .ui-icon {
+  width: 28rpx;
+  height: 28rpx;
+}
+.header-exit-text {
+  font-size: 22rpx;
+  color: #ffffff;
 }
 
 /* ===== 区块标题 ===== */
@@ -42,36 +54,36 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 24rpx 4rpx 16rpx;
+  padding: 32rpx 32rpx 16rpx;
 }
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #1F2329;
+  color: var(--text-main);
 }
 .section-count {
   font-size: 24rpx;
-  color: #86909C;
+  color: var(--text-secondary);
 }
 
-/* ===== 场馆管理卡（核心） ===== */
+/* ===== 场馆管理卡（核心）===== */
 .venue-manage-card {
   display: flex;
   align-items: center;
+  margin: 0 32rpx 20rpx;
   padding: 24rpx;
-  margin-bottom: 16rpx;
-  gap: 20rpx;
 }
 .vm-cover {
-  width: 132rpx;
-  height: 132rpx;
-  border-radius: 16rpx;
-  background: #F2F3F5;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: var(--radius-md);
+  background: var(--border-light);
   flex-shrink: 0;
 }
 .vm-body {
   flex: 1;
   min-width: 0;
+  margin-left: 24rpx;
 }
 .vm-title-row {
   display: flex;
@@ -81,84 +93,87 @@
 .vm-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #1F2329;
+  color: var(--text-main);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .vm-status {
   font-size: 20rpx;
-  padding: 2rpx 12rpx;
-  border-radius: 16rpx;
+  padding: 2rpx 14rpx;
+  border-radius: var(--radius-pill);
   flex-shrink: 0;
 }
-.vm-status.tag-green {
-  background: #E8FFEA;
-  color: #00994D;
+.vm-status.is-open {
+  background: var(--success-light);
+  color: var(--success-color);
 }
-.vm-status.tag-gray {
-  background: #F2F3F5;
-  color: #86909C;
+.vm-status.is-off {
+  background: var(--border-light);
+  color: var(--text-secondary);
 }
-.vm-meta,
-.vm-time {
+.vm-meta {
   display: block;
   font-size: 24rpx;
-  color: #86909C;
-  margin-top: 6rpx;
+  color: var(--text-secondary);
+  margin-top: 8rpx;
 }
 .vm-arrow {
-  font-size: 40rpx;
-  color: #C9CDD4;
+  font-size: 36rpx;
+  color: var(--text-placeholder);
   flex-shrink: 0;
+  margin-left: 12rpx;
 }
 
-/* ===== 快捷操作 ===== */
+/* ===== 快捷操作：与用户端订单宫格一致的两列 ===== */
 .quick-grid {
   display: flex;
   flex-wrap: wrap;
+  padding: 0 24rpx;
   gap: 16rpx;
 }
 .quick-item {
-  width: calc((100% - 32rpx) / 2);
-  background: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(31, 35, 41, 0.05);
+  width: calc((100% - 16rpx) / 2);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 28rpx 24rpx;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-press) var(--ease-press);
 }
-.q-icon {
-  width: 72rpx;
-  height: 72rpx;
-  border-radius: 20rpx;
+.quick-item.hover-press {
+  transform: scale(0.98);
+}
+.q-icon-box {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 22rpx;
+  background: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
-  margin-bottom: 14rpx;
+  margin-bottom: 16rpx;
 }
-.q-icon.bg-purple {
-  background: #F4ECFF;
+.q-icon-box.is-success {
+  background: var(--success-light);
 }
-.q-icon.bg-green {
-  background: #E8FFEA;
+.q-icon-box.is-warning {
+  background: var(--warning-light);
 }
-.q-icon.bg-blue {
-  background: #E6F4FF;
-}
-.q-icon.bg-orange {
-  background: #FFF7E8;
+.q-icon {
+  width: 42rpx;
+  height: 42rpx;
 }
 .q-name {
   display: block;
   font-size: 28rpx;
   font-weight: 600;
-  color: #1F2329;
+  color: var(--text-main);
 }
 .q-desc {
   display: block;
   font-size: 22rpx;
-  color: #86909C;
-  margin-top: 4rpx;
+  color: var(--text-secondary);
+  margin-top: 6rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -168,26 +183,46 @@
 .dashboard-entry {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 24rpx;
-  padding: 28rpx 24rpx;
+  margin: 32rpx 32rpx 40rpx;
+  padding: 32rpx 28rpx;
+  background: var(--primary-gradient);
+  box-shadow: var(--shadow-float);
+  transition: transform var(--dur-press) var(--ease-press);
+}
+.dashboard-entry.hover-press {
+  transform: scale(0.98);
+}
+.dashboard-entry .de-title,
+.dashboard-entry .de-desc {
+  color: #ffffff;
+}
+.de-left {
+  flex: 1;
+  min-width: 0;
 }
 .de-title {
   display: block;
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 600;
-  color: #1F2329;
 }
 .de-desc {
   display: block;
   font-size: 24rpx;
-  color: #86909C;
-  margin-top: 6rpx;
+  opacity: 0.82;
+  margin-top: 8rpx;
+}
+.dashboard-entry .ui-icon {
+  width: 40rpx;
+  height: 40rpx;
 }
 
+/* ===== 空态与加载 ===== */
+.admin-home .empty-state {
+  margin: 0 32rpx;
+}
 .loading-box {
-  padding: 80rpx 0;
+  padding: 96rpx 0;
   text-align: center;
-  color: #86909C;
+  color: var(--text-secondary);
   font-size: 26rpx;
 }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.request = request;
+exports.request = void 0;
 const config_1 = require("../config");
 const auth_1 = require("../store/auth");
 /** 并发 401 时合并为一次 refresh */
@@ -147,3 +147,4 @@ function request(url, method = 'GET', data, options = {}) {
         });
     });
 }
+exports.request = request;

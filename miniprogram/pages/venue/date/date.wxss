@@ -31,3 +31,26 @@
   font-size: 26rpx;
   opacity: 0.85;
 }
+
+/* 预约窗口提示 */
+.page-hint {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  margin-bottom: 16rpx;
+}
+
+/* 每日余量角标 */
+.day-remaining {
+  display: block;
+  font-size: 20rpx;
+  color: var(--text-secondary);
+  margin-top: 6rpx;
+}
+.day-item.active .day-remaining {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* 闭馆/约满置灰 */
+.day-item.disabled {
+  opacity: 0.45;
+}

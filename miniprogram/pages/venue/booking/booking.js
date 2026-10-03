@@ -111,7 +111,8 @@ Page({
                 throw new Error("超出该场馆可提前预约的日期范围");
             }
             // 可选状态以服务端为准，未来日期不能按今天的钟点置灰。
-            const slots = avail.slots || [];
+            // 管理员关闭的时段对普通用户完全不可见，不能只靠置灰来隐藏。
+            const slots = (0, booking_calendar_1.userVisibleSlots)(avail.slots || []);
             this.setData({
                 venue,
                 coverImage: (0, venue_image_1.venueImage)(venue.coverImage),

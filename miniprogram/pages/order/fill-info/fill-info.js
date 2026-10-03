@@ -2,9 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth_1 = require("../../../store/auth");
 const auth_guard_1 = require("../../../utils/auth-guard");
+const identity_1 = require("../../../utils/identity");
 /**
  * P4 填写预约信息
  * booking → fill-info → confirm → pay → success
+ *
+ * 本期只面向校内场馆，但预约人可能是校外人员（陪同入场、赛事外来人员），
+ * 因此「身份」显式区分在校生 / 校外人员，各自的证件规则不同。
+ * 同时支持 1 位同行人，用于解决校外人员进校需登记的问题。
  */
 function safeDecode(s) {
     const raw = s || '';
@@ -30,9 +35,19 @@ Page({
         unitPrice: 0,
         quantity: 1,
         courtNo: 0,
+        // 预约人（我）
+        identityType: 'STUDENT',
         studentNo: '',
         contactName: '',
         contactPhone: '',
+        identityPlaceholder: identity_1.IDENTITY_PLACEHOLDER.STUDENT,
+        // 同行人（最多 1 位）
+        companionEnabled: false,
+        companionName: '',
+        companionPhone: '',
+        companionIdentityType: 'VISITOR',
+        companionIdentityNo: '',
+        companionPlaceholder: identity_1.IDENTITY_PLACEHOLDER.VISITOR,
         submitting: false,
         pageLoading: true,
     },
@@ -83,9 +98,22 @@ Page({
     onRetry() {
         this.onLoad(this.options || {});
     },
-    onInputStudentNo(e) {
-        const v = String(e.detail.value || '').replace(/\D/g, '').slice(0, 12);
-        this.setData({ studentNo: v });
+    /** ===== 预约人身份切换 ===== */
+    onIdentityChange(e) {
+        const identityType = e.detail.value;
+        this.setData({
+            identityType,
+            identityPlaceholder: identity_1.IDENTITY_PLACEHOLDER[identityType],
+            // 切换身份后清空证件，避免把学号当身份证提交
+            studentNo: '',
+        });
+    },
+    onIdentityNoInput(e) {
+        const raw = e.detail.value || '';
+        const value = this.data.identityType === 'VISITOR'
+            ? (0, identity_1.sanitizeIdentityNo)(raw)
+            : (0, identity_1.sanitizeStudentNo)(raw);
+        this.setData({ studentNo: value });
     },
     onInputName(e) {
         this.setData({ contactName: e.detail.value || '' });
@@ -94,30 +122,58 @@ Page({
         const v = String(e.detail.value || '').replace(/\D/g, '').slice(0, 11);
         this.setData({ contactPhone: v });
     },
+    /** ===== 同行人 ===== */
+    onToggleCompanion() {
+        const next = !this.data.companionEnabled;
+        this.setData({
+            companionEnabled: next,
+            companionName: next ? this.data.companionName : '',
+            companionPhone: next ? this.data.companionPhone : '',
+            companionIdentityNo: next ? this.data.companionIdentityNo : '',
+        });
+    },
+    onCompanionIdentityChange(e) {
+        const companionIdentityType = e.detail.value;
+        this.setData({ companionIdentityType, companionIdentityNo: '' });
+    },
+    onCompanionIdentityNoInput(e) {
+        const raw = e.detail.value || '';
+        const value = this.data.companionIdentityType === 'VISITOR'
+            ? (0, identity_1.sanitizeIdentityNo)(raw)
+            : (0, identity_1.sanitizeStudentNo)(raw);
+        this.setData({ companionIdentityNo: value });
+    },
+    onCompanionNameInput(e) {
+        this.setData({ companionName: e.detail.value || '' });
+    },
+    onCompanionPhoneInput(e) {
+        const v = String(e.detail.value || '').replace(/\D/g, '').slice(0, 11);
+        this.setData({ companionPhone: v });
+    },
     onClickNext() {
         if (this.data.submitting)
             return;
-        const { studentNo, contactName, contactPhone, venueName, venueAddress, slotId, date, timeRange, unitPrice, quantity, venueId, courtNo, } = this.data;
+        const { venueId, slotId, date, timeRange, unitPrice, quantity, venueName, venueAddress, courtNo, identityType, studentNo, contactName, contactPhone, companionEnabled, companionIdentityType, companionName, companionPhone, companionIdentityNo, } = this.data;
         if (!venueId || !slotId || !date || !timeRange) {
             wx.showToast({ title: '预约信息不完整', icon: 'none' });
             return;
         }
-        if (!/^\d{6,12}$/.test(studentNo)) {
-            wx.showToast({ title: '请输入 6-12 位数字学号', icon: 'none' });
+        const selfError = (0, identity_1.validatePerson)({ name: contactName, phone: contactPhone, identityType, identityNo: studentNo }, '');
+        if (selfError) {
+            wx.showToast({ title: selfError, icon: 'none' });
             return;
         }
-        const name = contactName.trim();
-        if (!name) {
-            wx.showToast({ title: '请输入真实姓名', icon: 'none' });
-            return;
-        }
-        if (name.length > 20) {
-            wx.showToast({ title: '姓名不能超过 20 个字符', icon: 'none' });
-            return;
-        }
-        if (!/^1[3-9]\d{9}$/.test(contactPhone)) {
-            wx.showToast({ title: '请输入正确的 11 位手机号', icon: 'none' });
-            return;
+        if (companionEnabled) {
+            const companionError = (0, identity_1.validatePerson)({
+                name: companionName,
+                phone: companionPhone,
+                identityType: companionIdentityType,
+                identityNo: companionIdentityNo,
+            }, '同行人');
+            if (companionError) {
+                wx.showToast({ title: companionError, icon: 'none' });
+                return;
+            }
         }
         const params = [
             `venueId=${encodeURIComponent(venueId)}`,
@@ -128,15 +184,25 @@ Page({
             `timeRange=${encodeURIComponent(timeRange)}`,
             `unitPrice=${unitPrice}`,
             `quantity=${quantity}`,
+            `identityType=${identityType}`,
+            // 后端 studentNo 字段沿用；校外人员改传身份证明文，避免字段扩容
             `studentNo=${encodeURIComponent(studentNo)}`,
-            `contactName=${encodeURIComponent(name)}`,
+            `contactName=${encodeURIComponent(contactName.trim())}`,
             `contactPhone=${encodeURIComponent(contactPhone)}`,
             `courtNo=${courtNo || 0}`,
+            `companionEnabled=${companionEnabled ? 1 : 0}`,
+            `companionName=${encodeURIComponent(companionEnabled ? companionName.trim() : '')}`,
+            `companionPhone=${encodeURIComponent(companionEnabled ? companionPhone : '')}`,
+            `companionIdentityType=${companionIdentityType}`,
+            `companionIdentityNo=${encodeURIComponent(companionEnabled ? companionIdentityNo : '')}`,
         ].join('&');
         this.setData({ submitting: true });
         wx.navigateTo({
             url: `/pages/order/confirm/confirm?${params}`,
             complete: () => this.setData({ submitting: false }),
         });
+    },
+    identityLabel(type) {
+        return identity_1.IDENTITY_LABEL[type] || identity_1.IDENTITY_LABEL.STUDENT;
     },
 });

@@ -3,15 +3,16 @@
   <view class="home-header">
     <view class="header-role">
       <text class="role-name">{{adminName}}</text>
-      <text class="role-tag {{isSuperAdmin ? 'tag-purple' : 'tag-green'}}">
-        {{isSuperAdmin ? '超级管理员' : '场馆管理员'}}
-      </text>
+      <text class="role-tag">{{isSuperAdmin ? '超级管理员' : '场馆管理员'}}</text>
     </view>
-    <text class="header-sub">管理我负责的场地</text>
+    <view class="header-exit" bindtap="goUserSide" hover-class="hover-press">
+      <image class="ui-icon" src="/assets/ui/venue.svg" />
+      <text class="header-exit-text">用户端</text>
+    </view>
   </view>
 
   <!-- 加载中 -->
-  <view wx:if="{{loading && venues.length === 0}}" class="loading-box">正在加载我的场馆...</view>
+  <view wx:if="{{loading && venues.length === 0}}" class="loading-box motion-orders">正在加载我的场馆...</view>
 
   <!-- 加载失败 -->
   <view wx:elif="{{loadError}}" class="empty-state">
@@ -34,24 +35,24 @@
     </view>
 
     <view
-      class="venue-manage-card card"
+      class="venue-manage-card card motion-list-card"
       wx:for="{{venues}}"
       wx:key="id"
       bindtap="goVenueDetail"
       data-id="{{item.id}}"
       data-name="{{item.name}}"
       hover-class="hover-press"
+      style="animation-delay: {{index * 70}}ms"
     >
       <image class="vm-cover" src="{{item.coverImage}}" mode="aspectFill" binderror="onImageError" />
       <view class="vm-body">
         <view class="vm-title-row">
           <text class="vm-name">{{item.name}}</text>
-          <text class="vm-status {{item.status === 'ACTIVE' ? 'tag-green' : 'tag-gray'}}">
+          <text class="vm-status {{item.status === 'ACTIVE' ? 'is-open' : 'is-off'}}">
             {{item.status === 'ACTIVE' ? '开放中' : '已下架'}}
           </text>
         </view>
-        <text class="vm-meta">{{venueTypeName(item.type)}}</text>
-        <text class="vm-time">营业 {{item.openTime}} - {{item.closeTime}}</text>
+        <text class="vm-meta">{{venueTypeName(item.type)}} · 营业 {{item.openTime}}-{{item.closeTime}}</text>
       </view>
       <text class="vm-arrow">›</text>
     </view>
@@ -62,7 +63,9 @@
     </view>
     <view class="quick-grid">
       <view class="quick-item" bindtap="goScan" hover-class="hover-press">
-        <view class="q-icon bg-purple">📱</view>
+        <view class="q-icon-box">
+          <image class="q-icon" src="/assets/ui/check.svg" />
+        </view>
         <text class="q-name">扫码核销</text>
         <text class="q-desc">入场校验</text>
       </view>
@@ -75,29 +78,40 @@
         data-venue-name="{{item.name}}"
         hover-class="hover-press"
       >
-        <view class="q-icon bg-green">📅</view>
+        <view class="q-icon-box is-success">
+          <image class="q-icon" src="/assets/ui/refresh.svg" />
+        </view>
         <text class="q-name">今日排期</text>
         <text class="q-desc">{{item.name}}</text>
       </view>
-      <view class="quick-item" bindtap="goBookings" hover-class="hover-press">
-        <view class="q-icon bg-blue">📑</view>
+      <view class="quick-item" bindtap="goSettlement" hover-class="hover-press">
+        <view class="q-icon-box">
+          <image class="q-icon" src="/assets/ui/ticket.svg" />
+        </view>
         <text class="q-name">预约监管</text>
         <text class="q-desc">订单检索</text>
       </view>
-      <view class="quick-item" bindtap="goUserSide" hover-class="hover-press">
-        <view class="q-icon bg-orange">🏸</view>
-        <text class="q-name">用户端</text>
-        <text class="q-desc">以学生视角看</text>
+      <view class="quick-item" bindtap="goBookings" hover-class="hover-press">
+        <view class="q-icon-box is-warning">
+          <image class="q-icon" src="/assets/ui/card.svg" />
+        </view>
+        <text class="q-name">资金结算</text>
+        <text class="q-desc">营收明细</text>
       </view>
     </view>
 
     <!-- 运营分析（仅超管） -->
-    <view class="dashboard-entry card" wx:if="{{isSuperAdmin}}" bindtap="goDashboard" hover-class="hover-press">
+    <view
+      class="dashboard-entry"
+      wx:if="{{isSuperAdmin}}"
+      bindtap="goDashboard"
+      hover-class="hover-press"
+    >
       <view class="de-left">
         <text class="de-title">全馆运营分析</text>
         <text class="de-desc">营收、利润与片区创收汇总</text>
       </view>
-      <text class="vm-arrow">›</text>
+      <image class="ui-icon" src="/assets/ui/info.svg" />
     </view>
   </block>
 </view>

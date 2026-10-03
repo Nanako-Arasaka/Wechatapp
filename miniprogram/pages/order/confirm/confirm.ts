@@ -1,6 +1,11 @@
 import { BookingService } from '../../../services/booking.service';
 import { safeDecode } from '../../../utils/format';
 import { guardLoginPage } from '../../../utils/auth-guard';
+import {
+  IdentityType,
+  validatePerson,
+  maskIdentityNo,
+} from '../../../utils/identity';
 
 /**
  * P5 确认预约信息（底部 sheet）
@@ -17,14 +22,29 @@ Page({
     unitPrice: 0,
     quantity: 1,
     courtNo: 0,
+    identityType: 'STUDENT' as IdentityType,
     studentNo: '',
     contactName: '',
     contactPhone: '',
+    identityNoMasked: '',
+    companionEnabled: false,
+    companionName: '',
+    companionPhone: '',
+    companionIdentityType: 'VISITOR' as IdentityType,
+    companionIdentityNo: '',
+    companionNoMasked: '',
     submitting: false,
     createdOrderId: '',
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    const identityType = (options.identityType || 'STUDENT') as IdentityType;
+    const companionEnabled = options.companionEnabled === '1';
+    const companionIdentityType = (options.companionIdentityType ||
+      'VISITOR') as IdentityType;
+    const studentNo = safeDecode(options.studentNo || '');
+    const companionIdentityNo = safeDecode(options.companionIdentityNo || '');
+
     this.setData({
       venueId: options.venueId || '',
       venueName: safeDecode(options.venueName || ''),
@@ -35,9 +55,17 @@ Page({
       unitPrice: Number(options.unitPrice || 0),
       quantity: Number(options.quantity || 1),
       courtNo: Number(options.courtNo || 0) || 0,
-      studentNo: safeDecode(options.studentNo || ''),
+      identityType,
+      studentNo,
       contactName: safeDecode(options.contactName || ''),
       contactPhone: safeDecode(options.contactPhone || ''),
+      identityNoMasked: maskIdentityNo(studentNo),
+      companionEnabled,
+      companionName: safeDecode(options.companionName || ''),
+      companionPhone: safeDecode(options.companionPhone || ''),
+      companionIdentityType,
+      companionIdentityNo,
+      companionNoMasked: maskIdentityNo(companionIdentityNo),
     });
   },
 
@@ -70,19 +98,48 @@ Page({
       contactPhone,
       studentNo,
       courtNo,
+      identityType,
+      companionEnabled,
+      companionName,
+      companionPhone,
+      companionIdentityType,
+      companionIdentityNo,
     } = this.data;
 
     if (
       !venueId ||
       !slotId ||
       !Number.isInteger(quantity) ||
-      quantity < 1 ||
-      !/^\d{6,12}$/.test(studentNo) ||
-      !contactName.trim() ||
-      !/^1[3-9]\d{9}$/.test(contactPhone)
+      quantity < 1
     ) {
       wx.showToast({ title: '预约信息不完整，请返回检查', icon: 'none' });
       return;
+    }
+
+    // 证件规则随身份变化，这里必须重新校验，不能信任上游页面
+    const selfError = validatePerson(
+      { name: contactName, phone: contactPhone, identityType, identityNo: studentNo },
+      '',
+    );
+    if (selfError) {
+      wx.showToast({ title: selfError, icon: 'none' });
+      return;
+    }
+
+    if (companionEnabled) {
+      const companionError = validatePerson(
+        {
+          name: companionName,
+          phone: companionPhone,
+          identityType: companionIdentityType,
+          identityNo: companionIdentityNo,
+        },
+        '同行人',
+      );
+      if (companionError) {
+        wx.showToast({ title: companionError, icon: 'none' });
+        return;
+      }
     }
 
     this.setData({ submitting: true });
@@ -95,6 +152,12 @@ Page({
         contactPhone,
         studentNo,
         courtNo: courtNo || undefined,
+        // 后端落库字段待定：先按契约透传，未接收时不影响原有下单
+        identityType,
+        companionName: companionEnabled ? companionName : undefined,
+        companionPhone: companionEnabled ? companionPhone : undefined,
+        companionIdentityType: companionEnabled ? companionIdentityType : undefined,
+        companionIdentityNo: companionEnabled ? companionIdentityNo : undefined,
       } as any);
       const orderId = res && res.orderId;
       if (!orderId) {

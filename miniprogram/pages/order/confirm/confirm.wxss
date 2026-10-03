@@ -129,3 +129,11 @@
 .btn-disabled {
   opacity: 0.5;
 }
+
+/* ===== 同行人区块 ===== */
+.companion-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 20rpx 0 4rpx;
+}

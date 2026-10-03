@@ -125,11 +125,12 @@
   color: #fff;
   font-size: 26rpx;
 }
+/* 封锁时段：沿用本文件既有的 purple 状态色，不再引入新的紫色 */
 .slot-cell.blocked {
-  background: #F4ECFF;
-  border-color: rgba(114, 46, 209, 0.45);
+  background: #f0e6ff;
+  border-color: #6a1b9a;
 }
 .slot-cell.blocked .slot-time,
 .slot-cell.blocked .slot-status {
-  color: #722ED1;
+  color: #6a1b9a;
 }

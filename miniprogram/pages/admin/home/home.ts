@@ -128,6 +128,10 @@ Page({
     wx.navigateTo({ url: '/pages/admin/bookings/bookings' });
   },
 
+  goSettlement() {
+    wx.navigateTo({ url: '/pages/admin/settlement/settlement' });
+  },
+
   goDashboard() {
     wx.navigateTo({ url: '/pages/admin/dashboard/dashboard' });
   },

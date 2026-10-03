@@ -64,7 +64,7 @@
   <view class="contact-card card">
     <view class="contact-title">联系信息（入场核验）</view>
     <view class="info-row flex-between">
-      <text class="info-label">学号</text>
+      <text class="info-label">{{order.booking.identityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
       <text class="info-value">{{order.booking.studentNo || '未填写'}}</text>
     </view>
     <view class="info-row flex-between">
@@ -74,6 +74,27 @@
     <view class="info-row flex-between info-row-last">
       <text class="info-label">手机号</text>
       <text class="info-value">{{order.booking.contactPhone}}</text>
+    </view>
+  </view>
+
+  <!-- 同行人（校外人员进校登记，前台核验需对照） -->
+  <view class="contact-card card" wx:if="{{order.booking.companionName}}">
+    <view class="contact-title">同行人（需一同入场）</view>
+    <view class="info-row flex-between">
+      <text class="info-label">姓名</text>
+      <text class="info-value">{{order.booking.companionName}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="info-label">身份</text>
+      <text class="info-value">{{order.booking.companionIdentityType === 'VISITOR' ? '校外人员' : '在校生'}}</text>
+    </view>
+    <view class="info-row flex-between">
+      <text class="info-label">{{order.booking.companionIdentityType === 'VISITOR' ? '身份证号' : '学号'}}</text>
+      <text class="info-value">{{order.booking.companionIdentityNo || '未填写'}}</text>
+    </view>
+    <view class="info-row flex-between info-row-last">
+      <text class="info-label">手机号</text>
+      <text class="info-value">{{order.booking.companionPhone}}</text>
     </view>
   </view>
 
