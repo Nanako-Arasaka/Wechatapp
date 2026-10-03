@@ -98,35 +98,17 @@
     </view>
 
     <view class="admin-grid">
-      <!-- 管理员预约 -->
-      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/venue/list/list">
-        <view class="a-icon-box bg-blue">🏸</view>
-        <text class="a-name">管理员预约</text>
-        <text class="a-desc">代预约/优先权</text>
-      </view>
-      <!-- 运营大屏 -->
-      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/dashboard/dashboard">
-        <view class="a-icon-box bg-blue">📊</view>
-        <text class="a-name">运营大屏</text>
-        <text class="a-desc">营收与利用率</text>
-      </view>
-      <!-- 实时监控 -->
-      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/realtime/realtime">
-        <view class="a-icon-box bg-green">📡</view>
-        <text class="a-name">实时监控</text>
-        <text class="a-desc">场馆负荷看板</text>
-      </view>
       <!-- 扫码核销 -->
       <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/checkin/checkin">
         <view class="a-icon-box bg-purple">📱</view>
         <text class="a-name">扫码核销</text>
         <text class="a-desc">前台入场校验</text>
       </view>
-      <!-- 场地维护 -->
-      <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/venues/venues">
+      <!-- 进入管理端 -->
+      <view class="admin-nav-item" bindtap="goAdminHome">
         <view class="a-icon-box bg-orange">🏸</view>
-        <text class="a-name">场地维护</text>
-        <text class="a-desc">排期与上下架</text>
+        <text class="a-name">场馆管理</text>
+        <text class="a-desc">返回管理端首页</text>
       </view>
       <!-- 资金结算 -->
       <view class="admin-nav-item" bindtap="navTo" data-url="/pages/admin/settlement/settlement">

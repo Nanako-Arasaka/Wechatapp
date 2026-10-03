@@ -13,6 +13,8 @@
     "pages/user/profile/profile",
     "pages/user/notifications/notifications",
     "pages/auth/login/login",
+    "pages/admin/home/home",
+    "pages/admin/venue-detail/venue-detail",
     "pages/admin/dashboard/dashboard",
     "pages/admin/realtime/realtime",
     "pages/admin/venue-schedule/venue-schedule",

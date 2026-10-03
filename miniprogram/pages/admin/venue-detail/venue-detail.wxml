@@ -1,0 +1,90 @@
+<view class="venue-detail-page container">
+  <!-- 加载中 -->
+  <view wx:if="{{loading && !venue}}" class="loading-box">正在加载场馆信息...</view>
+
+  <!-- 加载失败 -->
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-title">场馆信息加载失败</text>
+    <text class="empty-desc">该场馆可能已下架或不在你的管理范围</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <block wx:elif="{{venue}}">
+    <!-- 场馆头图 -->
+    <view class="vd-hero">
+      <image class="vd-cover" src="{{coverImage}}" mode="aspectFill" binderror="onImageError" />
+      <view class="vd-hero-mask"></view>
+      <view class="vd-hero-copy">
+        <text class="vd-name">{{venue.name}}</text>
+        <text class="vd-meta">
+          {{venueTypeName(venue.type)}} · 容量 {{venue.capacity}} 场
+        </text>
+      </view>
+      <text class="vd-status {{venue.status === 'ACTIVE' ? 'tag-green' : 'tag-gray'}}">
+        {{venue.status === 'ACTIVE' ? '开放中' : '已下架'}}
+      </text>
+    </view>
+
+    <!-- 场馆信息 -->
+    <view class="card info-card">
+      <view class="info-row">
+        <text class="info-label">营业时间</text>
+        <text class="info-value">{{venue.openTime}} - {{venue.closeTime}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">基础单价</text>
+        <text class="info-value">{{priceText(venue.basePrice)}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">可提前预约</text>
+        <text class="info-value">{{venue.advanceDays}} 天</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">场馆地址</text>
+        <text class="info-value">{{venue.address || '未填写'}}</text>
+      </view>
+    </view>
+
+    <!-- 主操作：排期与预约 -->
+    <view class="section-header">
+      <text class="section-title">时段与预约</text>
+    </view>
+    <view class="action-grid">
+      <view class="action-item" bindtap="goSchedule" hover-class="hover-press">
+        <view class="ac-icon bg-green">📅</view>
+        <text class="ac-name">排期管理</text>
+        <text class="ac-desc">查看时段余量</text>
+      </view>
+      <view class="action-item" bindtap="goBookings" hover-class="hover-press">
+        <view class="ac-icon bg-blue">📑</view>
+        <text class="ac-name">预约监管</text>
+        <text class="ac-desc">该馆订单</text>
+      </view>
+    </view>
+
+    <!-- 运营操作 -->
+    <view class="section-header">
+      <text class="section-title">运营操作</text>
+    </view>
+    <view class="card op-card">
+      <view class="op-row" bindtap="goEdit" hover-class="hover-press">
+        <text class="op-label">编辑场馆资料</text>
+        <text class="op-arrow">›</text>
+      </view>
+      <view class="op-row" bindtap="setClosedRange" hover-class="hover-press">
+        <text class="op-label">临时闭馆</text>
+        <text class="op-value">今日 / 区间</text>
+      </view>
+      <view class="op-row" bindtap="reopenVenue" hover-class="hover-press">
+        <text class="op-label">直接开馆</text>
+        <text class="op-value">清除未来闭馆</text>
+      </view>
+      <view class="op-row" bindtap="toggleStatus" hover-class="hover-press">
+        <text class="op-label">{{venue.status === 'ACTIVE' ? '下架场馆' : '重新上架'}}</text>
+        <text class="op-value {{venue.status === 'ACTIVE' ? 'danger' : ''}}">
+          {{venue.status === 'ACTIVE' ? '用户端不可见' : '恢复可见'}}
+        </text>
+      </view>
+    </view>
+  </block>
+</view>

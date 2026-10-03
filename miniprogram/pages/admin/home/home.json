@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "场馆管理",
+  "navigationBarBackgroundColor": "#1F2329",
+  "navigationBarTextStyle": "white",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

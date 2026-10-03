@@ -23,6 +23,13 @@ App({
       this.globalData.isLoggedIn = true;
       console.log(`👤 恢复已登录用户会话: ${user.nickname} [${user.role}]`);
 
+      // 管理端与用户端分离：管理员打开小程序直接进入场馆管理落地页，
+      // 不经过用户端首页。普通用户不受影响，仍从 tabBar 首页进入。
+      if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+        wx.reLaunch({ url: '/pages/admin/home/home' });
+        return;
+      }
+
       // 后台静默校验并刷新最新用户信息
       AuthService.getProfile()
         .then((profile) => {

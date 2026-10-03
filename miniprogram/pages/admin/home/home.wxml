@@ -1,0 +1,103 @@
+<view class="admin-home container">
+  <!-- 顶部身份条 -->
+  <view class="home-header">
+    <view class="header-role">
+      <text class="role-name">{{adminName}}</text>
+      <text class="role-tag {{isSuperAdmin ? 'tag-purple' : 'tag-green'}}">
+        {{isSuperAdmin ? '超级管理员' : '场馆管理员'}}
+      </text>
+    </view>
+    <text class="header-sub">管理我负责的场地</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading && venues.length === 0}}" class="loading-box">正在加载我的场馆...</view>
+
+  <!-- 加载失败 -->
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-title">场馆加载失败</text>
+    <text class="empty-desc">请检查网络后重试</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <!-- 无场馆 -->
+  <view wx:elif="{{!loading && venues.length === 0}}" class="empty-state">
+    <text class="empty-title">暂未分配场馆</text>
+    <text class="empty-desc">请联系超级管理员为你分配场馆</text>
+  </view>
+
+  <block wx:else>
+    <!-- 我负责的场馆（核心区） -->
+    <view class="section-header">
+      <text class="section-title">我的场馆</text>
+      <text class="section-count">{{venues.length}} 个</text>
+    </view>
+
+    <view
+      class="venue-manage-card card"
+      wx:for="{{venues}}"
+      wx:key="id"
+      bindtap="goVenueDetail"
+      data-id="{{item.id}}"
+      data-name="{{item.name}}"
+      hover-class="hover-press"
+    >
+      <image class="vm-cover" src="{{item.coverImage}}" mode="aspectFill" binderror="onImageError" />
+      <view class="vm-body">
+        <view class="vm-title-row">
+          <text class="vm-name">{{item.name}}</text>
+          <text class="vm-status {{item.status === 'ACTIVE' ? 'tag-green' : 'tag-gray'}}">
+            {{item.status === 'ACTIVE' ? '开放中' : '已下架'}}
+          </text>
+        </view>
+        <text class="vm-meta">{{venueTypeName(item.type)}}</text>
+        <text class="vm-time">营业 {{item.openTime}} - {{item.closeTime}}</text>
+      </view>
+      <text class="vm-arrow">›</text>
+    </view>
+
+    <!-- 单馆快捷操作 -->
+    <view class="section-header">
+      <text class="section-title">快捷操作</text>
+    </view>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goScan" hover-class="hover-press">
+        <view class="q-icon bg-purple">📱</view>
+        <text class="q-name">扫码核销</text>
+        <text class="q-desc">入场校验</text>
+      </view>
+      <view
+        class="quick-item"
+        wx:for="{{venues}}"
+        wx:key="id"
+        bindtap="goSchedule"
+        data-venue-id="{{item.id}}"
+        data-venue-name="{{item.name}}"
+        hover-class="hover-press"
+      >
+        <view class="q-icon bg-green">📅</view>
+        <text class="q-name">今日排期</text>
+        <text class="q-desc">{{item.name}}</text>
+      </view>
+      <view class="quick-item" bindtap="goBookings" hover-class="hover-press">
+        <view class="q-icon bg-blue">📑</view>
+        <text class="q-name">预约监管</text>
+        <text class="q-desc">订单检索</text>
+      </view>
+      <view class="quick-item" bindtap="goUserSide" hover-class="hover-press">
+        <view class="q-icon bg-orange">🏸</view>
+        <text class="q-name">用户端</text>
+        <text class="q-desc">以学生视角看</text>
+      </view>
+    </view>
+
+    <!-- 运营分析（仅超管） -->
+    <view class="dashboard-entry card" wx:if="{{isSuperAdmin}}" bindtap="goDashboard" hover-class="hover-press">
+      <view class="de-left">
+        <text class="de-title">全馆运营分析</text>
+        <text class="de-desc">营收、利润与片区创收汇总</text>
+      </view>
+      <text class="vm-arrow">›</text>
+    </view>
+  </block>
+</view>
