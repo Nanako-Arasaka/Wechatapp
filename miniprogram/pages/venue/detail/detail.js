@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const venue_service_1 = require("../../../services/venue.service");
 const format_1 = require("../../../utils/format");
 const venue_image_1 = require("../../../utils/venue-image");
+const auth_1 = require("../../../store/auth");
 /**
  * ============================================================================
  * P1 场地概况页 (VenueDetailPage)
@@ -49,7 +50,8 @@ Page({
         try {
             this.setData({ loading: true, loadError: false });
             // 调用已有接口 GET /venues 获取场馆基础信息
-            const venues = await venue_service_1.VenueService.getVenues();
+            const venuesRes = await venue_service_1.VenueService.getVenues();
+            const venues = venuesRes.list || [];
             const activeList = venues.filter((v) => v.status !== "INACTIVE");
             const tabs = activeList.reduce((items, item) => {
                 if (!items.some((tab) => tab.key === item.type)) {
@@ -143,8 +145,14 @@ Page({
             wx.showToast({ title: "场馆信息加载中，请稍候", icon: "none" });
             return;
         }
-        wx.navigateTo({
-            url: `/pages/venue/date/date?id=${encodeURIComponent(this.data.venue.id)}`,
-        });
+        const back = `/pages/venue/booking/booking?id=${encodeURIComponent(this.data.venue.id)}`;
+        if (!auth_1.AuthStore.getToken()) {
+            // 未登录跳登录页并携带预约目标，登录成功自动回跳
+            wx.navigateTo({
+                url: `/pages/auth/login/login?redirect=${encodeURIComponent(back)}`,
+            });
+            return;
+        }
+        wx.navigateTo({ url: back });
     },
 });

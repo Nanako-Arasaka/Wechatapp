@@ -55,9 +55,18 @@ Page({
     this.setData({ avatarUrl: "/assets/ui/user.svg" });
   },
 
-  refreshUserInfo() {
-    const user = AuthStore.getUser();
+  async refreshUserInfo() {
+    let user = AuthStore.getUser();
     if (user && AuthStore.getToken()) {
+      // 每次显示个人中心时从服务端刷新一次资料，避免本地缓存昵称/头像过期或乱码
+      try {
+        const fresh = await AuthService.getProfile();
+        AuthStore.setUser(fresh);
+        user = fresh;
+      } catch (err) {
+        console.warn("刷新个人资料失败，使用本地缓存:", err);
+      }
+
       const phone = user.phone || "未绑定手机号";
       const maskedPhone =
         phone.length === 11
@@ -211,8 +220,11 @@ Page({
       content: "退出后将返回未登录状态。",
       success: async (res) => {
         if (res.confirm) {
-          // 调用 POST /auth/logout 吊销 refreshToken，并清理本地会话
-          await AuthService.logout();
+          try {
+            await AuthService.logout();
+          } catch (err) {
+            console.warn('logout API 失败，仍清理本地会话', err);
+          }
           const app = getApp<any>();
           if (app && app.globalData) {
             app.globalData.userInfo = null;

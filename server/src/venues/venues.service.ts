@@ -62,8 +62,14 @@ export class VenuesService {
     ]);
 
     const list = venues.map((v) => {
-      // 计算目标日期可用剩余时段数与总余量
-      const activeSlots = v.slots.filter((s) => s.status !== SlotStatus.CLOSED);
+      // 计算目标日期普通用户可见的可用剩余时段数与总余量
+      // 管理员专属、营业时间外、内部预留等状态不计入对外展示
+      const activeSlots = v.slots.filter(
+        (s) => s.status !== SlotStatus.CLOSED &&
+               s.status !== SlotStatus.ADMIN_ONLY &&
+               s.status !== SlotStatus.OUT_OF_HOURS &&
+               s.status !== SlotStatus.RESERVED,
+      );
       const availableSlotsCount = activeSlots.filter((s) => s.totalCapacity > s.bookedCapacity).length;
       const totalCapacity = activeSlots.reduce((acc, cur) => acc + cur.totalCapacity, 0);
       const bookedCapacity = activeSlots.reduce((acc, cur) => acc + cur.bookedCapacity, 0);
@@ -138,8 +144,9 @@ export class VenuesService {
 
   /**
    * 查询指定时段的场地占用情况（选场地页真实数据源）
-   * 返回总容量与已被占用的场地编号列表，occupied 由 CourtOccupancy 表驱动。
-   * 对于历史无 courtNo 的订单，按顺序补齐占用位，保证 occupied 总数与 bookedCapacity 一致。
+   * 返回总容量与已被占用的场地编号列表，occupied 仅由 CourtOccupancy 真实占用表驱动。
+   * 注意：不做任何模拟补齐，历史无 courtNo 的订单只占用总量名额、不占据具体场地号，
+   * 避免把未选场地的订单错误标记为某号场地已占用。
    */
   async getSlotCourts(venueId: string, slotId: string) {
     const slot = await this.prisma.venueSlot.findUnique({
@@ -154,32 +161,10 @@ export class VenuesService {
       throw new BusinessException('场馆不存在或已下架', BusinessErrorCode.VENUE_NOT_FOUND);
     }
 
-    const [occupancies, legacyCount] = await Promise.all([
-      this.prisma.courtOccupancy.findMany({
-        where: { slotId },
-        select: { courtNo: true },
-      }),
-      this.prisma.booking.count({
-        where: {
-          slotId,
-          courtNo: null,
-          status: { notIn: [BookingStatus.CANCELLED, BookingStatus.REFUNDED] },
-        },
-      }),
-    ]);
-
-    const occupied = occupancies.map((o) => o.courtNo);
-    const occupiedSet = new Set(occupied);
-
-    // 补齐历史无 courtNo 订单的占用位（按场地号从小到大）
-    let nextNo = 1;
-    while (legacyCount > 0 && occupied.length < slot.bookedCapacity && nextNo <= slot.totalCapacity) {
-      if (!occupiedSet.has(nextNo)) {
-        occupied.push(nextNo);
-        occupiedSet.add(nextNo);
-      }
-      nextNo++;
-    }
+    const occupancies = await this.prisma.courtOccupancy.findMany({
+      where: { slotId },
+      select: { courtNo: true },
+    });
 
     return {
       slotId: slot.id,
@@ -187,7 +172,7 @@ export class VenuesService {
       timeRange: `${slot.startTime}-${slot.endTime}`,
       totalCapacity: slot.totalCapacity,
       bookedCapacity: slot.bookedCapacity,
-      occupied: occupied.sort((a, b) => a - b),
+      occupied: occupancies.map((o) => o.courtNo).sort((a, b) => a - b),
     };
   }
 
@@ -246,7 +231,10 @@ export class VenuesService {
     const formattedSlots = slots.map((s) => {
       const remaining = Math.max(0, s.totalCapacity - s.bookedCapacity);
       const isPast = isToday && s.startTime < currentHourMinute;
-      const isAdminOnly = s.status === SlotStatus.ADMIN_ONLY || s.isAdminOnly;
+      // 营业时间外/管理员专属时段统一视为管理员专属，普通用户不可见
+      let isAdminOnly = s.status === SlotStatus.ADMIN_ONLY ||
+                        s.status === SlotStatus.OUT_OF_HOURS ||
+                        s.isAdminOnly;
 
       // 普通用户不可见管理员专属时段
       if (isAdminOnly && !isAdmin) {
@@ -257,17 +245,21 @@ export class VenuesService {
       let statusText = '余量充足';
       let statusColor = 'green';
 
-      if (s.status === SlotStatus.CLOSED || s.status === SlotStatus.OUT_OF_HOURS || isPast) {
+      if (isPast) {
         statusDisplay = 'CLOSED';
-        statusText = isPast ? '已过时段' : '不可预约';
+        statusText = '已过时段';
         statusColor = 'gray';
-      } else if (s.status === SlotStatus.RESERVED) {
-        statusDisplay = 'RESERVED';
-        statusText = '内部预留';
-        statusColor = 'purple';
+      } else if (s.status === SlotStatus.CLOSED) {
+        statusDisplay = 'CLOSED';
+        statusText = '不可预约';
+        statusColor = 'gray';
       } else if (isAdminOnly) {
         statusDisplay = 'ADMIN_ONLY';
         statusText = '管理员专属';
+        statusColor = 'purple';
+      } else if (s.status === SlotStatus.RESERVED) {
+        statusDisplay = 'RESERVED';
+        statusText = '内部预留';
         statusColor = 'purple';
       } else if (remaining === 0) {
         statusDisplay = 'FULL';

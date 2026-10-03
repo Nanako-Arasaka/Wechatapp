@@ -15,6 +15,7 @@
     "pages/auth/login/login",
     "pages/admin/dashboard/dashboard",
     "pages/admin/realtime/realtime",
+    "pages/admin/venue-schedule/venue-schedule",
     "pages/admin/venues/venues",
     "pages/admin/bookings/bookings",
     "pages/order/fill-info/fill-info",

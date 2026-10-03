@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.request = void 0;
+exports.request = request;
 const config_1 = require("../config");
 const auth_1 = require("../store/auth");
 /** 并发 401 时合并为一次 refresh */
@@ -15,11 +15,11 @@ function refreshAccessToken() {
     }
     refreshInFlight = new Promise((resolve, reject) => {
         wx.request({
-            url: `${config_1.CONFIG.API_BASE_URL}/auth/refresh`,
+            url: `${(0, config_1.getApiBaseUrl)()}/auth/refresh`,
             method: 'POST',
             data: { refreshToken },
             header: { 'Content-Type': 'application/json' },
-            timeout: 5000,
+            timeout: config_1.CONFIG.REQUEST_TIMEOUT_MS || 15000,
             success: (res) => {
                 const body = res.data;
                 const ok = (res.statusCode === 200 || res.statusCode === 201) && body && body.code === 0 && body.data?.token;
@@ -29,11 +29,14 @@ function refreshAccessToken() {
                     resolve(body.data.token);
                 }
                 else {
-                    reject(new Error(body?.message || 'REFRESH_FAILED'));
+                    // 刷新失败：清会话，避免「看似在线、请求全 401」
+                    auth_1.AuthStore.clear();
+                    reject(new Error(body?.message || '登录已过期，请重新登录'));
                 }
             },
             fail: (err) => {
-                reject(new Error(err.errMsg || 'REFRESH_FAILED'));
+                auth_1.AuthStore.clear();
+                reject(new Error(err.errMsg || '网络异常，登录已失效'));
             },
         });
     }).finally(() => {
@@ -66,14 +69,14 @@ function request(url, method = 'GET', data, options = {}) {
             }
         }
     }
-    const fullUrl = url.startsWith('http') ? url : `${config_1.CONFIG.API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+    const fullUrl = url.startsWith('http') ? url : `${(0, config_1.getApiBaseUrl)()}${url.startsWith('/') ? '' : '/'}${url}`;
     return new Promise((resolve, reject) => {
         wx.request({
             url: fullUrl,
             method,
             data: cleanData,
             header,
-            timeout: 5000,
+            timeout: config_1.CONFIG.REQUEST_TIMEOUT_MS || 15000,
             success: async (res) => {
                 if (showLoading) {
                     wx.hideLoading();
@@ -144,4 +147,3 @@ function request(url, method = 'GET', data, options = {}) {
         });
     });
 }
-exports.request = request;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.venueImage = void 0;
+exports.venueImage = venueImage;
 const localPhotos = {
     "1626224583764-f87db24ac4ea": "badminton",
     "1546519638-68e109498ffc": "basketball",
@@ -15,4 +15,3 @@ function venueImage(source) {
         ? `/assets/venues/${localPhotos[known]}.jpg`
         : source || "/assets/ui/venue.svg";
 }
-exports.venueImage = venueImage;

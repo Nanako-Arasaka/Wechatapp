@@ -1,5 +1,6 @@
 import { VenueService } from "../../../services/venue.service";
 import { formatMoney, safeDecode } from "../../../utils/format";
+import { guardLoginPage } from "../../../utils/auth-guard";
 
 /**
  * ============================================================================
@@ -49,6 +50,11 @@ Page({
     });
 
     this.loadCourts();
+  },
+
+  onShow() {
+    // 预约必须登录：防止通过分享 URL 未登录直达选场地页
+    if (!guardLoginPage()) return;
   },
 
   /**

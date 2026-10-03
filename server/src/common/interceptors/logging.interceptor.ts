@@ -15,7 +15,8 @@ export class LoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
-    const { method, url, body } = request;
+    // 注意：绝不在日志中记录 request.body，防止密码、手机号、核销码等敏感信息泄露
+    const { method, url } = request;
     const now = Date.now();
 
     return next.handle().pipe(

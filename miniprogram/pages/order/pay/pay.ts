@@ -1,5 +1,6 @@
 import { OrderService } from '../../../services/order.service';
 import { OrderDetail } from '../../../types';
+import { guardLoginPage } from '../../../utils/auth-guard';
 
 Page({
   data: {
@@ -15,12 +16,16 @@ Page({
   },
   _timer: null as any,
   _visible: false,
+  /** 服务器时间与本地时间的偏移量（毫秒），用于校正倒计时 */
+  _serverOffset: 0,
 
   onLoad(options: any) {
     this.setData({ orderId: options.orderId || '' });
   },
 
   onShow() {
+    // 支付页必须登录：防止通过分享 URL 未登录直达收银台
+    if (!guardLoginPage()) return;
     this._visible = true;
     this.loadOrderDetail();
   },
@@ -39,8 +44,12 @@ Page({
     this.setData({ loading: true, loadError: false, canPay: false });
     try {
       if (!this.data.orderId) throw new Error('缺少订单号');
-      const order = await OrderService.getOrderDetail(this.data.orderId);
+      const order: any = await OrderService.getOrderDetail(this.data.orderId);
       if (!this._visible) return;
+      // 用服务器时间校正本地时钟偏移，防止用户篡改手机时间影响倒计时展示
+      if (order?.serverTime) {
+        this._serverOffset = new Date(order.serverTime).getTime() - Date.now();
+      }
       this.setData({ order, loading: false });
       this.startCountdown();
     } catch (err) {
@@ -62,7 +71,9 @@ Page({
     const order = this.data.order;
     const deadline = new Date(order?.booking.expiredAt || '').getTime();
     const pending = order?.orderStatus === 'PENDING_PAYMENT' && order.booking.status === 'PENDING_PAYMENT';
-    const remainingSeconds = Number.isFinite(deadline) ? Math.max(0, Math.ceil((deadline - Date.now()) / 1000)) : 0;
+    const remainingSeconds = Number.isFinite(deadline)
+      ? Math.max(0, Math.ceil((deadline - Date.now() - this._serverOffset) / 1000))
+      : 0;
     const canPay = !!pending && remainingSeconds > 0;
     const countdownText = `${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`;
     let paymentNotice = '';

@@ -17,6 +17,7 @@ model User {
   phone           String?
   role            String           @default("USER") // USER, ADMIN, SUPER_ADMIN
   status          String           @default("ACTIVE") // ACTIVE, DISABLED
+  tokenVersion    Int              @default(0) // 递增即可吊销该用户所有已签发 token
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   bookings        Booking[]
@@ -24,6 +25,19 @@ model User {
   checkinRecords  CheckinRecord[]
   operatorCheckins CheckinRecord[] @relation("OperatorCheckins")
   logs            OperationLog[]
+  refreshTokens   RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Venue {
@@ -89,6 +103,7 @@ model VenueSlot {
   bookings       Booking[]
 
   @@unique([venueId, date, startTime])
+  @@index([venueId, date])
 }
 
 model Booking {
@@ -121,6 +136,11 @@ model Booking {
   order          Order?
   checkinRecords CheckinRecord[]
   courtOccupancies CourtOccupancy[]
+
+  @@index([userId])
+  @@index([slotId])
+  @@index([bookingDate])
+  @@index([status])
 }
 
 // 场地级占用表：一条记录 = 某时段的某号场地被一个预约占用。
@@ -155,6 +175,10 @@ model Order {
   cancelledAt    DateTime?
   payments       Payment[]
   refunds        Refund[]
+
+  @@index([userId])
+  @@index([orderStatus])
+  @@index([createdAt])
 }
 
 model Payment {
@@ -202,6 +226,9 @@ model Notification {
   type      String   // BOOKING_SUCCESS, PAYMENT_SUCCESS, REMINDER, CANCELLED, REFUND
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt])
 }
 
 model OperationLog {

@@ -11,26 +11,32 @@ class VenueService {
     static async getVenues(params) {
         try {
             const res = await (0, request_1.request)('/venues', 'GET', params, { showErrorToast: false });
-            if (Array.isArray(res))
-                return res;
-            if (res && Array.isArray(res.list))
-                return res.list;
-            return [];
+            if (Array.isArray(res)) {
+                return { list: res, total: res.length, page: params?.page || 1, pageSize: params?.pageSize || res.length };
+            }
+            if (res && Array.isArray(res.list)) {
+                return {
+                    list: res.list,
+                    total: Number(res.total) || res.list.length,
+                    page: Number(res.page) || params?.page || 1,
+                    pageSize: Number(res.pageSize) || params?.pageSize || res.list.length,
+                };
+            }
+            return { list: [], total: 0, page: 1, pageSize: params?.pageSize || 20 };
         }
         catch (httpErr) {
             if (!config_1.CONFIG.ENABLE_OFFLINE_DEMO)
                 throw httpErr;
             VenueService.showDemoToast();
-            // 二级自愈保障：返回内置场馆数据
             let venues = [...mock_data_1.MOCK_VENUES];
             if (params?.type) {
                 venues = venues.filter((v) => v.type === params.type);
             }
             if (params?.keyword) {
                 const kw = params.keyword.toLowerCase();
-                venues = venues.filter((v) => v.name.toLowerCase().includes(kw) || v.description.toLowerCase().includes(kw));
+                venues = venues.filter((v) => v.name.toLowerCase().includes(kw) || (v.description || '').toLowerCase().includes(kw));
             }
-            return venues;
+            return { list: venues, total: venues.length, page: 1, pageSize: venues.length };
         }
     }
     /**

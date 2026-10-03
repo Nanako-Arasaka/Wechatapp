@@ -300,3 +300,17 @@
     animation: none !important;
   }
 }
+
+/* G-3 管理员专属时段 */
+.slot-cell.admin-only {
+  background: #F4ECFF;
+  border-color: rgba(114, 46, 209, 0.45);
+}
+.slot-cell.admin-only .slot-time,
+.slot-cell.admin-only .slot-status {
+  color: #722ED1;
+}
+.slot-cell.admin-only.selected {
+  background: #EAD9FF;
+  border-color: #722ED1;
+}

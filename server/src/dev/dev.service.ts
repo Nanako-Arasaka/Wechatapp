@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { SlotStatus } from '../common/enums';
+import { BusinessException, BusinessErrorCode } from '../common/exceptions/business.exception';
 import * as dayjs from 'dayjs';
 
 @Injectable()
@@ -96,9 +97,12 @@ export class DevService {
   }
 
   /**
-   * 一键生成今日晚高峰火爆客流
+   * 一键生成今日晚高峰火爆客流（仅允许非生产环境，防止污染真实运营数据）
    */
   async generatePeakTraffic() {
+    if (process.env.NODE_ENV === 'production') {
+      throw new BusinessException('演示数据注入功能仅允许在非生产环境使用', BusinessErrorCode.FORBIDDEN);
+    }
     const today = dayjs().format('YYYY-MM-DD');
     const peakSlots = await this.prisma.venueSlot.findMany({
       where: {

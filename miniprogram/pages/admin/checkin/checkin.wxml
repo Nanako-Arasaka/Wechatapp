@@ -1,3 +1,4 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
 <view class="checkin-page container">
   <!-- 头部控制卡片 -->
   <view class="checkin-header-card card">
@@ -56,7 +57,7 @@
       </view>
       <view class="vr-row flex-between">
         <text class="vr-label">实付金额</text>
-        <text class="vr-val text-danger font-bold">¥{{verifyResult.amount / 100}}</text>
+        <text class="vr-val text-danger font-bold">¥{{filters.formatMoney(verifyResult.amount)}}</text>
       </view>
     </view>
 

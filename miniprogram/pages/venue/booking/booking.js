@@ -4,6 +4,7 @@ const venue_service_1 = require("../../../services/venue.service");
 const format_1 = require("../../../utils/format");
 const booking_calendar_1 = require("../../../utils/booking-calendar");
 const venue_image_1 = require("../../../utils/venue-image");
+const auth_guard_1 = require("../../../utils/auth-guard");
 /**
  * ============================================================================
  * P2 选择时间页 (BookingPage)
@@ -63,6 +64,11 @@ Page({
         this._loadId++;
         if (this._summaryTimer)
             clearTimeout(this._summaryTimer);
+    },
+    onShow() {
+        // 预约必须登录：防止通过分享 URL 未登录直达选时段页
+        if (!(0, auth_guard_1.guardLoginPage)())
+            return;
     },
     changeDate() {
         const previous = getCurrentPages().slice(-2)[0];

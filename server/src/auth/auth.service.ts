@@ -6,6 +6,7 @@ import { MockWechatAuthProvider } from '../common/providers/mock-providers';
 import { LoginDto, WechatLoginDto } from './dto/login.dto';
 import { Role } from '../common/enums';
 import { BusinessException, BusinessErrorCode } from '../common/exceptions/business.exception';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AuthService {
@@ -43,25 +44,7 @@ export class AuthService {
 
     this.loginAttempts.delete(dto.username);
 
-    const payload = {
-      sub: user.id,
-      username: user.username,
-      role: user.role,
-      nickname: user.nickname,
-    };
-
-    const token = this.jwtService.sign(payload);
-    return {
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        nickname: user.nickname,
-        avatar: user.avatar,
-        phone: user.phone,
-        role: user.role,
-      },
-    };
+    return this.issueSession(user);
   }
 
   /**
@@ -91,23 +74,114 @@ export class AuthService {
       });
     }
 
+    if (user.status === 'DISABLED') {
+      throw new BusinessException('账号已被禁用', BusinessErrorCode.UNAUTHORIZED);
+    }
+
+    return this.issueSession(user);
+  }
+
+  /**
+   * 签发会话：access token（2h）+ refresh token（30 天，轮换制）
+   * tokenVersion 纳入 payload，管理员禁用/删除账号时可立即吊销全部已签发 token。
+   */
+  private async issueSession(user: { id: string; username?: string | null; role: string; nickname: string; avatar?: string | null; phone?: string | null }) {
     const payload = {
       sub: user.id,
+      username: user.username,
       role: user.role,
       nickname: user.nickname,
+      tv: await this.getTokenVersion(user.id),
     };
 
     const token = this.jwtService.sign(payload);
+    const refreshToken = await this.createRefreshToken(user.id);
+
     return {
       token,
+      refreshToken,
       user: {
         id: user.id,
+        username: user.username,
         nickname: user.nickname,
         avatar: user.avatar,
         phone: user.phone,
         role: user.role,
       },
     };
+  }
+
+  private async getTokenVersion(userId: string): Promise<number> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { tokenVersion: true },
+    });
+    return user?.tokenVersion ?? 0;
+  }
+
+  private generateRefreshTokenString(): string {
+    return `rt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+  }
+
+  private async createRefreshToken(userId: string) {
+    const token = this.generateRefreshTokenString();
+    // 30 天有效期
+    const expiresAt = dayjs().add(30, 'day').toDate();
+    await this.prisma.refreshToken.create({
+      data: { token, userId, expiresAt },
+    });
+    return token;
+  }
+
+  /**
+   * 刷新会话（refresh token 轮换：旧 refresh token 立即作废，防止重放）
+   */
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw new BusinessException('缺少刷新凭证', BusinessErrorCode.UNAUTHORIZED);
+    }
+
+    const stored = await this.prisma.refreshToken.findUnique({
+      where: { token: refreshToken },
+      include: { user: true },
+    });
+
+    if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+      throw new BusinessException('登录已过期，请重新登录', BusinessErrorCode.UNAUTHORIZED);
+    }
+
+    if (stored.user.status === 'DISABLED') {
+      throw new BusinessException('账号已被禁用', BusinessErrorCode.UNAUTHORIZED);
+    }
+
+    // 轮换：吊销旧 token，签发新对
+    await this.prisma.refreshToken.update({
+      where: { id: stored.id },
+      data: { revokedAt: new Date() },
+    });
+
+    const token = this.jwtService.sign({
+      sub: stored.user.id,
+      username: stored.user.username,
+      role: stored.user.role,
+      nickname: stored.user.nickname,
+      tv: stored.user.tokenVersion,
+    });
+    const newRefreshToken = await this.createRefreshToken(stored.user.id);
+
+    return { token, refreshToken: newRefreshToken };
+  }
+
+  /**
+   * 退出登录：吊销 refresh token，access token 短期内自然过期（2h）
+   */
+  async logout(refreshToken: string) {
+    if (!refreshToken) return { message: '已退出登录' };
+    await this.prisma.refreshToken.updateMany({
+      where: { token: refreshToken, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    return { message: '已退出登录' };
   }
 
   /**

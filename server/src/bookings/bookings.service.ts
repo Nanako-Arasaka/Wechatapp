@@ -90,6 +90,11 @@ export class BookingsService {
         throw new BusinessException('所选预约时段不存在', BusinessErrorCode.SLOT_NOT_FOUND);
       }
 
+      // 防伪造：传入的场馆 ID 必须与时段实际归属的场馆一致
+      if (dto.venueId && dto.venueId !== slot.venueId) {
+        throw new BusinessException('场馆与时段不匹配，请刷新后重试', BusinessErrorCode.PARAM_INVALID);
+      }
+
       if (slot.status === SlotStatus.CLOSED) {
         throw new BusinessException('该时段已暂停预约', BusinessErrorCode.SLOT_CLOSED);
       }
@@ -113,14 +118,15 @@ export class BookingsService {
       // 校验 advanceDays 与历史时间
       this.validateBookingTime(slot, isAdmin);
 
-      // 管理员专属时段校验
-      if (slot.status === SlotStatus.ADMIN_ONLY && !isAdmin) {
+      // 管理员专属/营业时间外时段校验
+      if ((slot.status === SlotStatus.ADMIN_ONLY || slot.status === SlotStatus.OUT_OF_HOURS) && !isAdmin) {
         throw new BusinessException('该时段为管理员专属，普通用户不可预约', BusinessErrorCode.FORBIDDEN);
       }
 
       // 步骤 3.2: 余量计算与防超卖拦截
-      const availableCapacity = Math.max(0, slot.totalCapacity - slot.bookedCapacity);
-      let targetCapacity = slot.totalCapacity;
+      const originalCapacity = slot.totalCapacity;
+      const availableCapacity = Math.max(0, originalCapacity - slot.bookedCapacity);
+      let targetCapacity = originalCapacity;
 
       if (availableCapacity < dto.quantity) {
         if (!isAdmin || !dto.privilege || dto.privilege === BookingPrivilege.NONE) {
@@ -132,7 +138,15 @@ export class BookingsService {
         }
 
         if (dto.privilege === BookingPrivilege.EXPAND) {
-          // 调大容量：按需求扩展总容量（管理员优先权）
+          // 调大容量（管理员优先权），但设置绝对上限：原容量的 120%，
+          // 防止管理员无限扩容破坏真实场地容量约束。
+          const expandCap = Math.max(originalCapacity, Math.ceil(originalCapacity * 1.2));
+          if (slot.bookedCapacity + dto.quantity > expandCap) {
+            throw new BusinessException(
+              `扩容已达上限（该时段最多 ${expandCap} 个名额）`,
+              BusinessErrorCode.SLOT_CAPACITY_NOT_ENOUGH,
+            );
+          }
           targetCapacity = slot.bookedCapacity + dto.quantity;
         } else if (dto.privilege === BookingPrivilege.RESERVE) {
           // 转为内部预留：标记为 RESERVED，并锁定名额
@@ -163,10 +177,11 @@ export class BookingsService {
       }
 
       // 场地编号预校验（真正占用写入在 booking 创建之后，同一事务内完成）
+      // 上限用 targetCapacity：管理员 EXPAND 扩容后允许选择新增场地编号
       if (dto.courtNo !== undefined && dto.courtNo !== null) {
-        if (dto.courtNo < 1 || dto.courtNo > slot.totalCapacity) {
+        if (dto.courtNo < 1 || dto.courtNo > targetCapacity) {
           throw new BusinessException(
-            `场地编号须在 1 ~ ${slot.totalCapacity} 之间`,
+            `场地编号须在 1 ~ ${targetCapacity} 之间`,
             BusinessErrorCode.PARAM_INVALID,
           );
         }
@@ -182,8 +197,9 @@ export class BookingsService {
 
       if (dto.privilege === BookingPrivilege.RESERVE) {
         newStatus = SlotStatus.RESERVED;
-      } else if (slot.status === SlotStatus.ADMIN_ONLY) {
-        newStatus = newBookedCapacity >= targetCapacity ? SlotStatus.FULL : SlotStatus.ADMIN_ONLY;
+      } else if (slot.status === SlotStatus.ADMIN_ONLY || slot.status === SlotStatus.OUT_OF_HOURS) {
+        // 营业时间外时段被管理员预约后仍保持原状态，避免向普通用户开放
+        newStatus = newBookedCapacity >= targetCapacity ? SlotStatus.FULL : slot.status;
       }
 
       await tx.venueSlot.update({
@@ -399,8 +415,8 @@ export class BookingsService {
         if (slot) {
           const newBooked = slot.bookedCapacity;
           let status = slot.status;
-          // 闭馆、超营业保留、内部预留状态不自动恢复为 AVAILABLE
-          if (status !== SlotStatus.CLOSED && status !== SlotStatus.OUT_OF_HOURS && status !== SlotStatus.RESERVED) {
+          // 闭馆、超营业保留、内部预留、管理员专属状态不自动恢复为 AVAILABLE
+          if (status !== SlotStatus.CLOSED && status !== SlotStatus.OUT_OF_HOURS && status !== SlotStatus.RESERVED && status !== SlotStatus.ADMIN_ONLY) {
             status = newBooked >= slot.totalCapacity ? SlotStatus.FULL : SlotStatus.AVAILABLE;
           }
           // 如果 RESERVED 状态下释放后无人占用，恢复为 AVAILABLE
@@ -514,8 +530,13 @@ export class BookingsService {
 
     if (slot.date === today) {
       const nowStr = dayjs().format('HH:mm');
-      if (slot.startTime <= nowStr) {
-        throw new BusinessException('该时段已开始或已结束，无法预约', BusinessErrorCode.BOOKING_TIME_INVALID);
+      // 普通用户只能约未开始的时段；管理员可约当前进行中且未结束的时段（代预约/优先权）
+      const timeLimit = isAdmin ? slot.endTime : slot.startTime;
+      if (timeLimit <= nowStr) {
+        throw new BusinessException(
+          isAdmin ? '该时段已结束，无法预约' : '该时段已开始或已结束，无法预约',
+          BusinessErrorCode.BOOKING_TIME_INVALID,
+        );
       }
     }
   }

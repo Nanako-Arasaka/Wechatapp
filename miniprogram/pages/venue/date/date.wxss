@@ -1,143 +1,33 @@
-.date-page {
-  padding-top: 12rpx;
-  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+.date-picker-page {
+  padding: 24rpx;
 }
-.date-heading-copy {
-  min-width: 0;
-  flex: 1;
-}
-.date-title {
-  font-size: 30rpx;
+.page-title {
+  font-size: 32rpx;
   font-weight: 700;
+  margin-bottom: 24rpx;
 }
-.date-subtitle {
-  font-size: 23rpx;
-  color: #86909c;
-  margin-top: 10rpx;
+.day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }
-.date-page .refresh-button {
-  width: auto;
-  min-width: 0;
-  flex: none;
-  margin: 0 0 0 16rpx;
-  padding: 0 20rpx;
-  line-height: 60rpx;
-  font-size: 24rpx;
-  color: #4e5969;
-  background: #f4f6f9;
-  border-radius: 999rpx;
-  white-space: nowrap;
-  box-sizing: border-box;
+.day-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 30rpx;
+  border-radius: 20rpx;
+  background: #f6f8fb;
 }
-.calendar-card {
-  padding: 24rpx 16rpx;
+.day-item.active {
+  background: #1677ff;
+  color: #fff;
 }
-.calendar-heading {
-  padding: 0 8rpx 24rpx;
-  font-size: 30rpx;
-  font-weight: 700;
-  flex-wrap: wrap;
-  gap: 8rpx;
+.day-week {
+  font-size: 28rpx;
+  font-weight: 600;
 }
-.calendar-hint {
-  font-size: 20rpx;
-  color: #86909c;
-  font-weight: 400;
-}
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 8rpx;
-}
-.calendar-weekdays {
-  text-align: center;
-  font-size: 22rpx;
-  color: #86909c;
-  margin-bottom: 14rpx;
-}
-.calendar-entry {
-  min-width: 0;
-  animation: calendar-in 420ms var(--ease-enter) both;
-}
-/* 两个类的优先级高于微信 v2 的 button:not([size='mini'])。 */
-.date-page .calendar-cell {
-  display: block;
-  min-width: 0;
-  width: 100%;
-  margin: 0;
-  padding: 12rpx 0;
-  min-height: 168rpx;
+.day-date {
   font-size: 26rpx;
-  line-height: 1.3;
-  border-radius: 18rpx;
-  background: #f0f8f5;
-  color: #1d2129;
-  box-sizing: border-box;
-  border: 2rpx solid transparent;
-}
-.date-page .calendar-empty {
-  background: transparent;
-  animation: none;
-}
-.calendar-day {
-  font-size: 30rpx;
-  font-weight: 700;
-}
-.calendar-tag {
-  height: 28rpx;
-  font-size: 18rpx;
-  color: #1677ff;
-}
-.calendar-label {
-  color: #86909c;
-  font-size: 18rpx;
-  margin: 4rpx 0;
-}
-.date-page .calendar-cell.today {
-  border-color: #91caff;
-}
-.date-page .calendar-cell.unavailable {
-  background: #f0f1f3;
-  color: #a8adb5;
-}
-.date-page .calendar-cell.selected {
-  background: #e6f4ff;
-  border-color: #1677ff;
-  box-shadow: 0 8rpx 20rpx rgba(22, 119, 255, 0.15);
-  animation: selection-pop 260ms var(--ease-enter) both;
-}
-.calendar-note {
-  margin: 20rpx 8rpx 0;
-  color: #86909c;
-  font-size: 20rpx;
-  line-height: 1.5;
-}
-.bottom-action-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-}
-.bottom-action-bar .btn-primary {
-  width: 100%;
-  margin: 0;
-}
-
-@keyframes calendar-in {
-  from {
-    opacity: 0;
-    transform: translateY(16rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .calendar-entry,
-  .calendar-cell {
-    animation: none !important;
-  }
+  opacity: 0.85;
 }

@@ -14,72 +14,73 @@ export class DashboardService {
     const yesterday = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
     const thisMonthStart = dayjs().startOf('month').format('YYYY-MM-DD');
 
-    // 1. 今日数据
-    const todayOrders = await this.prisma.order.findMany({
+    // 1. 今日数据（数据库聚合，避免全表拉取）
+    const todayOrderAgg = await this.prisma.order.aggregate({
       where: {
         createdAt: {
           gte: dayjs(today).toDate(),
           lt: dayjs(today).add(1, 'day').toDate(),
         },
       },
+      _count: { id: true },
+      _sum: { paidAmount: true, refundAmount: true },
     });
-
-    const todayBookings = await this.prisma.booking.findMany({
-      where: {
-        bookingDate: today,
-      },
-    });
-
-    const todayPaidOrders = todayOrders.filter((o) => o.paymentStatus === 'PAID');
-    const todayRefundedOrders = todayOrders.filter((o) => o.refundAmount > 0);
-    const todayPaidAmount = todayPaidOrders.reduce((sum, o) => sum + o.paidAmount, 0);
-    const todayRefundAmount = todayRefundedOrders.reduce((sum, o) => sum + o.refundAmount, 0);
+    const todayOrdersCount = todayOrderAgg._count.id;
+    const todayPaidAmount = todayOrderAgg._sum.paidAmount || 0;
+    const todayRefundAmount = todayOrderAgg._sum.refundAmount || 0;
     const todayNetIncome = Math.max(0, todayPaidAmount - todayRefundAmount);
 
+    const todayBookingsCount = await this.prisma.booking.count({
+      where: { bookingDate: today },
+    });
+
     // 2. 昨日数据 (用于计算环比)
-    const yesterdayOrders = await this.prisma.order.findMany({
+    const yesterdayOrderAgg = await this.prisma.order.aggregate({
       where: {
         createdAt: {
           gte: dayjs(yesterday).toDate(),
           lt: dayjs(today).toDate(),
         },
       },
+      _count: { id: true },
+      _sum: { paidAmount: true, refundAmount: true },
     });
-
-    const yesterdayBookings = await this.prisma.booking.findMany({
-      where: {
-        bookingDate: yesterday,
-      },
-    });
-
-    const yesterdayPaidOrders = yesterdayOrders.filter((o) => o.paymentStatus === 'PAID');
-    const yesterdayRefundedOrders = yesterdayOrders.filter((o) => o.refundAmount > 0);
-    const yesterdayPaidAmount = yesterdayPaidOrders.reduce((sum, o) => sum + o.paidAmount, 0);
-    const yesterdayRefundAmount = yesterdayRefundedOrders.reduce((sum, o) => sum + o.refundAmount, 0);
+    const yesterdayOrdersCount = yesterdayOrderAgg._count.id;
+    const yesterdayPaidAmount = yesterdayOrderAgg._sum.paidAmount || 0;
+    const yesterdayRefundAmount = yesterdayOrderAgg._sum.refundAmount || 0;
     const yesterdayNetIncome = Math.max(0, yesterdayPaidAmount - yesterdayRefundAmount);
 
+    const yesterdayBookingsCount = await this.prisma.booking.count({
+      where: { bookingDate: yesterday },
+    });
+
     // 计算环比增长率
-    const orderGrowthRate = yesterdayOrders.length > 0
-      ? Math.round(((todayOrders.length - yesterdayOrders.length) / yesterdayOrders.length) * 100)
+    const orderGrowthRate = yesterdayOrdersCount > 0
+      ? Math.round(((todayOrdersCount - yesterdayOrdersCount) / yesterdayOrdersCount) * 100)
       : 12;
     const incomeGrowthRate = yesterdayNetIncome > 0
       ? Math.round(((todayNetIncome - yesterdayNetIncome) / yesterdayNetIncome) * 100)
       : 15;
-    const bookingGrowthRate = yesterdayBookings.length > 0
-      ? Math.round(((todayBookings.length - yesterdayBookings.length) / yesterdayBookings.length) * 100)
+    const bookingGrowthRate = yesterdayBookingsCount > 0
+      ? Math.round(((todayBookingsCount - yesterdayBookingsCount) / yesterdayBookingsCount) * 100)
       : 8;
 
-    // 3. 累计与本月资金
-    const allPaidOrders = await this.prisma.order.findMany({
+    // 3. 累计与本月资金（聚合）
+    const totalOrderAgg = await this.prisma.order.aggregate({
+      where: { paymentStatus: { in: ['PAID', 'REFUNDED'] } },
+      _sum: { paidAmount: true, refundAmount: true },
+    });
+    const totalRevenue = (totalOrderAgg._sum.paidAmount || 0) - (totalOrderAgg._sum.refundAmount || 0);
+    const totalRefunds = totalOrderAgg._sum.refundAmount || 0;
+
+    const monthOrderAgg = await this.prisma.order.aggregate({
       where: {
         paymentStatus: { in: ['PAID', 'REFUNDED'] },
+        createdAt: { gte: dayjs(thisMonthStart).toDate() },
       },
+      _sum: { paidAmount: true, refundAmount: true },
     });
-    const totalRevenue = allPaidOrders.reduce((sum, o) => sum + (o.paidAmount - o.refundAmount), 0);
-    const totalRefunds = allPaidOrders.reduce((sum, o) => sum + o.refundAmount, 0);
-
-    const monthOrders = allPaidOrders.filter((o) => dayjs(o.createdAt).format('YYYY-MM-DD') >= thisMonthStart);
-    const monthRevenue = monthOrders.reduce((sum, o) => sum + (o.paidAmount - o.refundAmount), 0);
+    const monthRevenue = (monthOrderAgg._sum.paidAmount || 0) - (monthOrderAgg._sum.refundAmount || 0);
     const pendingSettlement = Math.round(todayNetIncome * 0.95); // 模拟待结算 (T+1)
 
     // 4. 实时在馆负荷 (当前小时)
@@ -110,7 +111,8 @@ export class DashboardService {
       const label = dayjs().subtract(i, 'day').format('MM/DD');
       trendDays.push(label);
 
-      const dOrders = await this.prisma.order.findMany({
+      // 单日聚合：一次 aggregate + 一次 count，不再拉全表
+      const dOrderAgg = await this.prisma.order.aggregate({
         where: {
           createdAt: {
             gte: dayjs(d).toDate(),
@@ -118,37 +120,52 @@ export class DashboardService {
           },
           paymentStatus: { in: ['PAID', 'REFUNDED'] },
         },
+        _sum: { paidAmount: true, refundAmount: true },
       });
 
       const dBookingsCount = await this.prisma.booking.count({
         where: { bookingDate: d },
       });
 
-      const dIncome = dOrders.reduce((sum, o) => sum + (o.paidAmount - o.refundAmount), 0);
+      const dIncome = (dOrderAgg._sum.paidAmount || 0) - (dOrderAgg._sum.refundAmount || 0);
       incomeTrend.push({ date: label, income: Math.round(dIncome / 100), fullDate: d });
       bookingTrend.push({ date: label, count: dBookingsCount, fullDate: d });
     }
 
-    // 6. 场馆营收占比与利用率排行
+    // 6. 场馆营收占比与利用率排行（groupBy 聚合，不拉关联全表）
+    const sevenDaysAgo = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+    const revenueByVenue = await this.prisma.booking.groupBy({
+      by: ['venueId'],
+      where: {
+        bookingDate: { gte: sevenDaysAgo },
+        status: { in: ['CONFIRMED', 'CHECKED_IN', 'COMPLETED'] },
+      },
+      _sum: { totalAmount: true },
+    });
+    const revenueMap = new Map(revenueByVenue.map((r) => [r.venueId, r._sum.totalAmount || 0]));
+
+    const capacityByVenue = await this.prisma.venueSlot.groupBy({
+      by: ['venueId'],
+      where: { date: today },
+      _sum: { totalCapacity: true, bookedCapacity: true },
+    });
+    const capacityMap = new Map(
+      capacityByVenue.map((c) => [c.venueId, {
+        total: c._sum.totalCapacity || 0,
+        booked: c._sum.bookedCapacity || 0,
+      }]),
+    );
+
     const venues = await this.prisma.venue.findMany({
       where: { status: { not: 'DELETED' } },
-      include: {
-        bookings: {
-          where: {
-            bookingDate: { gte: dayjs().subtract(7, 'day').format('YYYY-MM-DD') },
-            status: { in: ['CONFIRMED', 'CHECKED_IN', 'COMPLETED'] },
-          },
-        },
-        slots: {
-          where: { date: today },
-        },
-      },
+      select: { id: true, name: true, type: true },
     });
 
     const venueRevenueList = venues.map((v) => {
-      const venueIncome = v.bookings.reduce((sum, b) => sum + b.totalAmount, 0);
-      const todayTotalCap = v.slots.reduce((sum, s) => sum + s.totalCapacity, 0);
-      const todayBookedCap = v.slots.reduce((sum, s) => sum + s.bookedCapacity, 0);
+      const venueIncome = revenueMap.get(v.id) || 0;
+      const cap = capacityMap.get(v.id);
+      const todayTotalCap = cap?.total || 0;
+      const todayBookedCap = cap?.booked || 0;
       const utilization = todayTotalCap > 0 ? Math.round((todayBookedCap / todayTotalCap) * 100) : 0;
 
       return {
@@ -223,9 +240,9 @@ export class DashboardService {
 
     return {
       kpi: {
-        todayOrders: todayOrders.length,
+        todayOrders: todayOrdersCount,
         todayOrderGrowth: orderGrowthRate,
-        todayBookings: todayBookings.length,
+        todayBookings: todayBookingsCount,
         todayBookingGrowth: bookingGrowthRate,
         todayNetIncome: Math.round(todayNetIncome / 100),
         todayIncomeGrowth: incomeGrowthRate,
@@ -317,27 +334,30 @@ export class DashboardService {
     const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
     const hours = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '21:00'];
 
-    // 聚合所有历史 Slots 的平均负荷
-    const allSlots = await this.prisma.venueSlot.findMany();
+    // 按 星期×起始时间 分组聚合负荷，不拉全表
+    const grouped = await this.prisma.venueSlot.groupBy({
+      by: ['date', 'startTime'],
+      _sum: { bookedCapacity: true, totalCapacity: true },
+    });
+
+    const groupMap = new Map<string, { booked: number; total: number }>();
+    for (const g of grouped) {
+      const key = `${dayjs(g.date).day()}|${g.startTime}`;
+      const existing = groupMap.get(key) || { booked: 0, total: 0 };
+      existing.booked += g._sum.bookedCapacity || 0;
+      existing.total += g._sum.totalCapacity || 0;
+      groupMap.set(key, existing);
+    }
 
     const matrix = days.map((dayName, dayIdx) => {
       const dayOfWeekPrisma = (dayIdx + 1) % 7; // 转换成 0-6 (0=周日)
       return hours.map((hourStr) => {
-        const matched = allSlots.filter((s) => {
-          const d = dayjs(s.date).day();
-          return d === dayOfWeekPrisma && s.startTime === hourStr;
-        });
-
-        if (matched.length === 0) {
-          // 兜底拟真
-          const isPeak = hourStr >= '18:00' && hourStr <= '20:00';
-          const isWk = dayIdx >= 5;
-          return isPeak ? Math.floor(80 + Math.random() * 18) : (isWk ? Math.floor(65 + Math.random() * 25) : Math.floor(30 + Math.random() * 40));
+        const data = groupMap.get(`${dayOfWeekPrisma}|${hourStr}`);
+        if (!data || data.total === 0) {
+          // 无数据时返回 0，绝不返回随机拟真数据（避免误导运营决策）
+          return 0;
         }
-
-        const totalBooked = matched.reduce((sum, s) => sum + s.bookedCapacity, 0);
-        const totalCap = matched.reduce((sum, s) => sum + s.totalCapacity, 0);
-        return totalCap > 0 ? Math.min(100, Math.round((totalBooked / totalCap) * 100)) : 40;
+        return Math.min(100, Math.round((data.booked / data.total) * 100));
       });
     });
 

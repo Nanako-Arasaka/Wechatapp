@@ -1,0 +1,48 @@
+<view class="venue-schedule-page container">
+  <!-- 日期选择 -->
+  <scroll-view class="day-bar" scroll-x enhanced show-scrollbar="{{false}}">
+    <view
+      class="day-pill {{item.date === currentDate ? 'active' : ''}}"
+      wx:for="{{days}}"
+      wx:key="date"
+      bindtap="onSelectDate"
+      data-date="{{item.date}}"
+    >
+      <text class="day-week">{{item.isToday ? '今天' : item.weekday}}</text>
+      <text class="day-date">{{item.date}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 加载 -->
+  <view wx:if="{{loading && slots.length === 0}}" class="loading-box">正在加载排期...</view>
+
+  <!-- 错误 -->
+  <view wx:elif="{{loadError}}" class="empty-state">
+    <text class="empty-title">排期加载失败</text>
+    <view class="btn-retry" bindtap="onRetry">点击重试</view>
+  </view>
+
+  <!-- 闭馆 -->
+  <view wx:elif="{{isClosed}}" class="closed-box card">
+    <text class="closed-text">{{closedReason || '该日场馆闭馆'}}</text>
+  </view>
+
+  <!-- 时段网格 -->
+  <view wx:elif="{{slots.length > 0}}" class="slot-grid card">
+    <view
+      class="slot-cell {{item.statusColor}}"
+      wx:for="{{slots}}"
+      wx:key="id"
+    >
+      <view class="slot-time">{{item.startTime}}</view>
+      <view class="slot-range">{{item.timeRange}}</view>
+      <view class="slot-status">{{item.statusText}}</view>
+      <view class="slot-remaining">余 {{item.remaining}} / {{item.totalCapacity}}</view>
+    </view>
+  </view>
+
+  <!-- 无时段 -->
+  <view wx:elif="{{!loading}}" class="empty-state">
+    <text class="empty-title">该日暂无可查看时段</text>
+  </view>
+</view>

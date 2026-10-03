@@ -37,16 +37,27 @@ export class AuthService {
   }
 
   /**
-   * 微信授权登录
+   * 微信授权登录（mock 模式）
+   * 后端当前只接受 mock_wx_code_ 前缀的 code，且同一 code 固定映射到同一 openid。
+   * 为了演示时不每次都创建新用户，本机会缓存一个稳定的 mock code。
    */
   static async wechatLogin(nickname?: string, avatar?: string): Promise<AuthSession> {
     try {
-      const code = await new Promise<string>((resolve, reject) => {
+      // 兼容调用一次 wx.login，但真实 code 在 mock 模式下不会被后端接受
+      await new Promise<void>((resolve) => {
         wx.login({
-          success: (result) => result.code ? resolve(result.code) : reject(new Error('未获取到微信登录凭证')),
-          fail: () => reject(new Error('微信登录失败，请重试')),
+          success: () => resolve(),
+          fail: () => resolve(),
         });
       });
+
+      const MOCK_CODE_KEY = 'SMART_VENUE_MOCK_WX_CODE';
+      let code = wx.getStorageSync(MOCK_CODE_KEY) as string | undefined;
+      if (!code) {
+        code = `mock_wx_code_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        wx.setStorageSync(MOCK_CODE_KEY, code);
+      }
+
       const res = await request<AuthSession>(
         '/auth/wechat-login',
         'POST',

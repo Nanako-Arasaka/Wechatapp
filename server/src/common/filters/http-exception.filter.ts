@@ -37,7 +37,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = exception.message;
       }
     } else if (exception instanceof Error) {
-      message = exception.message;
+      // 未捕获异常：生产环境绝不把原始错误消息（可能含数据库结构/文件路径）返回给客户端
+      const isProduction = process.env.NODE_ENV === 'production';
+      message = isProduction ? '服务器内部异常，请稍后重试' : exception.message;
       this.logger.error(`Unhandled Exception at ${request.method} ${request.url}: ${exception.stack}`);
     }
 

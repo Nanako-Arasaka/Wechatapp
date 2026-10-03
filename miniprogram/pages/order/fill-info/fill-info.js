@@ -1,97 +1,124 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth_1 = require("../../../store/auth");
- const safeDecode = (s = '') => {
-    try { return decodeURIComponent(s); } catch (e) { return s; }
-};
+const auth_guard_1 = require("../../../utils/auth-guard");
 /**
- * ============================================================================
- * P4 填写预约信息页 (FillInfoPage)
- * ----------------------------------------------------------------------------
- * 接收 booking.js 跳过来的预约基础信息（场馆/时段/数量），
- * 收集「学号 / 姓名 / 手机号」三项联系方式，本地校验后跳到 P5 确认页。
- *
- * 数据流：
- *   P2 booking → P4 fill-info → P5 confirm → pay → P6 success
- *
- * 学号 / 姓名 / 手机号三项必填，随 createBooking 一并入库，供入场核验。
- * ============================================================================
+ * P4 填写预约信息
+ * booking → fill-info → confirm → pay → success
  */
+function safeDecode(s) {
+    const raw = s || '';
+    try {
+        return decodeURIComponent(raw);
+    }
+    catch {
+        return raw;
+    }
+}
+function parsePositiveInt(v, fallback) {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
+}
 Page({
     data: {
-        // 来自 P2 booking 的基础信息
         venueId: '',
         venueName: '',
         venueAddress: '',
         slotId: '',
         date: '',
         timeRange: '',
-        unitPrice: 0, // 分
+        unitPrice: 0,
         quantity: 1,
-        courtNo: 0, // 选中的场地编号（0 = 未选场地流程）
-        // 用户填写
+        courtNo: 0,
         studentNo: '',
         contactName: '',
         contactPhone: '',
-        // UI 状态
         submitting: false,
+        pageLoading: true,
     },
-
-
- 
-
-onLoad(options) {
-    const user = auth_1.AuthStore.getUser();
-    this.setData({
-        venueId: options.venueId || '',
-        venueName: safeDecode(options.venueName || '预约场馆'),
-        venueAddress: safeDecode(options.venueAddress || ''),
-        slotId: options.slotId || '',
-        date: safeDecode(options.date || ''),
-        timeRange: safeDecode(options.timeRange || ''),  // ← 补上
-        unitPrice: Number(options.unitPrice || 0),
-        quantity: Number(options.quantity || 1),
-        courtNo: Number(options.courtNo || 0),
-        contactName: user ? user.nickname : '',
-        contactPhone: user && user.phone ? user.phone : '',
-    });
-},
+    onLoad(options) {
+        const user = auth_1.AuthStore.getUser();
+        const venueId = options.venueId || '';
+        const slotId = options.slotId || '';
+        const date = safeDecode(options.date);
+        const timeRange = safeDecode(options.timeRange);
+        // 缺关键参数时给友好提示（G-2）
+        if (!venueId || !slotId || !date || !timeRange) {
+            this.setData({ pageLoading: false });
+            wx.showModal({
+                title: '预约信息不完整',
+                content: '缺少场馆或时段信息，请返回重新选择。',
+                showCancel: false,
+                confirmText: '返回上一页',
+                success: () => {
+                    wx.navigateBack({ delta: 1, fail: () => wx.switchTab({ url: '/pages/venue/list/list' }) });
+                },
+            });
+            return;
+        }
+        this.setData({
+            venueId,
+            venueName: safeDecode(options.venueName) || '预约场馆',
+            venueAddress: safeDecode(options.venueAddress),
+            slotId,
+            date,
+            timeRange,
+            unitPrice: parsePositiveInt(options.unitPrice, 0),
+            quantity: parsePositiveInt(options.quantity, 1),
+            courtNo: parsePositiveInt(options.courtNo, 0) || 0,
+            contactName: user ? user.nickname : '',
+            contactPhone: (user && user.phone) || '',
+            pageLoading: true,
+        });
+        setTimeout(() => this.setData({ pageLoading: false }), 180);
+    },
+    onShow() {
+        // 预约必须登录：防止通过分享 URL 未登录直达填写信息页
+        if (!(0, auth_guard_1.guardLoginPage)())
+            return;
+    },
+    onPullDownRefresh() {
+        wx.stopPullDownRefresh();
+    },
+    onRetry() {
+        this.onLoad(this.options || {});
+    },
     onInputStudentNo(e) {
-        // 仅允许数字，最长 12 位
-        const v = (e.detail.value || '').replace(/\D/g, '').slice(0, 12);
+        const v = String(e.detail.value || '').replace(/\D/g, '').slice(0, 12);
         this.setData({ studentNo: v });
     },
     onInputName(e) {
         this.setData({ contactName: e.detail.value || '' });
     },
     onInputPhone(e) {
-        const v = (e.detail.value || '').replace(/\D/g, '').slice(0, 11);
+        const v = String(e.detail.value || '').replace(/\D/g, '').slice(0, 11);
         this.setData({ contactPhone: v });
     },
     onClickNext() {
         if (this.data.submitting)
             return;
         const { studentNo, contactName, contactPhone, venueName, venueAddress, slotId, date, timeRange, unitPrice, quantity, venueId, courtNo, } = this.data;
-        // 学号校验：6-12 位数字
+        if (!venueId || !slotId || !date || !timeRange) {
+            wx.showToast({ title: '预约信息不完整', icon: 'none' });
+            return;
+        }
         if (!/^\d{6,12}$/.test(studentNo)) {
             wx.showToast({ title: '请输入 6-12 位数字学号', icon: 'none' });
             return;
         }
-        // 姓名校验：非空，长度 <= 20
-        if (!contactName.trim()) {
+        const name = contactName.trim();
+        if (!name) {
             wx.showToast({ title: '请输入真实姓名', icon: 'none' });
             return;
         }
-        if (contactName.trim().length > 20) {
+        if (name.length > 20) {
             wx.showToast({ title: '姓名不能超过 20 个字符', icon: 'none' });
             return;
         }
-        // 手机校验：1[3-9] 开头 11 位
         if (!/^1[3-9]\d{9}$/.test(contactPhone)) {
             wx.showToast({ title: '请输入正确的 11 位手机号', icon: 'none' });
             return;
         }
-        // 跳 P5 confirm，11 个参数全量透传
         const params = [
             `venueId=${encodeURIComponent(venueId)}`,
             `venueName=${encodeURIComponent(venueName)}`,
@@ -102,20 +129,14 @@ onLoad(options) {
             `unitPrice=${unitPrice}`,
             `quantity=${quantity}`,
             `studentNo=${encodeURIComponent(studentNo)}`,
-            `contactName=${encodeURIComponent(contactName.trim())}`,
+            `contactName=${encodeURIComponent(name)}`,
             `contactPhone=${encodeURIComponent(contactPhone)}`,
             `courtNo=${courtNo || 0}`,
         ].join('&');
         this.setData({ submitting: true });
         wx.navigateTo({
             url: `/pages/order/confirm/confirm?${params}`,
-            success: () => {
-                this.setData({ submitting: false });
-            },
-            fail: () => {
-                this.setData({ submitting: false });
-                wx.showToast({ title: '页面跳转失败', icon: 'none' });
-            },
+            complete: () => this.setData({ submitting: false }),
         });
     },
 });

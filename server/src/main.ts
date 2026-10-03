@@ -6,9 +6,16 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // 允许跨域请求（方便调试与开发）
+  // 跨域配置：通过 CORS_ORIGINS 环境变量注入白名单（逗号分隔），
+  // 生产环境禁止通配 origin；未配置时仅允许本地开发地址。
+  const corsOrigins = (process.env.CORS_ORIGINS ||
+    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   app.enableCors({
-    origin: '*',
+    origin: corsOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

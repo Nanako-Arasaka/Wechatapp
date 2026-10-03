@@ -34,3 +34,11 @@ output/playwright/
 
 # WeChat
 project.private.config.json
+
+# Miniprogram: compiled JS from TS（防 .js/.ts 漂移，见 F-1/F-11）
+# 改 .ts 后必须 npm run build:miniprogram；下列保留手写/第三方
+miniprogram/**/*.js
+!miniprogram/utils/vendor/
+
+# Local agent/tooling scratch
+.workbuddy/

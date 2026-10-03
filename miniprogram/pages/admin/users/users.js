@@ -132,24 +132,27 @@ Page({
         const { id, username } = e.currentTarget.dataset;
         if (!id || this.data.deletingId)
             return;
-        const res = await wx.showModal({
+        // 注意：wx.showModal 是回调 API，不返回 Promise，不能 await
+        wx.showModal({
             title: '确认删除',
             content: `确定删除管理员账号「${username}」吗？删除后该账号将无法登录。`,
             confirmColor: '#FF4D4F',
+            success: async (res) => {
+                if (!res.confirm || this.data.deletingId)
+                    return;
+                this.setData({ deletingId: id });
+                try {
+                    await admin_service_1.AdminService.deleteUser(id);
+                    wx.showToast({ title: '删除成功', icon: 'success' });
+                    this.loadAdmins();
+                }
+                catch (err) {
+                    // request 拦截器已弹 Toast
+                }
+                finally {
+                    this.setData({ deletingId: '' });
+                }
+            },
         });
-        if (!res.confirm || this.data.deletingId)
-            return;
-        this.setData({ deletingId: id });
-        try {
-            await admin_service_1.AdminService.deleteUser(id);
-            wx.showToast({ title: '删除成功', icon: 'success' });
-            this.loadAdmins();
-        }
-        catch (err) {
-            // request 拦截器已弹 Toast
-        }
-        finally {
-            this.setData({ deletingId: '' });
-        }
     },
 });

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const venue_service_1 = require("../../../services/venue.service");
 const format_1 = require("../../../utils/format");
+const auth_guard_1 = require("../../../utils/auth-guard");
 /**
  * ============================================================================
  * P3 可选场地页 (CourtSelectPage)
@@ -47,6 +48,11 @@ Page({
             priceText: (0, format_1.formatMoney)(Number(options.price || 0)),
         });
         this.loadCourts();
+    },
+    onShow() {
+        // 预约必须登录：防止通过分享 URL 未登录直达选场地页
+        if (!(0, auth_guard_1.guardLoginPage)())
+            return;
     },
     /**
      * 加载目标时段的场地可用状态

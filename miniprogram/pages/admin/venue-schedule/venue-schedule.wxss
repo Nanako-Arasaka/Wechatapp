@@ -1,0 +1,127 @@
+.venue-schedule-page {
+  padding: 24rpx;
+}
+
+.day-bar {
+  white-space: nowrap;
+  margin-bottom: 24rpx;
+}
+
+.day-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 28rpx;
+  margin-right: 16rpx;
+  border-radius: 20rpx;
+  background: #f6f8fb;
+}
+
+.day-pill.active {
+  background: #1677ff;
+  color: #fff;
+}
+
+.day-week {
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.day-date {
+  font-size: 22rpx;
+  opacity: 0.85;
+  margin-top: 4rpx;
+}
+
+.loading-box {
+  text-align: center;
+  padding: 60rpx 0;
+  color: #86909c;
+}
+
+.closed-box {
+  padding: 40rpx;
+  text-align: center;
+  color: #86909c;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+  padding: 24rpx;
+}
+
+.slot-cell {
+  border-radius: 16rpx;
+  padding: 20rpx 14rpx;
+  text-align: center;
+  background: #f6f8fb;
+  color: #1f2329;
+}
+
+.slot-time {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.slot-range {
+  font-size: 20rpx;
+  color: #86909c;
+  margin: 6rpx 0;
+}
+
+.slot-status {
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.slot-remaining {
+  font-size: 20rpx;
+  color: #4e5969;
+  margin-top: 6rpx;
+}
+
+/* 状态色 */
+.slot-cell.green {
+  background: #e6f7e6;
+  color: #1f7a1f;
+}
+.slot-cell.orange {
+  background: #fff4e6;
+  color: #a65f00;
+}
+.slot-cell.red {
+  background: #ffe8e6;
+  color: #a61d1d;
+}
+.slot-cell.gray {
+  background: #f2f3f5;
+  color: #86909c;
+}
+.slot-cell.purple {
+  background: #f0e6ff;
+  color: #6a1b9a;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 24rpx;
+  color: #86909c;
+}
+
+.empty-title {
+  display: block;
+  font-size: 28rpx;
+  margin-bottom: 24rpx;
+}
+
+.btn-retry {
+  display: inline-block;
+  padding: 14rpx 36rpx;
+  border-radius: 30rpx;
+  background: #1677ff;
+  color: #fff;
+  font-size: 26rpx;
+}

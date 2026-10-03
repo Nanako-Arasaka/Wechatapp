@@ -3,6 +3,7 @@ import { Venue, VenueSlot } from "../../../types";
 import { formatDate, getWeekdayName, formatMoney } from "../../../utils/format";
 import { isBookingDate, bookingDates } from "../../../utils/booking-calendar";
 import { venueImage } from "../../../utils/venue-image";
+import { guardLoginPage } from "../../../utils/auth-guard";
 
 /**
  * ============================================================================
@@ -63,6 +64,11 @@ Page({
     this._unloaded = true;
     this._loadId++;
     if (this._summaryTimer) clearTimeout(this._summaryTimer);
+  },
+
+  onShow() {
+    // 预约必须登录：防止通过分享 URL 未登录直达选时段页
+    if (!guardLoginPage()) return;
   },
 
   changeDate() {

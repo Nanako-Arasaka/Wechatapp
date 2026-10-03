@@ -51,6 +51,16 @@
         <text class="next-label">下一时段 ({{item.nextSlotRange}})</text>
         <text class="next-rem text-primary font-bold">剩余 {{item.nextRemaining}} 个名额</text>
       </view>
+
+      <!-- 查看全天排期 -->
+      <view class="schedule-action-row">
+        <button
+          class="btn-view-schedule"
+          bindtap="goToSchedule"
+          data-venue-id="{{item.venueId}}"
+          data-venue-name="{{item.venueName}}"
+        >查看全天排期</button>
+      </view>
     </view>
   </view>
 </view>

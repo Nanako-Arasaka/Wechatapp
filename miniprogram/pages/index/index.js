@@ -46,16 +46,21 @@ Page({
         }
     },
     /**
-     * 全自动获取手机当前真实 GPS 位置，无需用户进行任何点击操作
+     * 自动获取手机 GPS 位置。
+     * 注意：逆地理编码（经纬度→地名）需接入地图 SDK（如腾讯位置服务 key），
+     * 未配置 key 前不编造地名，统一展示「我的附近」；用户点选位置后才显示真实地名。
      */
     autoFetchRealLocation() {
         wx.getLocation({
             type: "gcj02",
             success: (res) => {
-                const { latitude, longitude } = res;
-                const realLocationName = this.resolveRealLocation(latitude, longitude);
-                this.setData({ currentLocation: realLocationName });
-                wx.setStorageSync("CURRENT_LOCATION", realLocationName);
+                // 保存坐标备用（接入地图 SDK 后可做附近场馆搜索）
+                wx.setStorageSync("CURRENT_COORDS", {
+                    latitude: res.latitude,
+                    longitude: res.longitude,
+                });
+                this.setData({ currentLocation: "我的附近" });
+                wx.setStorageSync("CURRENT_LOCATION", "我的附近");
             },
             fail: (err) => {
                 this.setData({
@@ -63,12 +68,6 @@ Page({
                 });
             },
         });
-    },
-    /**
-     * 真实经纬度反查真实所在城市与区域文体中心地标
-     */
-    resolveRealLocation(lat, lng) {
-        return `当前位置 ${lat.toFixed(3)}, ${lng.toFixed(3)}`;
     },
     /**
      * 若用户想要手动更换其他场地，也可以点击直接唤起微信地图精准选点
@@ -121,7 +120,8 @@ Page({
     async loadData() {
         this.setData({ venuesLoading: true, venuesError: false });
         try {
-            const venues = await venue_service_1.VenueService.getVenues();
+            const venuesRes = await venue_service_1.VenueService.getVenues();
+            const venues = venuesRes.list || [];
             if (venues && venues.length > 0) {
                 this.setData({
                     venues,
@@ -172,15 +172,18 @@ Page({
         this.loadAvailabilityForVenue(id);
     },
     /**
-     * 加载指定场馆的时段余量
+     * 加载指定场馆的时段余量，并过滤掉已过时段
      */
     async loadAvailabilityForVenue(venueId) {
         this.setData({ slotsLoading: true, slotsError: false, quickSlots: [] });
         try {
             const avail = await venue_service_1.VenueService.getAvailability(venueId);
             if (avail && this.data.selectedVenueId === venueId) {
+                const now = new Date();
+                const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const upcomingSlots = (avail.slots || []).filter((s) => s.startTime >= nowStr);
                 this.setData({
-                    quickSlots: (avail.slots || []).slice(0, 8),
+                    quickSlots: upcomingSlots.slice(0, 8),
                     isClosedToday: avail.isClosed || false,
                     closedReason: avail.closedReason || "",
                     peakAdvice: avail.peakAdvice || "",
@@ -202,32 +205,43 @@ Page({
         const id = e.detail.id || e.currentTarget.dataset.id;
         wx.navigateTo({ url: `/pages/venue/detail/detail?id=${id}` });
     },
+    /** 未登录时跳登录页并携带预约目标页，登录成功自动回跳 */
+    redirectToLogin(backUrl) {
+        wx.navigateTo({
+            url: `/pages/auth/login/login?redirect=${encodeURIComponent(backUrl)}`,
+        });
+    },
     goToBooking(e) {
         const id = e.detail.id || e.currentTarget.dataset.id;
-        wx.navigateTo({
-            url: `/pages/venue/date/date?id=${encodeURIComponent(id)}`,
-        });
+        const back = `/pages/venue/booking/booking?id=${encodeURIComponent(id)}`;
+        if (!auth_1.AuthStore.getToken()) {
+            this.redirectToLogin(back);
+            return;
+        }
+        wx.navigateTo({ url: back });
     },
     onQuickSlotTap(e) {
         const slot = e.currentTarget.dataset.slot;
         const targetVenueId = this.data.selectedVenueId;
         if (!slot || !targetVenueId)
             return;
-        if (slot.isSelectable) {
-            wx.navigateTo({
-                url: `/pages/venue/booking/booking?id=${targetVenueId}&slotId=${slot.id}`,
-            });
-        }
-        else {
+        if (!slot.isSelectable) {
             wx.showToast({ title: "该时段已约满或不可选", icon: "none" });
+            return;
         }
+        const back = `/pages/venue/booking/booking?id=${targetVenueId}&slotId=${slot.id}`;
+        if (!auth_1.AuthStore.getToken()) {
+            this.redirectToLogin(back);
+            return;
+        }
+        wx.navigateTo({ url: back });
     },
     goToNotifications() {
-        wx.navigateTo({
-            url: auth_1.AuthStore.getToken()
-                ? "/pages/user/notifications/notifications"
-                : "/pages/auth/login/login",
-        });
+        if (!auth_1.AuthStore.getToken()) {
+            this.redirectToLogin("/pages/user/notifications/notifications");
+            return;
+        }
+        wx.navigateTo({ url: "/pages/user/notifications/notifications" });
     },
     navTo(e) {
         const url = e.currentTarget.dataset.url;

@@ -2,7 +2,11 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import * as dayjs from 'dayjs';
 
-const prisma = new PrismaClient();
+// 支持通过 DATABASE_URL 环境变量覆盖数据库地址（测试环境使用独立 test 数据库）
+const databaseUrl = process.env.DATABASE_URL;
+const prisma = new PrismaClient(
+  databaseUrl ? { datasources: { db: { url: databaseUrl } } } : undefined,
+);
 
 async function main() {
   console.log('🌱 Starting high-speed database seeding for SmartVenue...');
@@ -51,7 +55,7 @@ async function main() {
   const admin2 = await prisma.user.create({
     data: {
       username: 'admin_li',
-      password: 'admin123',
+      password: bcrypt.hashSync('admin123', 10),
       nickname: '李主管 (前台运营)',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
       phone: '13800000003',
@@ -63,7 +67,7 @@ async function main() {
   const defaultUser = await prisma.user.create({
     data: {
       username: 'user',
-      password: 'user123',
+      password: bcrypt.hashSync('user123', 10),
       nickname: '张同学 (运动爱好者)',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
       phone: '13800138000',
@@ -84,6 +88,7 @@ async function main() {
     const u = await prisma.user.create({
       data: {
         username: `user_${i + 1}`,
+        password: bcrypt.hashSync('user123', 10),
         nickname: userNicknames[i],
         avatar: `https://images.unsplash.com/photo-${1530000000000 + (i * 1234567) % 90000000}?w=150`,
         phone: `139${String(10000000 + i * 111111).slice(0, 8)}`,

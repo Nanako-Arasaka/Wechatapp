@@ -2,6 +2,7 @@ import { VenueService } from "../../../services/venue.service";
 import { Venue } from "../../../types";
 import { getVenueTypeName } from "../../../utils/format";
 import { venueImage } from "../../../utils/venue-image";
+import { AuthStore } from "../../../store/auth";
 
 /**
  * ============================================================================
@@ -50,7 +51,8 @@ Page({
     try {
       this.setData({ loading: true, loadError: false });
       // 调用已有接口 GET /venues 获取场馆基础信息
-      const venues = await VenueService.getVenues();
+      const venuesRes = await VenueService.getVenues();
+      const venues = venuesRes.list || [];
       const activeList = venues.filter((v) => v.status !== "INACTIVE");
       const tabs = activeList.reduce(
         (items: Array<{ key: string; label: string }>, item) => {
@@ -160,8 +162,14 @@ Page({
       wx.showToast({ title: "场馆信息加载中，请稍候", icon: "none" });
       return;
     }
-    wx.navigateTo({
-      url: `/pages/venue/date/date?id=${encodeURIComponent(this.data.venue.id)}`,
-    });
+    const back = `/pages/venue/booking/booking?id=${encodeURIComponent(this.data.venue.id)}`;
+    if (!AuthStore.getToken()) {
+      // 未登录跳登录页并携带预约目标，登录成功自动回跳
+      wx.navigateTo({
+        url: `/pages/auth/login/login?redirect=${encodeURIComponent(back)}`,
+      });
+      return;
+    }
+    wx.navigateTo({ url: back });
   },
 });

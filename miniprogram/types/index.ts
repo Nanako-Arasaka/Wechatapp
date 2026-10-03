@@ -55,6 +55,8 @@ export interface VenueSlot {
   statusText: string;
   statusColor: 'green' | 'orange' | 'red' | 'gray';
   isSelectable: boolean;
+  /** 管理员专属时段（P5）；USER 端可按需过滤展示 */
+  isAdminOnly?: boolean;
 }
 
 export interface AvailabilityData {

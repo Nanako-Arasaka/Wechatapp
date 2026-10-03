@@ -128,7 +128,8 @@ export class OrdersService {
       throw new BusinessException('无权查看该订单', BusinessErrorCode.FORBIDDEN);
     }
 
-    return order;
+    // 附带服务器时间，前端据此校正倒计时，防止用户篡改手机时间绕过支付时限展示
+    return { ...order, serverTime: new Date().toISOString() };
   }
 
   /**
@@ -169,8 +170,24 @@ export class OrdersService {
       throw new BusinessException('订单已超时关闭，请重新预约', BusinessErrorCode.ORDER_PAY_FAILED);
     }
 
-    // 1. 调用企业级 Mock 微信支付 Provider，生成微信商户号支付流水
-    const payResult = await this.mockWechatPay.createPayment(order.orderNo, order.amount);
+    if (order.orderStatus === OrderStatus.REFUNDED) {
+      throw new BusinessException('订单已退款，无法支付', BusinessErrorCode.ORDER_PAY_FAILED);
+    }
+
+    // 生产环境保护：未接入真实微信支付前，禁止 mock 支付（防任意改单为已支付）
+    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_MOCK_PAY !== 'true') {
+      throw new BusinessException('支付渠道未配置，请联系管理员', BusinessErrorCode.ORDER_PAY_FAILED);
+    }
+
+    // 1. 调用 Mock 微信支付 Provider 生成支付流水。
+    // 幂等设计：paymentNo/transactionNo 由 orderNo 确定性生成 + 全局唯一约束，
+    // 网络重试/用户连点不会产生重复支付流水（唯一约束冲突时返回已有流水）。
+    const basePay = await this.mockWechatPay.createPayment(order.orderNo, order.amount);
+    const payResult = {
+      ...basePay,
+      paymentNo: `PAY${order.orderNo}`,
+      transactionNo: `WXPAY_${order.orderNo}`,
+    };
 
     // 2. 事务内执行入账与状态扭转
     return await this.prisma.$transaction(async (tx) => {
@@ -194,18 +211,26 @@ export class OrdersService {
         throw new BusinessException('订单状态已变更（可能已支付或已关闭），请勿重复支付', BusinessErrorCode.ORDER_ALREADY_PAID);
       }
 
-      // 步骤 2.2: 插入支付记录 (Payment)
-      const payment = await tx.payment.create({
-        data: {
-          paymentNo: payResult.paymentNo,
-          orderId: order.id,
-          paymentMethod: 'WECHAT_PAY',
-          transactionNo: payResult.transactionNo,
-          amount: order.amount,
-          status: 'SUCCESS',
-          paidAt: payResult.paidAt,
-        },
-      });
+      // 步骤 2.2: 插入支付记录 (Payment)，幂等：并发/重试撞唯一约束时返回已有流水
+      let payment;
+      try {
+        payment = await tx.payment.create({
+          data: {
+            paymentNo: payResult.paymentNo,
+            orderId: order.id,
+            paymentMethod: 'WECHAT_PAY',
+            transactionNo: payResult.transactionNo,
+            amount: order.amount,
+            status: 'SUCCESS',
+            paidAt: payResult.paidAt,
+          },
+        });
+      } catch (err: any) {
+        if (err?.code === 'P2002') {
+          payment = await tx.payment.findFirst({ where: { orderId: order.id } });
+        }
+        if (!payment) throw err;
+      }
 
       // 步骤 2.3: 更新关联 Booking 为 CONFIRMED (待核销使用)
       await tx.booking.updateMany({

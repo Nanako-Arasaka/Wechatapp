@@ -2,10 +2,16 @@ import { VenueService } from "../../../services/venue.service";
 import { Venue } from "../../../types";
 import { getVenueTypeName, safeDecode } from "../../../utils/format";
 import { VenueFilterMotion } from "../../../utils/venue-filter-motion";
+import { AuthStore } from "../../../store/auth";
 
 Page({
   data: {
     loading: true,
+    loadingMore: false,
+    page: 1,
+    pageSize: 20,
+    hasMore: true,
+    total: 0,
     loadError: false,
     keyword: "",
     currentType: "",
@@ -170,19 +176,67 @@ Page({
   async loadVenues() {
     this.cancelFilter();
     const loadId = ++this._loadId;
-    this.setData({ loading: true, loadError: false });
+    this.setData({ loading: true, loadError: false, page: 1, hasMore: true });
     try {
-      const res = await VenueService.getVenues();
+      // 与 loadMoreVenues 保持一致：过滤条件统一传给后端，
+      // 避免首次只拉第一页再前端过滤导致遗漏匹配场馆
+      const res = await VenueService.getVenues({
+        page: 1,
+        pageSize: this.data.pageSize,
+        type: this.data.currentType || undefined,
+        keyword: this.data.keyword || undefined,
+        sortBy: this.data.sortBy,
+      });
       if (loadId !== this._loadId) return;
-      const venues = Array.isArray(res) ? res : (res as any).list || [];
-      this.setData({ rawVenues: venues });
-      this.filterAndSort(venues);
+      const list = res.list || [];
+      const hasMore = list.length >= (res.pageSize || this.data.pageSize) && list.length < (res.total || list.length);
+      this.setData({
+        rawVenues: list,
+        total: res.total || list.length,
+        hasMore: list.length < (res.total || list.length),
+        page: 1,
+      });
+      this.filterAndSort(list);
+      void hasMore;
     } catch (err: any) {
       if (loadId !== this._loadId) return;
       console.warn("加载场地列表失败:", err);
-      this.setData({ loadError: true, rawVenues: [], venueList: [] });
+      this.setData({ loadError: true, rawVenues: [], venueList: [], hasMore: false });
     } finally {
       if (loadId === this._loadId) this.setData({ loading: false });
+    }
+  },
+
+  /** 触底加载下一页（G-5） */
+  onReachBottom() {
+    if (!this.data.hasMore || this.data.loading || this.data.loadingMore) return;
+    this.loadMoreVenues();
+  },
+
+  async loadMoreVenues() {
+    const nextPage = this.data.page + 1;
+    this.setData({ loadingMore: true });
+    try {
+      const res = await VenueService.getVenues({
+        page: nextPage,
+        pageSize: this.data.pageSize,
+        type: this.data.currentType || undefined,
+        keyword: this.data.keyword || undefined,
+        sortBy: this.data.sortBy,
+      });
+      const add = res.list || [];
+      const rawVenues = this.data.rawVenues.concat(add);
+      this.setData({
+        rawVenues,
+        page: nextPage,
+        hasMore: rawVenues.length < (res.total || rawVenues.length) && add.length > 0,
+      });
+      this.filterAndSort(rawVenues);
+    } catch (err) {
+      console.warn('加载更多场馆失败', err);
+      this.setData({ hasMore: false });
+    } finally {
+      this.setData({ loadingMore: false });
     }
   },
 
@@ -250,9 +304,15 @@ Page({
 
   goToBooking(e: any) {
     const id = e.detail.id || e.currentTarget.dataset.id;
-    wx.navigateTo({
-      url: `/pages/venue/date/date?id=${encodeURIComponent(id)}`,
-    });
+    const back = `/pages/venue/booking/booking?id=${encodeURIComponent(id)}`;
+    if (!AuthStore.getToken()) {
+      // 未登录跳登录页并携带预约目标，登录成功自动回跳
+      wx.navigateTo({
+        url: `/pages/auth/login/login?redirect=${encodeURIComponent(back)}`,
+      });
+      return;
+    }
+    wx.navigateTo({ url: back });
   },
 
   noBubble() {},

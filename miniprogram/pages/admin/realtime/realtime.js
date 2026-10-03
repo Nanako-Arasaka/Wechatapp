@@ -61,4 +61,13 @@ Page({
             this.setData({ loading: false });
         }
     },
+    goToSchedule(e) {
+        const venueId = e.currentTarget.dataset.venueId;
+        const venueName = e.currentTarget.dataset.venueName;
+        if (!venueId)
+            return;
+        wx.navigateTo({
+            url: `/pages/admin/venue-schedule/venue-schedule?venueId=${encodeURIComponent(venueId)}&venueName=${encodeURIComponent(venueName || '')}`,
+        });
+    },
 });

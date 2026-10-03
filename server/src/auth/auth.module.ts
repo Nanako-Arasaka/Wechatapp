@@ -12,7 +12,9 @@ import { getJwtSecret } from './jwt-secret';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: getJwtSecret(),
-      signOptions: { expiresIn: '7d' },
+      // access token 2 小时过期，配合 refresh token（30 天）轮换续期，
+      // 缩短泄露窗口；禁用账号通过 tokenVersion 立即吊销。
+      signOptions: { expiresIn: '2h' },
     }),
   ],
   controllers: [AuthController],

@@ -1,3 +1,4 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
 <view class="page-state" wx:if="{{loading}}">正在加载订单...</view>
 <view class="page-state" wx:elif="{{loadError}}">
   <text>订单加载失败</text>
@@ -62,7 +63,7 @@
     </view>
     <view class="item-row flex-between">
       <text class="item-label">实付金额</text>
-      <text class="item-val price-val">¥{{order.paidAmount / 100}}</text>
+      <text class="item-val price-val">¥{{filters.formatMoney(order.paidAmount)}}</text>
     </view>
   </view>
 
@@ -75,7 +76,7 @@
     </view>
     <view class="item-row flex-between">
       <text class="item-label">退款金额</text>
-      <text class="item-val text-danger font-bold">¥{{order.refunds[0].amount / 100}} (全额原路退回)</text>
+      <text class="item-val text-danger font-bold">¥{{filters.formatMoney(order.refunds[0].amount)}} (全额原路退回)</text>
     </view>
     <view class="item-row flex-between">
       <text class="item-label">退款原因</text>

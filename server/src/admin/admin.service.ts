@@ -492,7 +492,8 @@ export class AdminService {
       bookingNo: b.bookingNo,
       bookingCode: b.bookingCode,
       userName: b.contactName || b.user.nickname,
-      userPhone: b.contactPhone || b.user.phone,
+      // 手机号脱敏：仅保留前3后4，中间打码，防止管理端明文泄露用户隐私
+      userPhone: this.maskPhone(b.contactPhone || b.user.phone),
       venueName: b.venue.name,
       bookingDate: b.bookingDate,
       timeRange: `${b.startTime}-${b.endTime}`,
@@ -509,6 +510,13 @@ export class AdminService {
     }));
 
     return { list, total, page, pageSize };
+  }
+
+  /** 手机号脱敏：138****8000 */
+  private maskPhone(phone?: string | null): string {
+    if (!phone) return '';
+    if (phone.length !== 11) return phone;
+    return `${phone.slice(0, 3)}****${phone.slice(7)}`;
   }
 
   /**
@@ -869,7 +877,13 @@ export class AdminService {
       }),
     ]);
 
-    return { list, total, page, pageSize };
+    // 手机号脱敏后返回
+    const maskedList = list.map((u) => ({
+      ...u,
+      phone: this.maskPhone(u.phone),
+    }));
+
+    return { list: maskedList, total, page, pageSize };
   }
 
   /**
@@ -892,7 +906,15 @@ export class AdminService {
 
     await this.prisma.user.update({
       where: { id },
-      data: { status: 'DELETED', username: `${user.username}_deleted_${Date.now()}` },
+      data: {
+        status: 'DELETED',
+        username: `${user.username}_deleted_${Date.now()}`,
+        // 吊销该用户所有已签发 token（access + refresh）
+        tokenVersion: { increment: 1 },
+        refreshTokens: {
+          updateMany: { where: { revokedAt: null }, data: { revokedAt: new Date() } },
+        },
+      },
     });
 
     await this.prisma.operationLog.create({

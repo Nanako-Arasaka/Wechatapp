@@ -1,3 +1,4 @@
+<wxs src="../../../utils/filters.wxs" module="filters" />
 <view class="page-state" wx:if="{{loading}}">正在加载入场凭证...</view>
 <view class="page-state" wx:elif="{{loadError}}">
   <text>凭证加载失败</text>
@@ -54,7 +55,7 @@
       </view>
       <view class="detail-row flex-between">
         <text class="d-label">实付金额</text>
-        <text class="d-val text-price">¥{{order.paidAmount / 100}}</text>
+        <text class="d-val text-price">¥{{filters.formatMoney(order.paidAmount)}}</text>
       </view>
     </view>
   </view>
