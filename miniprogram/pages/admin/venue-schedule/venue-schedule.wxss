@@ -125,3 +125,11 @@
   color: #fff;
   font-size: 26rpx;
 }
+.slot-cell.blocked {
+  background: #F4ECFF;
+  border-color: rgba(114, 46, 209, 0.45);
+}
+.slot-cell.blocked .slot-time,
+.slot-cell.blocked .slot-status {
+  color: #722ED1;
+}

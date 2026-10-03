@@ -2,6 +2,7 @@ import { VenueService } from "../../services/venue.service";
 import { AuthStore } from "../../store/auth";
 import { NotificationService } from "../../services/notification.service";
 import { Venue, VenueSlot } from "../../types";
+import { userVisibleSlots } from "../../utils/booking-calendar";
 
 Page({
   data: {
@@ -194,7 +195,9 @@ Page({
       if (avail && this.data.selectedVenueId === venueId) {
         const now = new Date();
         const nowStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const upcomingSlots = (avail.slots || []).filter((s) => s.startTime >= nowStr);
+        const upcomingSlots = userVisibleSlots(avail.slots || []).filter(
+          (s) => s.startTime >= nowStr,
+        );
         this.setData({
           quickSlots: upcomingSlots.slice(0, 8),
           isClosedToday: avail.isClosed || false,

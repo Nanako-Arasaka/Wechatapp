@@ -1,6 +1,7 @@
 import { VenueService } from "../../../services/venue.service";
 import { formatMoney, safeDecode } from "../../../utils/format";
 import { guardLoginPage } from "../../../utils/auth-guard";
+import { userVisibleSlots } from "../../../utils/booking-calendar";
 
 /**
  * ============================================================================
@@ -78,7 +79,8 @@ Page({
         VenueService.getSlotCourts(this.data.venueId, this.data.slotId),
         VenueService.getAvailability(this.data.venueId, this.data.date),
       ]);
-      const slot = availability.slots.find(
+      // 该时段若已被管理员关闭，普通用户不应再看到可选场地。
+      const slot = userVisibleSlots(availability.slots).find(
         (item) => item.id === this.data.slotId,
       );
       if (availability.isClosed || !slot || !slot.isSelectable) {

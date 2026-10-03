@@ -1,4 +1,4 @@
-import { AvailabilityData } from "../types";
+import { AvailabilityData, VenueSlot } from "../types";
 import { formatDate, getWeekdayName } from "./format";
 
 export interface BookingDay {
@@ -27,6 +27,17 @@ export function isBookingDate(date: string, now = new Date()): boolean {
   return bookingDates(now).includes(date);
 }
 
+/**
+ * 过滤出普通用户可见的时段。
+ *
+ * 被管理员关闭（isBlocked）的时段对普通用户完全不可见：既不出现在时段
+ * 列表、也不计入每日余量汇总、更不能被下单。用户端所有渲染与校验都必须
+ * 走这一个入口，避免各处各自判断导致口径不一致而泄漏内部预留。
+ */
+export function userVisibleSlots(slots: VenueSlot[]): VenueSlot[] {
+  return (slots || []).filter((slot) => !slot?.isBlocked);
+}
+
 export function summarizeDay(
   date: string,
   availability?: AvailabilityData,
@@ -34,7 +45,7 @@ export function summarizeDay(
 ): BookingDay {
   const slots = availability?.isClosed
     ? []
-    : (availability?.slots || []).filter(
+    : userVisibleSlots(availability?.slots || []).filter(
         (slot) => slot.isSelectable && slot.remaining > 0,
       );
   const totalRemaining = slots.reduce(

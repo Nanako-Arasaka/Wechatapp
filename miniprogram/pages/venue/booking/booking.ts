@@ -1,7 +1,11 @@
 import { VenueService } from "../../../services/venue.service";
 import { Venue, VenueSlot } from "../../../types";
 import { formatDate, getWeekdayName, formatMoney } from "../../../utils/format";
-import { isBookingDate, bookingDates } from "../../../utils/booking-calendar";
+import {
+  isBookingDate,
+  bookingDates,
+  userVisibleSlots,
+} from "../../../utils/booking-calendar";
 import { venueImage } from "../../../utils/venue-image";
 import { guardLoginPage } from "../../../utils/auth-guard";
 
@@ -112,7 +116,8 @@ Page({
         throw new Error("超出该场馆可提前预约的日期范围");
       }
       // 可选状态以服务端为准，未来日期不能按今天的钟点置灰。
-      const slots = avail.slots || [];
+      // 管理员关闭的时段对普通用户完全不可见，不能只靠置灰来隐藏。
+      const slots = userVisibleSlots(avail.slots || []);
 
       this.setData({
         venue,

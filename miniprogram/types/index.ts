@@ -55,8 +55,14 @@ export interface VenueSlot {
   statusText: string;
   statusColor: 'green' | 'orange' | 'red' | 'gray';
   isSelectable: boolean;
-  /** 管理员专属时段（P5）；USER 端可按需过滤展示 */
-  isAdminOnly?: boolean;
+  /**
+   * 内部预留/封锁时段（P2-A3）：由管理员在管理端关闭给普通用户。
+   * 语义为「管理员自主开关的使用权」，非管理员可预约的概念——
+   * 用户端一律过滤不展示，管理员端可见并可再次开放。
+   */
+  isBlocked?: boolean;
+  /** 封锁原因（仅管理端展示，避免向普通用户泄露校内内部安排） */
+  blockReason?: string;
 }
 
 export interface AvailabilityData {

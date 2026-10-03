@@ -47,7 +47,7 @@
   <!-- 小时格子时间选择组件 -->
   <view class="slot-grid card content-enter delay-medium" wx:if="{{!loading && !loadError && !isClosed && slots.length > 0}}">
     <view
-      class="slot-cell {{item.isSelectable ? '' : 'disabled'}} {{selectedSlotId === item.id ? 'selected' : ''}} {{item.isAdminOnly ? 'admin-only' : ''}}"
+      class="slot-cell {{item.isSelectable ? '' : 'disabled'}} {{selectedSlotId === item.id ? 'selected' : ''}}"
       wx:for="{{slots}}"
       wx:key="id"
       bindtap="onSelectSlot"
@@ -57,7 +57,7 @@
       <view class="slot-time">{{item.startTime}}</view>
       <view class="slot-range">{{item.startTime}}-{{item.endTime}}</view>
       <!-- 状态文字：可预约显示余量，不可预约显示原因（颜色之外补充图标语义） -->
-      <view class="slot-status">{{item.isAdminOnly ? '★ 专属' : (item.isSelectable ? '✓ 余 ' + item.remaining : item.statusText === '已过时段' ? '— 已过' : item.statusText === '已满' ? '满' : '× ' + item.statusText)}}</view>
+      <view class="slot-status">{{item.isSelectable ? '✓ 余 ' + item.remaining : item.statusText === '已过时段' ? '— 已过' : item.statusText === '已满' ? '满' : '× ' + item.statusText}}</view>
     </view>
   </view>
 

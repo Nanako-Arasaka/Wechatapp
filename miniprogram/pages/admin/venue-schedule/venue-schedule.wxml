@@ -30,13 +30,13 @@
   <!-- 时段网格 -->
   <view wx:elif="{{slots.length > 0}}" class="slot-grid card">
     <view
-      class="slot-cell {{item.statusColor}}"
+      class="slot-cell {{item.isBlocked ? 'blocked' : item.statusColor}}"
       wx:for="{{slots}}"
       wx:key="id"
     >
       <view class="slot-time">{{item.startTime}}</view>
       <view class="slot-range">{{item.timeRange}}</view>
-      <view class="slot-status">{{item.statusText}}</view>
+      <view class="slot-status">{{item.isBlocked ? (item.blockReason || '已封锁') : item.statusText}}</view>
       <view class="slot-remaining">余 {{item.remaining}} / {{item.totalCapacity}}</view>
     </view>
   </view>
