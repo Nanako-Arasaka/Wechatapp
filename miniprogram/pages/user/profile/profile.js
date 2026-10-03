@@ -198,7 +198,7 @@ Page({
     showFeedback() {
         wx.showModal({
             title: "意见反馈",
-            content: "请联系场馆管理中心或前台工作人员反馈预约问题。",
+            content: "请联系所在场馆管理中心或前台工作人员反馈预约问题。",
             showCancel: false,
         });
     },

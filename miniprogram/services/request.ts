@@ -67,7 +67,7 @@ function refreshAccessToken(): Promise<string> {
  */
 export function request<T = any>(
   url: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   data?: any,
   options: RequestOptions = {},
 ): Promise<T> {

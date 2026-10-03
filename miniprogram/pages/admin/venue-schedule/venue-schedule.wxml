@@ -13,6 +13,11 @@
     </view>
   </scroll-view>
 
+  <!-- 提示：时段可点击开关 -->
+  <view class="schedule-hint" wx:if="{{!loading && !loadError}}">
+    点击时段可开关未来 {{advanceDays}} 天内的使用权
+  </view>
+
   <!-- 加载 -->
   <view wx:if="{{loading && slots.length === 0}}" class="loading-box">正在加载排期...</view>
 
@@ -28,21 +33,93 @@
   </view>
 
   <!-- 时段网格 -->
-  <view wx:elif="{{slots.length > 0}}" class="slot-grid card">
+  <view wx:elif="{{slots.length > 0}}" class="slot-grid card motion-panel">
     <view
       class="slot-cell {{item.isBlocked ? 'blocked' : item.statusColor}}"
       wx:for="{{slots}}"
       wx:key="id"
+      bindtap="onTapSlot"
+      data-slot="{{item}}"
+      hover-class="hover-press"
     >
       <view class="slot-time">{{item.startTime}}</view>
       <view class="slot-range">{{item.timeRange}}</view>
       <view class="slot-status">{{item.isBlocked ? (item.blockReason || '已封锁') : item.statusText}}</view>
-      <view class="slot-remaining">余 {{item.remaining}} / {{item.totalCapacity}}</view>
+      <view class="slot-remaining" wx:if="{{!item.isBlocked}}">余 {{item.remaining}} / {{item.totalCapacity}}</view>
+      <view class="slot-remaining" wx:else>仅管理员可用</view>
     </view>
   </view>
 
   <!-- 无时段 -->
   <view wx:elif="{{!loading}}" class="empty-state">
     <text class="empty-title">该日暂无可查看时段</text>
+  </view>
+
+  <!-- 单时段开关弹层 -->
+  <view class="mask" wx:if="{{actionSheet.visible}}" bindtap="closeActionSheet"></view>
+  <view class="sheet" wx:if="{{actionSheet.visible}}" catchtap="noBubble">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">
+      {{actionSheet.slot.startTime}} - {{actionSheet.slot.endTime}}
+    </view>
+    <view class="sheet-sub">{{actionSheet.slot.timeRange}} · 当前 {{actionSheet.slot.statusText}}</view>
+
+    <view class="reason-row">
+      <text class="reason-label">占用原因</text>
+      <input
+        class="reason-input"
+        value="{{actionSheet.reason}}"
+        placeholder="如：校队训练 / 赛事占用"
+        placeholder-class="reason-placeholder"
+        bindinput="onReasonInput"
+      />
+    </view>
+    <view class="reason-tip">封锁与关闭需填写原因，便于后续核对</view>
+
+    <view class="sheet-actions">
+      <view
+        class="act-btn {{actionSheet.slot.isBlocked ? '' : 'current'}}"
+        bindtap="onPickAction"
+        data-action="open"
+        hover-class="hover-press"
+      >
+        <text class="act-name">开放预约</text>
+        <text class="act-desc">普通用户可约</text>
+      </view>
+      <view
+        class="act-btn {{actionSheet.slot.isBlocked ? 'current' : ''}}"
+        bindtap="onPickAction"
+        data-action="block"
+        hover-class="hover-press"
+      >
+        <text class="act-name">封锁</text>
+        <text class="act-desc">仅管理员内部使用</text>
+      </view>
+      <view class="act-btn" bindtap="onPickAction" data-action="close" hover-class="hover-press">
+        <text class="act-name">关闭</text>
+        <text class="act-desc">用户端不可见</text>
+      </view>
+    </view>
+
+    <!-- 批量：把同一动作应用到未来 N 天 -->
+    <view class="batch-entry" bindtap="onToggleBatch" hover-class="hover-press">
+      <text class="batch-title">批量应用到未来多天</text>
+      <text class="batch-arrow">{{batchRangeOpen ? '⌃' : '⌄'}}</text>
+    </view>
+
+    <view class="batch-panel" wx:if="{{batchRangeOpen}}">
+      <view class="batch-days">
+        <text class="batch-label">应用天数</text>
+        <radio-group class="batch-group" bindchange="onBatchDaysChange">
+          <label class="batch-opt"><radio value="2" checked="{{batchDays === 2}}" color="#1677FF" /><text>2 天</text></label>
+          <label class="batch-opt"><radio value="3" checked="{{batchDays === 3}}" color="#1677FF" /><text>3 天</text></label>
+          <label class="batch-opt"><radio value="7" checked="{{batchDays === 7}}" color="#1677FF" /><text>7 天</text></label>
+        </radio-group>
+      </view>
+      <view class="batch-actions">
+        <view class="batch-btn" bindtap="onBatchApply" data-action="block" hover-class="hover-press">全部封锁</view>
+        <view class="batch-btn" bindtap="onBatchApply" data-action="open" hover-class="hover-press">全部开放</view>
+      </view>
+    </view>
   </view>
 </view>

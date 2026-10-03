@@ -18,7 +18,7 @@
     <view class="banner-card motion-home" bindtap="navTo" data-url="/pages/venue/list/list" data-type="BADMINTON">
       <image class="banner-photo" src="/assets/venues/badminton.jpg" mode="aspectFill" />
       <view class="banner-shade"></view>
-      <view class="banner-copy"><text class="banner-tag">热门推荐</text><view class="banner-title">发现身边的羽毛球场馆</view><view class="banner-desc">查看开放时间，选好下一场运动</view></view>
+      <view class="banner-copy"><text class="banner-tag">校内场馆</text><view class="banner-title">预约校内体育场馆</view><view class="banner-desc">查看开放时段，选好下一场运动</view></view>
     </view>
     <view class="advice-card motion-home" wx:if="{{!venuesError && !slotsError && !slotsLoading && peakAdvice}}">
       <view class="advice-title">今日错峰建议</view><view class="advice-text">{{peakAdvice}}</view>

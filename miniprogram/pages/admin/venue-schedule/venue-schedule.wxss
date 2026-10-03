@@ -134,3 +134,186 @@
 .slot-cell.blocked .slot-status {
   color: #6a1b9a;
 }
+
+/* ===== 提示条 ===== */
+.schedule-hint {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  padding: 20rpx 32rpx 0;
+}
+
+/* ===== 时段格可点击反馈 ===== */
+.slot-cell.hover-press {
+  opacity: 0.7;
+}
+
+/* ===== 开关弹层 ===== */
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(29, 33, 41, 0.45);
+  z-index: 100;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+  background: var(--bg-white);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 16rpx 32rpx 40rpx;
+  animation: sheet-up 280ms var(--ease-enter) both;
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.08);
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.sheet-handle {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: var(--border-color);
+  margin: 0 auto 20rpx;
+}
+.sheet-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+}
+.sheet-sub {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 8rpx;
+}
+
+/* ===== 原因输入 ===== */
+.reason-row {
+  display: flex;
+  align-items: center;
+  margin-top: 28rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid var(--border-light);
+}
+.reason-label {
+  font-size: 26rpx;
+  color: var(--text-regular);
+  flex-shrink: 0;
+  margin-right: 20rpx;
+}
+.reason-input {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-main);
+  text-align: right;
+}
+.reason-placeholder {
+  color: var(--text-placeholder);
+}
+.reason-tip {
+  font-size: 20rpx;
+  color: var(--text-secondary);
+  margin-top: 10rpx;
+}
+
+/* ===== 三个动作 ===== */
+.sheet-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.act-btn {
+  flex: 1;
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  padding: 22rpx 12rpx;
+  text-align: center;
+  border: 2rpx solid transparent;
+  transition: border-color var(--dur-press) var(--ease-press);
+}
+.act-btn.current {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+}
+.act-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.act-desc {
+  display: block;
+  font-size: 20rpx;
+  color: var(--text-secondary);
+  margin-top: 6rpx;
+}
+
+/* ===== 批量面板 ===== */
+.batch-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 28rpx;
+  padding: 20rpx 0;
+  border-top: 1rpx solid var(--border-light);
+}
+.batch-title {
+  font-size: 26rpx;
+  color: var(--text-regular);
+}
+.batch-arrow {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+.batch-panel {
+  margin-top: 8rpx;
+}
+.batch-days {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+.batch-label {
+  font-size: 26rpx;
+  color: var(--text-regular);
+}
+.batch-group {
+  display: flex;
+  gap: 24rpx;
+}
+.batch-opt {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: var(--text-main);
+}
+.batch-opt radio {
+  transform: scale(0.8);
+  margin-right: 4rpx;
+}
+.batch-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.batch-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--primary-color);
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+  padding: 20rpx 0;
+}

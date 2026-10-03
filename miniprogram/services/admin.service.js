@@ -117,5 +117,27 @@ class AdminService {
     static async devExpireOrders() {
         return (0, request_1.request)('/dev/expire-orders', 'POST', {}, { showLoading: true, loadingTitle: '正在扫描超时订单...', showErrorToast: true });
     }
+    /**
+     * 开关单个时段的使用权（管理端自主开关，非「管理员专属预约」）
+     * @param slotId 时段 ID
+     * @param action open=开放预约 / block=封锁（仅管理员内部使用）/ close=关闭
+     * @param reason 占用原因，block 时必填
+     *
+     * 后端待提供（见 docs/backend-requests.md A5）：
+     *   PATCH /admin/slots/:id  body: { action, reason }
+     */
+    static async setSlotAvailability(slotId, action, reason = '') {
+        return (0, request_1.request)(`/admin/slots/${slotId}`, 'PATCH', { action, reason: reason || undefined }, { showLoading: false, showErrorToast: true });
+    }
+    /**
+     * 批量开关未来若干天的同一时段
+     * @param payload venueId / dates / action / reason / startTime
+     *
+     * 后端待提供（见 docs/backend-requests.md A5）：
+     *   POST /admin/slots/batch  body: { venueId, dates, startTime, action, reason }
+     */
+    static async batchSetSlotAvailability(payload) {
+        return (0, request_1.request)('/admin/slots/batch', 'POST', payload, { showLoading: false, showErrorToast: true });
+    }
 }
 exports.AdminService = AdminService;
